@@ -71,7 +71,7 @@ The form posts directly to the public API so the backend's per-IP limits retain 
 | `IMAGE_REMOTE_HOSTS`         | Comma-separated exact HTTPS image hostnames approved for optimization           |
 | `CONTACT_EMAIL`              | Optional approved public contact address; omitted email renders no email method |
 
-1. Connect this repository to Netlify. `netlify.toml` sets Node 22, `npm run build`, and `.next` output. Netlify supplies its maintained OpenNext adapter automatically; no static export or separate API service is created.
+1. Connect this repository to Netlify. `netlify.toml` sets Node 22, `npm run build`, and `.next` output. The repository explicitly installs and enables `@netlify/plugin-nextjs` to package server-rendered routes and API functions; no static export or separate API service is created.
 2. Set production environment variables in Netlify, including both server and build scope where appropriate. `NEXT_PUBLIC_*`, image configuration, canonical metadata, contact details, and preview indexing are build-sensitive; rebuild when changing them. Do not set secrets under `NEXT_PUBLIC_*`.
 3. Run `npm run check:config` with your production variables, then deploy. Missing production settings intentionally fail this readiness check. Local builds remain possible without those settings.
 4. Allow the exact production frontend origin in the existing backend's `CORS_ORIGINS`. For local work, allow `http://localhost:3000`. The existing backend exposes `Retry-After` and `X-Request-ID` for browser error handling.
@@ -137,3 +137,9 @@ Playwright reports are in `playwright-report/`; failure traces/screenshots are i
 ### Dependency advisory
 
 The npm audit reports an unpatched `braces` stack-exhaustion advisory through the **development-only** `eslint-config-next` → `fast-glob` → `micromatch` chain. Its glob input here is trusted local lint configuration. Do not downgrade Next.js/ESLint or force a breaking audit fix to hide it; revisit when upstream publishes a compatible patch. [Advisory GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm). Run `npm audit --omit=dev` separately to assess shipped dependencies.
+
+### Netlify default 404 after a successful build
+
+A successful `next build` alone is insufficient for this server-rendered application. The deploy log must also show `@netlify/plugin-nextjs` adapter steps and server-function packaging. A log that only uploads `.next` with zero functions indicates the runtime was not applied. This repository explicitly declares the adapter in `netlify.toml` and its development dependencies.
+
+Push the dependency lockfile and configuration changes, then clear the Netlify build cache and redeploy. Ensure the Next.js runtime is not disabled in project settings and remove `NETLIFY_NEXT_PLUGIN_SKIP` if configured. Check that the deploy log includes the adapter and that the homepage, `/about`, and `/articles` load. Backend outages should render application recovery states rather than Netlify's default 404.
