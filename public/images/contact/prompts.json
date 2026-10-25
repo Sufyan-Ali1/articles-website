@@ -1,0 +1,13 @@
+{
+  "generator": "Built-in image_gen tool",
+  "assets": [
+    {
+      "file": "hero.webp",
+      "prompt": "Use case: photorealistic-natural. Asset type: contact page hero photograph for Ask & Explore, a thoughtful editorial publication. A silver laptop on a light oak desk in a calm bright home workspace, viewed from behind the laptop at a gentle three-quarter angle. The back of the laptop bears the small navy two-line brand text exactly 'Ask &\\nExplore'. A plain white coffee mug, a closed neutral notebook and a healthy green potted plant sit on the desk, with soft-focus greenery and linen furnishings beyond. Clean natural daylight, pale cream and muted green palette, realistic wood grain, ceramic and brushed aluminum textures. Composition: wide landscape exactly 16:9, 1920x1080, all laptop, mug and plant completely in frame with comfortable breathing room. No people, no extra text, no watermark. One single photograph, no collage."
+    },
+    {
+      "file": "plant-books.webp",
+      "prompt": "Use case: photorealistic-natural. Asset type: decorative photograph at the bottom of a contact-information card for Ask & Explore. A leafy healthy houseplant in a plain cream ceramic pot beside a neat stack of four cream linen books on a light oak tabletop. The book spines read exactly, one title per book: 'Technology', 'Automotive', 'Lifestyle', 'Buying Guides'. Clean pale powder-blue backdrop with a soft organic cloud-like tonal shape, bright diffuse natural daylight, tactile paper and ceramic details, calm professional editorial aesthetic. Wide landscape exactly 16:9, 1920x1080, keep the entire plant and all books completely visible with ample breathing room. No people, no extra props, no watermark, no other lettering. One single photo."
+    }
+  ]
+}

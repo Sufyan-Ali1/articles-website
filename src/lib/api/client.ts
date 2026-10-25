@@ -2,6 +2,8 @@ import "server-only";
 import { cache } from "react";
 import { cacheLife, cacheTag } from "next/cache";
 import { z } from "zod";
+import { configuredApiUrl } from "@/lib/security/urls";
+import { readBoundedJson } from "@/lib/security/read-json";
 import {
   ArticleResponseSchema,
   ArticleSummarySchema,
@@ -37,29 +39,26 @@ export function apiOrigin() {
       "not_configured",
       "The publication is being connected. Please check back shortly.",
     );
-  const url = new URL(value);
-  if (
-    !["http:", "https:"].includes(url.protocol) ||
-    url.username ||
-    url.password
-  )
+  const url = configuredApiUrl(value);
+  if (!url)
     throw new ApiError(
       503,
       "configuration_error",
       "The publication is temporarily unavailable.",
     );
-  return url.href.replace(/\/$/, "");
+  return url;
 }
 async function request<T>(path: string, schema: z.ZodType<T>): Promise<T> {
   try {
     const response = await fetch(`${apiOrigin()}/api/v1/${path}`, {
       cache: "no-store",
+      redirect: "error",
       signal: AbortSignal.timeout(15000),
       headers: { Accept: "application/json" },
     });
     if (!response.ok) {
       const parsed = ErrorResponseSchema.safeParse(
-        await response.json().catch(() => null),
+        await readBoundedJson(response).catch(() => null),
       );
       throw new ApiError(
         response.status,
@@ -71,7 +70,7 @@ async function request<T>(path: string, schema: z.ZodType<T>): Promise<T> {
           (parsed.success ? parsed.data.error.request_id : undefined),
       );
     }
-    const result = schema.safeParse(await response.json());
+    const result = schema.safeParse(await readBoundedJson(response));
     if (!result.success)
       throw new ApiError(
         502,
@@ -96,7 +95,7 @@ function query(filters: object) {
   ).toString();
 }
 const articlePageSchema = z.object({
-  data: z.array(ArticleSummarySchema),
+  data: z.array(ArticleSummarySchema).max(100),
   meta: MetaSchema,
 });
 async function fetchArticles(filters: ArticleFilters = {}) {
@@ -169,7 +168,7 @@ export async function getClassifications(
   return collectPages(async (page) =>
     request(
       `${collection}?${query({ page, page_size: 100, sort: "name" })}`,
-      z.object({ data: z.array(schema), meta: MetaSchema }),
+      z.object({ data: z.array(schema).max(100), meta: MetaSchema }),
     ),
   );
 }
@@ -177,16 +176,23 @@ export async function collectPages<T>(
   loader: (page: number) => Promise<Page<T>>,
 ) {
   const first = await loader(1);
-  if (first.meta.pages > 1000)
+  if (
+    first.meta.pages > 1000 ||
+    first.meta.total > 100000 ||
+    first.meta.page !== 1
+  )
     throw new ApiError(
       503,
       "collection_limit",
       "This collection is too large to load at once.",
     );
   const items = [...first.data];
+  let bytes = Buffer.byteLength(JSON.stringify(first.data), "utf8");
   for (let page = 2; page <= first.meta.pages; page++) {
     const next = await loader(page);
     if (
+      next.meta.page !== page ||
+      next.meta.page_size !== first.meta.page_size ||
       next.meta.pages !== first.meta.pages ||
       next.meta.total !== first.meta.total
     )
@@ -194,6 +200,13 @@ export async function collectPages<T>(
         503,
         "collection_changed",
         "Content changed while loading. Please try again.",
+      );
+    bytes += Buffer.byteLength(JSON.stringify(next.data), "utf8");
+    if (bytes > 32 * 1024 * 1024)
+      throw new ApiError(
+        503,
+        "collection_limit",
+        "This collection is too large to load at once.",
       );
     items.push(...next.data);
   }

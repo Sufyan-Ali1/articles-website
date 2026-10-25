@@ -1,0 +1,9 @@
+{
+  "generator": "Built-in image_gen tool",
+  "assets": [
+    {
+      "file": "hero-background.webp",
+      "prompt": "Use case: photorealistic-natural editorial website background. Generate ONLY a clean background image for the Request an Article hero of Ask & Explore. Canvas exactly 1920x1080, wide 16:9. Composition must leave the central 55% of the canvas and the top 65% as clean empty near-white and very pale icy-blue negative space for a separately coded centered headline. Behind that empty area are a few very subtle large organic light-blue curves/blobs, bright white at center, no room interior or busy scenery. At the LOWER LEFT OUTER EDGE, a small stack of three cream books on a white tabletop, with readable spine text exactly 'Ideas', 'Knowledge', and 'A Brighter Everyday', alongside a leafy plant and a white pencil cup with two dark pens. At the LOWER RIGHT OUTER EDGE, a silver laptop viewed from behind, its small dark navy lid branding exactly 'Ask &\\nExplore', beside a white ceramic mug and a little softly blurred greenery at the right edge. Props are realistic studio/editorial photography with natural daylight, soft shadows, neutral cream and silver materials. CRITICAL layout: props confined to the outer left 23% and outer right 25% of the image; all important props and the laptop fully in frame; no objects in the middle 55%. Props occupy approximately the lower 28% of image height, with their baseline at 88% image height; the bottom 12% is uninterrupted white tabletop. This is crop-safe artwork for a wide desktop banner and a narrow mobile layout. No heading, no subtitle, no buttons, no form, no webpage mockup, no watermark, no extra text other than the specified three book spines and laptop logo. The image should resemble a clean pale-blue-white editorial hero background with balanced stationery/book props at the left corner and laptop/mug props at the right corner."
+    }
+  ]
+}

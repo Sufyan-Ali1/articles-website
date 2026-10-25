@@ -1,6 +1,8 @@
 "use client";
-import { useEffect, useState } from "react";
-import { Check, ChevronDown, Copy, Share2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Check, ChevronDown, Link2, Share2 } from "lucide-react";
+import { ReadingPanel } from "./reading-panel";
+import styles from "./reading-layout.module.css";
 import type { TocHeading } from "@/lib/utils/article-html";
 export function ShareActions({ title }: { title: string }) {
   const [message, setMessage] = useState("");
@@ -8,9 +10,10 @@ export function ShareActions({ title }: { title: string }) {
   async function copy() {
     try {
       await navigator.clipboard.writeText(window.location.href.split("#")[0]);
-      setMessage("Link copied");
+      setMessage("");
       setCopied(true);
     } catch {
+      setCopied(false);
       setMessage("Copy the address from your browser to share this story.");
     }
   }
@@ -26,8 +29,12 @@ export function ShareActions({ title }: { title: string }) {
   return (
     <div className="share-block">
       <div className="share-actions">
-        <button onClick={copy}>
-          {copied ? <Check size={14} /> : <Copy size={14} />}
+        <button onClick={copy} data-copied={copied} aria-live="polite">
+          {copied ? (
+            <Check size={14} aria-hidden="true" />
+          ) : (
+            <Link2 size={14} aria-hidden="true" />
+          )}
           {copied ? "Copied" : "Copy link"}
         </button>
         <button onClick={share}>
@@ -35,34 +42,22 @@ export function ShareActions({ title }: { title: string }) {
           Share
         </button>
       </div>
-      <span className="share-message" role="status">
-        {message}
-      </span>
+      {message && (
+        <span className="share-message" role="status">
+          {message}
+        </span>
+      )}
     </div>
   );
 }
-export function ReadingTools({
-  headings,
-  title,
-}: {
-  headings: TocHeading[];
-  title: string;
-}) {
+export function ReadingTools({ headings }: { headings: TocHeading[] }) {
   const [active, setActive] = useState("");
   useEffect(() => {
     const article = document.getElementById("article-content");
-    const progress = document.getElementById("reading-progress");
-    if (!article || !progress) return;
+    if (!article) return;
     let frame = 0;
     const update = () => {
       frame = 0;
-      const rect = article.getBoundingClientRect();
-      const total = Math.max(
-        1,
-        article.offsetHeight - window.innerHeight + 110,
-      );
-      const fraction = Math.min(1, Math.max(0, (110 - rect.top) / total));
-      progress.style.transform = `scaleX(${fraction})`;
       let current = "";
       for (const heading of headings) {
         const node = document.getElementById(heading.id);
@@ -88,32 +83,53 @@ export function ReadingTools({
   }, [headings]);
   return (
     <>
-      <div
-        id="reading-progress"
-        className="reading-progress"
-        aria-hidden="true"
-      />
-      <aside className="toc-desktop">
-        {headings.length > 0 && (
-          <>
-            <h2 className="toc-title">In this article</h2>
-            <TocLinks headings={headings} active={active} />
-          </>
-        )}
-        <ShareActions title={title} />
-      </aside>
+      {headings.length > 0 && (
+        <ReadingPanel side="contents">
+          <TocLinks headings={headings} active={active} followActive />
+        </ReadingPanel>
+      )}
     </>
   );
 }
 function TocLinks({
   headings,
   active = "",
+  followActive = false,
 }: {
   headings: TocHeading[];
   active?: string;
+  followActive?: boolean;
 }) {
+  const navigation = useRef<HTMLElement>(null);
+  useEffect(() => {
+    if (!followActive) return;
+    const nav = navigation.current;
+    const scroller = nav?.closest<HTMLElement>("[data-reader-scroll]");
+    if (!nav || !scroller) return;
+    const revealActive = () => {
+      const link = nav.querySelector<HTMLElement>('[aria-current="location"]');
+      if (!link || !scroller.clientHeight) return;
+      const bounds = scroller.getBoundingClientRect();
+      const item = link.getBoundingClientRect();
+      if (item.top < bounds.top + 8 || item.bottom > bounds.bottom - 8) {
+        scroller.scrollTo({
+          top:
+            scroller.scrollTop +
+            item.top -
+            bounds.top -
+            scroller.clientHeight / 2 +
+            item.height / 2,
+          behavior: "instant",
+        });
+      }
+    };
+    const observer = new ResizeObserver(revealActive);
+    observer.observe(scroller);
+    revealActive();
+    return () => observer.disconnect();
+  }, [active, followActive]);
   return (
-    <nav className="toc-links" aria-label="Table of contents">
+    <nav ref={navigation} className="toc-links" aria-label="Table of contents">
       {headings.map((heading) => (
         <a
           href={`#${heading.id}`}
@@ -137,4 +153,71 @@ export function MobileToc({ headings }: { headings: TocHeading[] }) {
       <TocLinks headings={headings} />
     </details>
   ) : null;
+}
+
+export function ReadingProgress() {
+  const progress = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const track = progress.current;
+    const content = document.getElementById("article-content");
+    if (!track || !content) return;
+    const article = content.closest("article") || content;
+    const header = document.querySelector<HTMLElement>(".site-header");
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const headerHeight = header?.getBoundingClientRect().height ?? 0;
+      const start = Math.max(
+        0,
+        window.scrollY + article.getBoundingClientRect().top - headerHeight,
+      );
+      const end = Math.max(
+        start + 1,
+        window.scrollY +
+          content.getBoundingClientRect().bottom -
+          window.innerHeight,
+      );
+      const fraction = Math.min(
+        1,
+        Math.max(0, (window.scrollY - start) / (end - start)),
+      );
+      track.style.setProperty("--progress", String(fraction));
+      track.setAttribute("aria-valuenow", String(Math.round(fraction * 100)));
+    };
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    const observer =
+      typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(schedule)
+        : null;
+    observer?.observe(article);
+    observer?.observe(content);
+    if (header) observer?.observe(header);
+    update();
+    return () => {
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+      observer?.disconnect();
+      cancelAnimationFrame(frame);
+    };
+  }, []);
+
+  return (
+    <div
+      ref={progress}
+      id="reading-progress"
+      className={styles.progressTrack}
+      role="progressbar"
+      aria-label="Article reading progress"
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={0}
+    >
+      <span aria-hidden="true" />
+    </div>
+  );
 }

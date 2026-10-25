@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import Image from "next/image";
-import { ArrowUpRight, Asterisk } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { safeHttpUrl } from "@/lib/utils";
 export function ArticleImage({
   src,
@@ -18,24 +18,39 @@ export function ArticleImage({
   className?: string;
   sizes?: string;
 }) {
-  const [failed, setFailed] = useState(false);
+  const [failedSource, setFailedSource] = useState<string | null>(null);
   const url = safeHttpUrl(src);
   return (
-    <div className={`article-image ${className}`}>
-      {url && !failed ? (
+    <div
+      className={`article-image ${className}`}
+      style={{
+        aspectRatio: "16 / 9",
+        width: "100%",
+        height: "auto",
+        minHeight: 0,
+      }}
+    >
+      {url && failedSource !== url ? (
         <Image
           src={url}
           alt={alt}
           fill
+          style={{ objectFit: "contain" }}
           sizes={sizes}
           preload={preload}
           unoptimized={!optimized}
-          onError={() => setFailed(true)}
+          onError={() => setFailedSource(url)}
         />
       ) : (
         <div className="image-fallback" aria-hidden="true">
-          <Asterisk size={65} strokeWidth={1} />
-          <span>ask & explore</span>
+          <Image
+            src="/images/brand/article-fallback.webp"
+            alt=""
+            fill
+            sizes={sizes}
+            style={{ objectFit: "contain" }}
+            preload={preload}
+          />
         </div>
       )}
       <span className="image-arrow" aria-hidden="true">

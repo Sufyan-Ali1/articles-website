@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { ArrowRight, BookOpen, SearchX, WifiOff } from "lucide-react";
+import { ArrowRight, BookOpen, Home, SearchX, WifiOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 export function EmptyState({
-  title = "A new perspective is on its way.",
-  description = "There are no published stories here yet. Explore another topic or tell us what you’d like to read.",
+  title = "No articles here yet.",
+  description = "There are no published articles in this collection yet. Browse another topic or suggest a question for a future guide.",
   search = false,
 }: {
   title?: string;
@@ -36,8 +36,11 @@ export function Unavailable({ compact = false }: { compact?: boolean }) {
       <span className="state-icon">
         <WifiOff size={27} strokeWidth={1.5} />
       </span>
-      <h2>A brief pause in the conversation.</h2>
-      <p>We couldn’t reach the publication. Please try again shortly.</p>
+      <h2>We couldn’t load the latest articles.</h2>
+      <p>
+        The article library is temporarily unavailable. Please try again in a
+        moment.
+      </p>
       <a className="text-link" href="">
         Try again <ArrowRight size={16} />
       </a>
@@ -112,14 +115,18 @@ export function PageHeading({
 }
 export function Breadcrumbs({
   items,
+  homeIcon = false,
 }: {
   items: { label: string; href?: string }[];
+  homeIcon?: boolean;
 }) {
   return (
     <nav aria-label="Breadcrumb" className="breadcrumbs">
       <ol>
         <li>
-          <Link href="/">Home</Link>
+          <Link href="/">
+            {homeIcon && <Home size={13} aria-hidden="true" />}Home
+          </Link>
         </li>
         {items.map((item, i) => (
           <li key={i}>

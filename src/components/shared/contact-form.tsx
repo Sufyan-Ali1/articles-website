@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -8,6 +8,7 @@ import {
   CheckCircle2,
   LoaderCircle,
   LockKeyhole,
+  Send,
 } from "lucide-react";
 import {
   contactSchema,
@@ -16,6 +17,8 @@ import {
   type ContactValues,
 } from "@/lib/utils/contact-schema";
 import { Button } from "@/components/ui/button";
+import { MathCaptcha, type MathCaptchaHandle } from "./math-captcha";
+import styles from "@/components/contact/contact.module.css";
 export function ContactForm({
   enabled,
   initialReason = "general",
@@ -29,6 +32,7 @@ export function ContactForm({
 }) {
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
+  const captcha = useRef<MathCaptchaHandle>(null);
   const form = useForm<ContactValues>({
     resolver: zodResolver(contactSchema),
     mode: "onTouched",
@@ -49,6 +53,7 @@ export function ContactForm({
       return;
     }
     setError("");
+    if (!captcha.current?.validate()) return;
     try {
       const body = new URLSearchParams({
         "form-name": "contact",
@@ -74,43 +79,51 @@ export function ContactForm({
       setError(
         "We couldn’t confirm delivery. Your message is still here—please check your connection and try again.",
       );
+    } finally {
+      captcha.current?.reset();
     }
   }
   if (sent)
     return (
-      <section className="contact-form-panel contact-success" role="status">
-        <span className="success-seal">
-          <CheckCircle2 size={38} strokeWidth={1.5} />
+      <section
+        className={`contact-form-panel ${styles.formPanel} ${styles.success}`}
+        role="status"
+        aria-labelledby="contact-form-title"
+      >
+        <span className={styles.successSeal}>
+          <CheckCircle2 size={38} strokeWidth={1.5} aria-hidden="true" />
         </span>
-        <span className="eyebrow">Message received</span>
-        <h2>
-          Thanks for
-          <br />
-          <em>getting in touch.</em>
-        </h2>
+        <p className={styles.eyebrow}>Message received</p>
+        <h2 id="contact-form-title">Thanks for getting in touch.</h2>
         <p>
-          Your message has been received. Thank you for taking the time to share
-          it with the publication.
+          Your message has been accepted. Thank you for sharing the details; we
+          may use the email you provided to follow up.
         </p>
-        <Button asChild>
+        <Button asChild className={styles.submitButton}>
           <Link href="/articles">
             Continue exploring
-            <ArrowUpRight size={18} />
+            <ArrowUpRight size={18} aria-hidden="true" />
           </Link>
         </Button>
-        <button className="text-link" onClick={() => setSent(false)}>
+        <button
+          className={styles.anotherMessage}
+          type="button"
+          onClick={() => setSent(false)}
+        >
           Send another message
         </button>
       </section>
     );
   return (
     <form
+      id="contact-message-form"
       name="contact"
       method="post"
       action="/__forms.html"
-      onSubmit={form.handleSubmit(submit)}
+      onSubmit={(event) => void form.handleSubmit(submit)(event)}
       noValidate
-      className="contact-form-panel"
+      className={`contact-form-panel ${styles.formPanel}`}
+      aria-labelledby="contact-form-title"
     >
       <input type="hidden" name="form-name" value="contact" />
       <noscript>
@@ -118,28 +131,13 @@ export function ContactForm({
           Please enable JavaScript and reload to send your message.
         </p>
       </noscript>
-      <div className="form-panel-heading">
-        <span className="eyebrow">A note to the publication</span>
-        <LockKeyhole size={16} aria-hidden="true" />
-      </div>
-      <h2>What’s on your mind?</h2>
-      <fieldset className="reason-fieldset">
-        <legend>How can we help?</legend>
-        <div className="reason-options">
-          {contactReasons.map((r) => (
-            <label key={r.value}>
-              <input
-                type="radio"
-                value={r.value}
-                {...form.register("reason")}
-              />
-              <span>{r.label}</span>
-            </label>
-          ))}
-        </div>
-      </fieldset>
+      <h2 id="contact-form-title">Send Us a Message</h2>
+      <p className={styles.formDescription}>
+        Tell us what you need help with. For article feedback, include the page
+        link and enough detail to explain your question or correction.
+      </p>
       {!enabled && (
-        <div className="form-notice" role="status">
+        <div className={styles.notice} role="status">
           The contact form is being connected.{" "}
           {email ? (
             <a href={`mailto:${email}`}>Email the publication instead.</a>
@@ -157,45 +155,59 @@ export function ContactForm({
           {error}
         </div>
       )}
-      <div className="form-row">
-        <div className="form-field">
-          <label htmlFor="contact-name">
-            Your name <span>Optional</span>
-          </label>
-          <input
-            id="contact-name"
-            autoComplete="name"
-            placeholder="What should we call you?"
-            maxLength={150}
-            aria-invalid={Boolean(fields.name)}
-            aria-describedby="contact-name-error"
-            {...form.register("name")}
-          />
-          <p className="field-error" id="contact-name-error">
-            {fields.name?.message}
-          </p>
-        </div>
-        <div className="form-field">
-          <label htmlFor="contact-email">
-            Email address <span>Required</span>
-          </label>
-          <input
-            id="contact-email"
-            type="email"
-            autoComplete="email"
-            placeholder="you@example.com"
-            maxLength={255}
-            aria-invalid={Boolean(fields.email)}
-            aria-describedby="contact-email-error"
-            {...form.register("email")}
-          />
-          <p className="field-error" id="contact-email-error">
-            {fields.email?.message}
-          </p>
-        </div>
+      <div className={styles.field}>
+        <label htmlFor="contact-name">
+          Your name <span>Optional</span>
+        </label>
+        <input
+          id="contact-name"
+          autoComplete="name"
+          placeholder="Your name"
+          maxLength={150}
+          aria-invalid={Boolean(fields.name)}
+          aria-describedby="contact-name-error"
+          {...form.register("name")}
+        />
+        <p className="field-error" id="contact-name-error">
+          {fields.name?.message}
+        </p>
       </div>
+      <div className={styles.field}>
+        <label htmlFor="contact-email">
+          Email address <span>Required</span>
+        </label>
+        <input
+          id="contact-email"
+          type="email"
+          autoComplete="email"
+          placeholder="you@example.com"
+          maxLength={255}
+          aria-required="true"
+          aria-invalid={Boolean(fields.email)}
+          aria-describedby="contact-email-error"
+          {...form.register("email")}
+        />
+        <p className="field-error" id="contact-email-error">
+          {fields.email?.message}
+        </p>
+      </div>
+      <fieldset className={styles.reasonFieldset}>
+        <legend>Subject</legend>
+        <div className={styles.reasonOptions}>
+          {contactReasons.map((reason) => (
+            <label key={reason.value}>
+              <input
+                type="radio"
+                value={reason.value}
+                {...form.register("reason")}
+              />
+              <span>{reason.label}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
       {reason === "correction" && (
-        <div className="form-field">
+        <div className={styles.field}>
           <label htmlFor="contact-article">
             Article link <span>Optional</span>
           </label>
@@ -213,7 +225,7 @@ export function ContactForm({
           </p>
         </div>
       )}
-      <div className="form-field">
+      <div className={styles.field}>
         <label htmlFor="contact-message">
           Your message <span>Required</span>
         </label>
@@ -221,13 +233,17 @@ export function ContactForm({
           id="contact-message"
           rows={6}
           maxLength={5000}
-          placeholder={contactReasons.find((r) => r.value === reason)?.hint}
+          placeholder={
+            contactReasons.find((item) => item.value === reason)?.hint
+          }
+          aria-required="true"
           aria-invalid={Boolean(fields.message)}
           aria-describedby="contact-message-hint contact-message-error"
           {...form.register("message")}
         />
-        <p className="field-hint" id="contact-message-hint">
-          A little context goes a long way. Plain text, up to 5,000 characters.
+        <p className={styles.fieldHint} id="contact-message-hint">
+          Include the details we need to understand your enquiry. Plain text, up
+          to 5,000 characters.
         </p>
         <p className="field-error" id="contact-message-error">
           {fields.message?.message}
@@ -242,28 +258,34 @@ export function ContactForm({
           {...form.register("bot-field")}
         />
       </div>
-      <div className="contact-form-bottom">
-        <p>
-          <LockKeyhole size={14} />
-          Sent privately.{" "}
-          <Link href="/privacy">How we use your information</Link>
-        </p>
+      <MathCaptcha ref={captcha} disabled={!enabled} />
+      <div className={styles.formBottom}>
         <Button
+          className={styles.submitButton}
           type="submit"
           disabled={!enabled || form.formState.isSubmitting}
         >
           {form.formState.isSubmitting ? (
             <>
-              <LoaderCircle size={17} className="animate-spin" />
+              <LoaderCircle
+                size={18}
+                className="animate-spin"
+                aria-hidden="true"
+              />
               Sending…
             </>
           ) : (
             <>
+              <Send size={19} strokeWidth={1.8} aria-hidden="true" />
               Send message
-              <ArrowUpRight size={18} />
             </>
           )}
         </Button>
+        <p>
+          <LockKeyhole size={13} aria-hidden="true" />
+          Sent privately.{" "}
+          <Link href="/privacy">How we use your information</Link>
+        </p>
       </div>
     </form>
   );

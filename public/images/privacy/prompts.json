@@ -1,0 +1,9 @@
+{
+  "generator": "Built-in image_gen tool",
+  "assets": [
+    {
+      "file": "hero.webp",
+      "prompt": "Use case: stylized-concept. Asset type: privacy policy hero illustration for Ask & Explore. Generate only a wide 16:9 illustration, intended 1920x1080, with transparent background. A friendly young adult man with styled dark brown hair, wearing a royal-blue hoodie and dark trousers, sits cross-legged using an unbranded silver laptop. A large glossy royal-blue protective shield with a white closed padlock floats behind him on the upper right. Two elegant broad-leaf green houseplants in small white pots flank him, one at lower left and one at lower right. Pale sky-blue rounded cloud and organic blob shapes softly frame the group. Premium soft 3D editorial illustration, friendly expression, smooth rounded forms, tasteful blue/white/green palette, soft daylight, subtle shadows and clean details. Composition: man in the lower center-left, large shield upper center-right, plants at the sides, complete person including feet, laptop, shield and plant leaves fully in frame with at least 8% clear breathing room around all edges. Transparent background outside the subjects and pale-blue shapes, ground shadows dissolve gently into transparency. No words, text, letters, branding, watermark, UI, headings, navigation, buttons, document mockup, harsh outlines or cropped subjects."
+    }
+  ]
+}

@@ -1,14 +1,15 @@
 import { test, expect } from "@playwright/test";
+import { solveMathCaptcha } from "./solve-captcha";
 const secret = "e2e-independent-revalidation-secret-over-32-chars";
 test("editorial home renders real API content and links to articles", async ({
   page,
 }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-    /electric car question/i,
+    /Practical Guides.*Smarter Everyday Choices/i,
   );
   await expect(
-    page.getByRole("heading", { name: "The latest perspectives" }),
+    page.getByRole("heading", { name: "Latest Articles" }),
   ).toBeVisible();
   await expect(
     page.getByRole("heading", { name: /electric car question/i }).first(),
@@ -20,9 +21,9 @@ test("editorial home renders real API content and links to articles", async ({
     ),
   ).toBe(true);
   await page
-    .getByRole("heading", { name: /electric car question/i })
-    .first()
+    .locator('[data-home-story="electric-car-question"]')
     .getByRole("link")
+    .first()
     .click();
   await expect(page).toHaveURL(/articles\/electric-car-question/);
 });
@@ -62,13 +63,18 @@ test("article HTML, TOC, disclosure, sharing, and metadata", async ({
 });
 test("GET filters synchronize URLs and pagination preserves them", async ({
   page,
+  isMobile,
 }) => {
   await page.goto("/articles?page=2");
   await expect(
     page.getByRole("link", { name: "Page 2", exact: true }),
   ).toHaveAttribute("aria-current", "page");
-  await page.getByLabel("Category", { exact: true }).selectOption("technology");
-  await page.getByRole("button", { name: "Apply", exact: true }).click();
+  if (isMobile)
+    await page.locator("[data-articles-page] details > summary").click();
+  await page
+    .getByRole("navigation", { name: "Filter articles by category" })
+    .getByRole("link", { name: /^Technology/ })
+    .click();
   await expect(page).toHaveURL(/category=technology/);
   expect(new URL(page.url()).searchParams.has("page")).toBe(false);
   await expect(page.locator(".results-info")).toContainText("6 articles");
@@ -80,8 +86,12 @@ test("search returns only matching titles and handles empty and error responses"
   page,
 }) => {
   await page.goto("/search");
-  await page.getByLabel("Search article titles").fill("electric");
   await page
+    .locator("[data-search-hero-form]")
+    .getByRole("searchbox")
+    .fill("electric");
+  await page
+    .locator("[data-search-hero-form]")
     .getByRole("button", { name: "Search articles", exact: true })
     .click();
   await expect(page).toHaveURL(/search=electric/);
@@ -90,8 +100,12 @@ test("search returns only matching titles and handles empty and error responses"
     "content",
     /noindex/,
   );
-  await page.getByLabel("Search article titles").fill("no-matching-title");
   await page
+    .locator("[data-search-hero-form]")
+    .getByRole("searchbox")
+    .fill("no-matching-title");
+  await page
+    .locator("[data-search-hero-form]")
     .getByRole("button", { name: "Search articles", exact: true })
     .click();
   await expect(
@@ -99,7 +113,7 @@ test("search returns only matching titles and handles empty and error responses"
   ).toBeVisible();
   await page.goto("/search?search=simulate-outage");
   await expect(
-    page.getByRole("heading", { name: /pick up where we left off/ }),
+    page.getByRole("heading", { name: /Our articles are taking a moment/ }),
   ).toBeVisible();
 });
 test("category hierarchy, direct membership, tags, and not found", async ({
@@ -131,23 +145,24 @@ test("category hierarchy, direct membership, tags, and not found", async ({
 
   await page.goto("/category/archived-topic");
   await expect(
-    page.getByRole("heading", { name: /off the beaten path/ }),
+    page.getByRole("heading", { name: /We Can’t Find This Page/ }),
   ).toBeVisible();
   await page.goto("/articles/not-a-published-story");
   await expect(
-    page.getByRole("heading", { name: /off the beaten path/ }),
+    page.getByRole("heading", { name: /We Can’t Find This Page/ }),
   ).toBeVisible();
 });
 test("topic submission validates and succeeds without admin data", async ({
   page,
 }) => {
   await page.goto("/request-article");
-  await page.getByRole("button", { name: "Send your suggestion" }).click();
+  await page.getByRole("button", { name: "Submit request" }).click();
   await expect(page.getByText(/Tell us the topic/)).toBeVisible();
   await page
     .getByLabel(/What should we explore/)
     .fill("How does home charging work?");
-  await page.getByRole("button", { name: "Send your suggestion" }).click();
+  await solveMathCaptcha(page.locator(".topic-form"));
+  await page.getByRole("button", { name: "Submit request" }).click();
   await expect(
     page.getByRole("heading", { name: "Curiosity, received." }),
   ).toBeVisible();
@@ -158,15 +173,17 @@ test("topic submission handles backend validation and Retry-After", async ({
 }) => {
   await page.goto("/request-article");
   await page.getByLabel(/What should we explore/).fill("server-invalid");
-  await page.getByRole("button", { name: "Send your suggestion" }).click();
+  await solveMathCaptcha(page.locator(".topic-form"));
+  await page.getByRole("button", { name: "Submit request" }).click();
   await expect(page.getByText(/check this field/)).toBeVisible();
   await page.getByLabel(/What should we explore/).fill("rate-limit-test");
-  await page.getByRole("button", { name: "Send your suggestion" }).click();
+  await solveMathCaptcha(page.locator(".topic-form"));
+  await page.getByRole("button", { name: "Submit request" }).click();
   await expect(page.locator(".topic-form [role=alert]")).toContainText(
     "wait before trying",
   );
   await expect(
-    page.getByRole("button", { name: "Send your suggestion" }),
+    page.getByRole("button", { name: "Submit request" }),
   ).toBeDisabled();
 });
 test("uncached detail visibility, webhook security, and former-slug invalidation", async ({
@@ -182,7 +199,7 @@ test("uncached detail visibility, webhook security, and former-slug invalidation
   });
   await page.reload();
   await expect(
-    page.getByRole("heading", { name: /off the beaten path/ }),
+    page.getByRole("heading", { name: /We Can’t Find This Page/ }),
   ).toBeVisible();
   await request.post("http://127.0.0.1:4100/__control", {
     data: { show: "replace-or-repair" },
@@ -248,7 +265,7 @@ test("sitemap, robots, static pages, and mobile navigation", async ({
     await expect(page.getByRole("dialog")).toBeVisible();
     await page
       .getByRole("dialog")
-      .getByRole("link", { name: "All articles", exact: true })
+      .getByRole("link", { name: "Articles", exact: true })
       .click();
     await expect(page).toHaveURL(/\/articles$/);
     await expect(page.getByRole("dialog")).not.toBeVisible();
@@ -288,7 +305,7 @@ test("responsive visual review and local performance diagnostics", async ({
   });
   await page.goto("/");
   await expect(
-    page.getByRole("heading", { name: "The latest perspectives" }),
+    page.getByRole("heading", { name: "Latest Articles" }),
   ).toBeVisible();
   await page.evaluate(() => document.fonts.ready);
   await page.waitForLoadState("networkidle");
@@ -399,7 +416,7 @@ test("view controls preserve browsing state and search highlights titles", async
     "https://ask-explore.test/articles?category=technology",
   );
   await page.goto("/search?search=electric");
-  await expect(page.locator(".card-title mark").first()).toHaveText(
+  await expect(page.locator("[data-archive-story] h2 mark").first()).toHaveText(
     /electric/i,
   );
   await page.getByRole("link", { name: /Remove filter/ }).click();
@@ -431,6 +448,7 @@ test("contact receives correction context and submits through the Netlify static
   await page
     .getByLabel(/Your message/)
     .fill("Please check the charging specification in this article.");
+  await solveMathCaptcha(page.getByRole("form", { name: "Send Us a Message" }));
   await page.getByRole("button", { name: "Send message", exact: true }).click();
   await expect(page.getByRole("heading", { name: /Thanks for/ })).toBeVisible();
   expect(new URLSearchParams(submitted).get("form-name")).toBe("contact");
@@ -446,6 +464,7 @@ test("contact errors preserve input and the topic starter does not replace a dra
   await page
     .getByLabel(/Your message/)
     .fill("A general question about the publication.");
+  await solveMathCaptcha(page.getByRole("form", { name: "Send Us a Message" }));
   await page.getByRole("button", { name: "Send message", exact: true }).click();
   await expect(page.locator(".contact-form-panel [role=alert]")).toContainText(
     /couldn’t confirm delivery/,
@@ -467,15 +486,17 @@ test("topic directory, desktop topics menu, and policy anchors", async ({
   isMobile,
 }) => {
   await page.goto("/categories");
-  await page.getByRole("searchbox", { name: "Find a topic" }).fill("everyday");
+  await page
+    .getByRole("searchbox", { name: "Search categories" })
+    .fill("everyday");
   await expect(
     page.getByRole("heading", { name: "Everyday tech", exact: true }),
   ).toBeVisible();
   if (!isMobile) {
-    await page.getByRole("button", { name: "Topics", exact: true }).click();
-    await expect(page.locator("#topics-panel")).toBeVisible();
+    await page.getByRole("button", { name: "Categories", exact: true }).click();
+    await expect(page.locator("#categories-panel")).toBeVisible();
     await page.keyboard.press("Escape");
-    await expect(page.locator("#topics-panel")).not.toBeVisible();
+    await expect(page.locator("#categories-panel")).not.toBeVisible();
   }
   await page.goto("/privacy");
   await page

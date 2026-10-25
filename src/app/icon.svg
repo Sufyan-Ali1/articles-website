@@ -1,1 +1,15 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><rect width="64" height="64" rx="32" fill="#365cf5"/><g stroke="#fff" stroke-width="4" stroke-linecap="round"><path d="M32 14v36M16.4 23l31.2 18M16.4 41l31.2-18"/></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512"><rect width="512" height="512" rx="106" fill="#f4f8ff"/><svg x="24" y="130" width="464" height="250" viewBox="0 0 800 430">
+  <defs>
+    <linearGradient id="navy" x1="280" y1="12" x2="470" y2="420" gradientUnits="userSpaceOnUse"><stop stop-color="#0753aa"/><stop offset="1" stop-color="#031d40"/></linearGradient>
+    <linearGradient id="fold" x1="275" y1="140" x2="45" y2="410" gradientUnits="userSpaceOnUse"><stop stop-color="#001a3d"/><stop offset="1" stop-color="#064b95"/></linearGradient>
+    <linearGradient id="blue" x1="400" y1="60" x2="800" y2="60" gradientUnits="userSpaceOnUse"><stop stop-color="#0458fb"/><stop offset="1" stop-color="#04a9f4"/></linearGradient>
+    <linearGradient id="teal" x1="484" y1="220" x2="800" y2="305" gradientUnits="userSpaceOnUse"><stop stop-color="#008cdd"/><stop offset="1" stop-color="#00deb4"/></linearGradient>
+    <linearGradient id="crossbar" x1="205" y1="348" x2="435" y2="348" gradientUnits="userSpaceOnUse"><stop stop-color="#0055ef"/><stop offset="1" stop-color="#00a9f7"/></linearGradient>
+  </defs>
+  <path d="M400 3h390c8 0 10 5 6 11l-48 71c-9 13-19 18-34 18H463c-5 0-8-2-11-7L397 12c-4-6-2-9 3-9Z" fill="url(#blue)"/>
+  <path d="M487 146h163c25 0 40 6 53 28l48 65c4 6 2 9-5 9H548c-5 0-8-2-11-7l-53-86c-4-6-3-9 3-9Z" fill="url(#teal)"/>
+  <path d="M580 294h211c9 0 12 5 7 12l-52 71c-9 13-20 19-37 19h-51c-16 0-27-6-37-20l-45-73c-4-6-3-9 4-9Z" fill="url(#teal)"/>
+  <path d="m205 390 47-76c8-14 18-20 34-20h81l69 103H209c-6 0-8-3-4-7Z" fill="url(#crossbar)"/>
+  <path d="M10 415c-8 0-10-5-6-12L235 46c32-50 93-61 130-8l238 375c4 6 2 9-5 9H486c-30 0-53-14-70-39L292 180 150 396c-9 13-17 19-31 19H10Z" fill="url(#navy)"/>
+  <path d="M171 145c46-33 91-19 121 35L150 396c-9 13-17 19-31 19H10c-8 0-10-5-6-12l167-258Z" fill="url(#fold)"/>
+</svg></svg>

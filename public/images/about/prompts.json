@@ -1,0 +1,33 @@
+{
+  "generator": "Built-in image_gen tool",
+  "assets": [
+    {
+      "file": "workspace.webp",
+      "prompt": "A photorealistic editorial photograph for the About page of Ask & Explore. A calm light oak workspace beside a large window overlooking soft blue mountains at sunrise, open silver laptop, white ceramic coffee mug, a small green plant and two neutral books. The scene resembles a thoughtful independent editorial publication, elegant natural materials, subtle lived-in detail, warm soft morning light, cream and pale blue palette. Wide landscape 16:9 composition, all objects completely in frame, no people, no logos, no lettering or watermark. Deliver a single 1920x1080 image."
+    },
+    {
+      "file": "mission.webp",
+      "prompt": "A photorealistic editorial close-up photograph for the mission section of Ask & Explore. On a light oak desk, a plain white ceramic mug with the exact small navy two-line text 'Ask &\\nExplore', beside a silver laptop partially open and a paper notebook. Soft greenery in the distant background and natural warm daylight from a nearby window, quiet welcoming real workspace, subtle material grain and ceramic texture. Wide landscape 16:9 composition, keep the mug and laptop wholly inside the frame, no other text, no watermark. Deliver a single 1920x1080 image."
+    },
+    {
+      "file": "explore.webp",
+      "prompt": "A photorealistic editorial landscape photo for an exploration call to action on a curious-minds publication. A lone traveler wearing a dark blue jacket and a small backpack sits safely on a broad rocky overlook contemplating layered mountain ridges and a lake at warm sunrise. The figure is seen from behind, naturally posed, the scenery feels spacious and peaceful. Realistic outdoor textures and atmospheric light, soft blue mountains, warm cream sky, quiet optimistic mood. Wide 16:9 composition with the complete traveler inside the frame, no text, no lettering, no watermark. Deliver one 1920x1080 image."
+    },
+    {
+      "file": "automotive.webp",
+      "prompt": "A photorealistic editorial automotive image for a website topic card. A modern unbranded dark silver crossover SUV parked on a quiet scenic mountain road, front three-quarter view, the entire car and all wheels clearly visible within the frame. Soft blue mountains and muted green landscape, natural daylight, refined neutral colors, crisp realistic textures, no people, no brand badges, no readable registration plate, no text, no watermark. Wide 16:9 single photo, 1920x1080."
+    },
+    {
+      "file": "buying-guides.webp",
+      "prompt": "A photorealistic editorial still-life for a buying guides website topic card. A miniature real metal shopping cart beside two simple kraft paper shopping bags and a smartphone on a pale warm cream surface, softly lit peach background. Carefully composed clean consumer-advice image with tactile paper and metal textures and soft natural shadows. Every object completely visible, no logos, no readable screen text, no lettering, no watermark. One wide 16:9 photo, 1920x1080."
+    },
+    {
+      "file": "how-to.webp",
+      "prompt": "A photorealistic editorial still-life for a how-to guides website topic card. A cream notebook lying open on a light oak desk, a dark blue pen and a small green plant beside it. The notebook has four short handwritten lines in navy ink reading exactly 'Learn\\nPlan\\nDo\\nGrow'. Soft daylight, calm and practical, realistic paper texture, pale blue and cream palette. Wide 16:9 composition, complete notebook inside the frame, no other text, no watermark. One 1920x1080 image."
+    },
+    {
+      "file": "lifestyle.webp",
+      "prompt": "A photorealistic editorial lifestyle image for a website topic card. A calm bright living room with a cream linen sofa, simple oak side table, large healthy green indoor plant, soft white curtains and natural morning light. Inviting uncluttered room, warm neutral palette, realistic woven linen and wood grain. Wide 16:9 composition with the complete sofa visible, no people, no logos, no text, no watermark. One 1920x1080 image."
+    }
+  ]
+}

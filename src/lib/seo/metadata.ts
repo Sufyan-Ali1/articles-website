@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { isIndexable, site } from "@/lib/config";
+import { safeHttpUrl } from "@/lib/security/urls";
 export function metadata(
   title: string,
   description: string,
@@ -14,8 +15,9 @@ export function metadata(
   } = {},
 ): Metadata {
   const canonical = new URL(path, site.url).href;
-  const images = options.image
-    ? [{ url: options.image }]
+  const image = safeHttpUrl(options.image);
+  const images = image
+    ? [{ url: image }]
     : [
         {
           url: new URL("/opengraph-image", site.url).href,

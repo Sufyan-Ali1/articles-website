@@ -1,0 +1,9 @@
+{
+  "generator": "Built-in image_gen tool",
+  "assets": [
+    {
+      "file": "hero.webp",
+      "prompt": "Use case: stylized-concept. Asset type: transparent illustration for the Ask & Explore website search hero. Generate only the illustration, no webpage layout. Wide 16:9 canvas intended 1920x1080. A friendly young adult man with softly styled dark brown hair, warm expressive brown eyes, wearing a royal blue hoodie over a white T-shirt, blue jeans and white sneakers, sitting cross-legged on a light floor using a silver unbranded laptop. At his left a stack of four colorful books with readable spine titles exactly 'Ideas', 'Guides', 'Reviews', 'How To', with a small leafy plant in a cream pot on top; a second simple green plant behind. Above the books a soft pale-blue speech bubble containing a white magnifying glass symbol. Behind the subject a simple large pale blue organic blob shape; three small blue accent strokes to the right of his head. Style: polished friendly soft 3D editorial illustration, smooth rounded shapes, refined clean surfaces, natural soft shadows, cream and sky-blue palette with royal-blue clothing. Composition: entire head, feet, laptop, books, plants and bubble fully visible with at least 7% breathing room at all edges. Person occupies right 60%, books occupy left 25%; ground shadow softly fades away. Transparent background outside the pale-blue blob and subjects, no hard rectangular backdrop. No other text, logos, branding, watermark, borders, UI, headings or buttons."
+    }
+  ]
+}

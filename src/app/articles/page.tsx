@@ -1,7 +1,13 @@
 import { Suspense } from "react";
-import { ArticleListing } from "@/components/articles/article-listing";
-import { PageHeading, GridSkeleton } from "@/components/shared/states";
+import { ArchiveHero } from "@/components/articles/archive/archive-hero";
+import {
+  ArchiveContent,
+  ArchiveSkeleton,
+} from "@/components/articles/archive/archive-content";
+import { ArchiveNewsletter } from "@/components/articles/archive/archive-newsletter";
+import styles from "@/components/articles/archive/archive.module.css";
 import { metadata } from "@/lib/seo/metadata";
+import { pageSeo } from "@/lib/content/site-copy";
 import {
   filterUrl,
   parseFilters,
@@ -21,8 +27,8 @@ export async function generateMetadata({
     filters.sort !== "-published_at",
   );
   return metadata(
-    "Explore all articles",
-    "Fresh ideas and practical answers. Browse the latest articles from Ask & Explore.",
+    pageSeo.articles.title,
+    pageSeo.articles.description,
     filterUrl("/articles", filters),
     { noindex: filtered },
   );
@@ -33,15 +39,14 @@ export default function Articles({
   searchParams: Promise<SearchParams>;
 }) {
   return (
-    <div className="container listing-page">
-      <PageHeading
-        eyebrow="The reading room"
-        title="Find your next perspective."
-        description="Practical answers, useful context, and a few unexpected discoveries. Follow a subject, or find a new one."
-      />
-      <Suspense fallback={<GridSkeleton />}>
-        <ArticleListing searchParams={searchParams} />
-      </Suspense>
+    <div className={styles.page} data-articles-page>
+      <ArchiveHero />
+      <div className={`${styles.shell} ${styles.content}`}>
+        <Suspense fallback={<ArchiveSkeleton />}>
+          <ArchiveContent searchParams={searchParams} />
+        </Suspense>
+        <ArchiveNewsletter />
+      </div>
     </div>
   );
 }

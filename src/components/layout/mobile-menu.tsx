@@ -1,20 +1,16 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { Menu, ArrowUpRight } from "lucide-react";
+import { Menu, ArrowUpRight, ChevronDown } from "lucide-react";
 import { Sheet } from "@/components/ui/sheet";
-export function MobileMenu({
-  categories = [],
-  children,
-}: {
-  categories?: { name: string; slug: string }[];
-  children?: React.ReactNode;
-}) {
+import { Brand } from "@/components/shared/brand";
+import styles from "./header.module.css";
+export function MobileMenu({ children }: { children?: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   return (
     <div className="mobile-menu">
       <Sheet
-        title="Ask & Explore"
+        title={<Brand />}
         open={open}
         onOpenChange={setOpen}
         trigger={
@@ -31,17 +27,21 @@ export function MobileMenu({
           }}
         >
           <span className="menu-group-label">Read & discover</span>
-          <Link href="/articles">All articles</Link>
-          <Link href="/categories">Explore categories</Link>
-          {categories.map((category) => (
-            <Link key={category.slug} href={`/category/${category.slug}`}>
-              {category.name}
-            </Link>
-          ))}
-          {children}
+          <Link href="/">Home</Link>
+          <Link href="/articles">Articles</Link>
+          <details className={styles.mobileCategories}>
+            <summary>
+              Categories
+              <ChevronDown size={17} aria-hidden="true" />
+            </summary>
+            <div>
+              <Link href="/categories">Explore all categories</Link>
+              {children}
+            </div>
+          </details>
+          <Link href="/about">About</Link>
           <Link href="/search">Search</Link>
           <span className="menu-group-label">The publication</span>
-          <Link href="/about">About us</Link>
           <Link href="/contact">Contact</Link>
           <Link href="/disclaimer">Editorial disclosures</Link>
           <span className="menu-group-label">Have a question?</span>

@@ -26,13 +26,12 @@ const newsreader = localFont({
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: `${site.name} — Stay curious.`,
+    default: `${site.name} — Practical Guides & Clear Answers`,
     template: `%s | ${site.name}`,
   },
   description: site.description,
   applicationName: site.name,
   robots: { index: isIndexable, follow: true },
-  icons: { icon: "/icon.svg" },
 };
 export default function RootLayout({
   children,

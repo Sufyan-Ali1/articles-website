@@ -1,14 +1,26 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowUpRight, CheckCircle2, LoaderCircle } from "lucide-react";
+import {
+  ArrowUpRight,
+  CheckCircle2,
+  LoaderCircle,
+  Send,
+  LockKeyhole,
+} from "lucide-react";
 import {
   topicFormSchema,
   type TopicFormValues,
 } from "@/lib/utils/request-schema";
 import { Button } from "@/components/ui/button";
+import { MathCaptcha, type MathCaptchaHandle } from "./math-captcha";
+import {
+  TopicStarters,
+  replaceTopicStarter,
+} from "@/components/requests/topic-starters";
+import styles from "@/components/requests/request.module.css";
 const defaults: TopicFormValues = {
   topic: "",
   description: "",
@@ -20,10 +32,12 @@ export function TopicForm({ apiUrl }: { apiUrl: string }) {
   const [complete, setComplete] = useState(false);
   const [alert, setAlert] = useState("");
   const [seconds, setSeconds] = useState(0);
+  const captcha = useRef<MathCaptchaHandle>(null);
   const form = useForm<TopicFormValues>({
     resolver: zodResolver(topicFormSchema),
     defaultValues: defaults,
   });
+  const topic = useWatch({ control: form.control, name: "topic" });
   useEffect(() => {
     if (!seconds) return;
     const timer = setTimeout(
@@ -40,6 +54,7 @@ export function TopicForm({ apiUrl }: { apiUrl: string }) {
       );
       return;
     }
+    if (!captcha.current?.validate()) return;
     try {
       const response = await fetch(
         `${apiUrl.replace(/\/$/, "")}/api/v1/article-requests`,
@@ -50,6 +65,7 @@ export function TopicForm({ apiUrl }: { apiUrl: string }) {
             Accept: "application/json",
           },
           credentials: "omit",
+          redirect: "error",
           cache: "no-store",
           signal: AbortSignal.timeout(20000),
           body: JSON.stringify({
@@ -102,31 +118,35 @@ export function TopicForm({ apiUrl }: { apiUrl: string }) {
       setAlert(
         "We couldn’t confirm your suggestion was received. Please check your connection and try again.",
       );
+    } finally {
+      captcha.current?.reset();
     }
   }
   if (complete)
     return (
-      <div className="topic-form form-success" role="status">
-        <CheckCircle2 size={45} strokeWidth={1.3} />
-        <h2>Curiosity, received.</h2>
+      <section
+        className={`topic-form ${styles.form} ${styles.success}`}
+        role="status"
+        aria-labelledby="request-form-title"
+      >
+        <span className={styles.successIcon}>
+          <CheckCircle2 size={39} strokeWidth={1.6} aria-hidden="true" />
+        </span>
+        <p className={styles.eyebrow}>Suggestion received</p>
+        <h2 id="request-form-title">Curiosity, received.</h2>
         <p>
-          Thank you for your suggestion. We’ll consider it as we plan future
-          articles. Submission doesn’t guarantee publication or a reply.
+          Thank you for your idea. We’ll consider it as we plan future articles.
+          Submission doesn’t guarantee publication or a reply.
         </p>
-        <Button asChild>
+        <Button asChild className={styles.submitButton}>
           <Link href="/articles">
             Find your next read
-            <ArrowUpRight size={16} />
+            <ArrowUpRight size={17} aria-hidden="true" />
           </Link>
         </Button>
         <button
-          className="text-link"
-          style={{
-            margin: "20px auto 0",
-            display: "flex",
-            background: "none",
-            border: 0,
-          }}
+          className={styles.anotherTopic}
+          type="button"
           onClick={() => {
             setComplete(false);
             setAlert("");
@@ -134,55 +154,34 @@ export function TopicForm({ apiUrl }: { apiUrl: string }) {
         >
           Suggest another topic
         </button>
-      </div>
+      </section>
     );
   const error = (field: keyof TopicFormValues) =>
     form.formState.errors[field]?.message;
   return (
     <form
+      id="article-request-form"
       method="post"
       action={
         apiUrl
           ? `${apiUrl.replace(/\/$/, "")}/api/v1/article-requests`
           : undefined
       }
-      className="topic-form"
-      onSubmit={form.handleSubmit(submit)}
+      className={`topic-form ${styles.form}`}
+      onSubmit={(event) => void form.handleSubmit(submit)(event)}
       noValidate
+      aria-labelledby="request-form-title"
     >
       <noscript>
         <p className="form-alert">
           Please enable JavaScript and reload to send a topic suggestion.
         </p>
       </noscript>
-      <div className="eyebrow">Your next question starts here</div>
-      <h2 className="form-heading">Put your curiosity into words.</h2>
-      <div className="topic-starters">
-        <span>Need a starting point?</span>
-        <div>
-          {[
-            { label: "Explain something", text: "How does " },
-            {
-              label: "Compare options",
-              text: "What’s the difference between ",
-            },
-            { label: "Help me choose", text: "How do I choose " },
-          ].map((prompt) => (
-            <button
-              type="button"
-              key={prompt.label}
-              onClick={() => {
-                if (!form.getValues("topic").trim())
-                  form.setValue("topic", prompt.text, { shouldDirty: true });
-                form.setFocus("topic");
-              }}
-            >
-              {prompt.label}
-              <ArrowUpRight size={13} />
-            </button>
-          ))}
-        </div>
-      </div>
+      <h2 id="request-form-title">Tell Us What You Want to Read</h2>
+      <p className={styles.formDescription}>
+        Start with the question you want answered. Add context if it would help
+        us understand your idea.
+      </p>
       {(!apiUrl || alert) && (
         <div className="form-alert" role="alert">
           {alert ||
@@ -190,48 +189,64 @@ export function TopicForm({ apiUrl }: { apiUrl: string }) {
           {seconds > 0 && <span> Try again in {seconds} seconds.</span>}
         </div>
       )}
-      <div className="form-field">
+      <div className={styles.field}>
         <label htmlFor="topic">
-          What should we explore? <span>Required</span>
+          What should we explore?{" "}
+          <span className={styles.required}>Required</span>
         </label>
         <input
           id="topic"
-          placeholder="e.g. How to choose your first electric car"
+          placeholder="e.g. How do I choose a laptop for working from home?"
           maxLength={300}
+          aria-required="true"
           aria-invalid={Boolean(error("topic"))}
           aria-describedby={error("topic") ? "topic-error" : "topic-hint"}
           {...form.register("topic")}
         />
-        <p id="topic-hint" className="field-hint">
-          A question, a comparison, a how-to. Up to 300 characters.
+        <p id="topic-hint" className={styles.hint}>
+          Ask a focused question or name a comparison. Up to 300 characters.
         </p>
         {error("topic") && (
           <p id="topic-error" className="field-error">
             {error("topic")}
           </p>
         )}
+        <TopicStarters
+          value={topic}
+          onChoose={(text) => {
+            const current = form.getValues("topic");
+            const next = replaceTopicStarter(current, text);
+            if (next !== current)
+              form.setValue("topic", next, {
+                shouldDirty: true,
+                shouldValidate: true,
+              });
+            form.setFocus("topic");
+            const input = document.activeElement;
+            if (input instanceof HTMLInputElement && input.id === "topic")
+              input.setSelectionRange(input.value.length, input.value.length);
+          }}
+        />
       </div>
-      <div className="form-field">
+      <div className={styles.field}>
         <label htmlFor="description">
           A little more context <span>Optional</span>
         </label>
         <textarea
           id="description"
-          placeholder="What would you like to learn? Any specific questions we should answer?"
+          rows={4}
+          placeholder="What are you trying to do, and what would a useful answer explain?"
           maxLength={10000}
           aria-invalid={Boolean(error("description"))}
-          aria-describedby="description-hint description-error"
+          aria-describedby="description-error"
           {...form.register("description")}
         />
-        <p className="field-hint" id="description-hint">
-          Plain text only. Up to 10,000 characters.
-        </p>
         <p className="field-error" id="description-error">
           {error("description")}
         </p>
       </div>
-      <div className="form-row">
-        <div className="form-field">
+      <div className={styles.fieldRow}>
+        <div className={styles.field}>
           <label htmlFor="name">
             Your name <span>Optional</span>
           </label>
@@ -239,7 +254,7 @@ export function TopicForm({ apiUrl }: { apiUrl: string }) {
             id="name"
             autoComplete="name"
             maxLength={150}
-            placeholder="What should we call you?"
+            placeholder="Your name"
             aria-invalid={Boolean(error("name"))}
             aria-describedby="name-error"
             {...form.register("name")}
@@ -248,7 +263,7 @@ export function TopicForm({ apiUrl }: { apiUrl: string }) {
             {error("name")}
           </p>
         </div>
-        <div className="form-field">
+        <div className={styles.field}>
           <label htmlFor="email">
             Email address <span>Optional</span>
           </label>
@@ -276,28 +291,32 @@ export function TopicForm({ apiUrl }: { apiUrl: string }) {
           {...form.register("website")}
         />
       </div>
-      <div className="form-footer">
+      <MathCaptcha ref={captcha} disabled={!apiUrl || seconds > 0} />
+      <div className={styles.formFooter}>
         <Button
+          className={styles.submitButton}
           type="submit"
           disabled={!apiUrl || form.formState.isSubmitting || seconds > 0}
         >
           {form.formState.isSubmitting ? (
             <>
-              <LoaderCircle size={16} className="animate-spin" />
+              <LoaderCircle
+                size={18}
+                className="animate-spin"
+                aria-hidden="true"
+              />
               Sending your suggestion…
             </>
           ) : (
             <>
-              Send your suggestion
-              <ArrowUpRight size={17} />
+              <Send size={18} strokeWidth={1.8} aria-hidden="true" />
+              Submit request
             </>
           )}
         </Button>
         <p>
-          Your suggestion and optional contact details are sent privately.
-          <br />
-          Read our <Link href="/privacy">Privacy Policy</Link> before
-          submitting.
+          <LockKeyhole size={13} aria-hidden="true" />
+          Sent privately. <Link href="/privacy">Privacy Policy</Link>
         </p>
       </div>
     </form>

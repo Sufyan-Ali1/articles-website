@@ -8,7 +8,7 @@ import {
 } from "@/lib/api/client";
 import { ArticleSummarySchema, RequestCreateSchema } from "@/lib/api/schemas";
 beforeEach(() => {
-  vi.stubEnv("API_BASE_URL", "http://api.test");
+  vi.stubEnv("API_BASE_URL", "https://api.test");
 });
 afterEach(() => {
   vi.unstubAllEnvs();
@@ -31,6 +31,7 @@ describe("public API boundary", () => {
     expect(url.searchParams.get("search")).toBe("a & b");
     expect(url.searchParams.has("status")).toBe(false);
     expect(fetch.mock.calls[0][1]).not.toHaveProperty("headers.Authorization");
+    expect(fetch.mock.calls[0][1]).toMatchObject({ redirect: "error" });
   });
   it("keeps backend errors distinct from successful empty results", async () => {
     vi.stubGlobal(
@@ -89,6 +90,24 @@ describe("public API boundary", () => {
       collectPages(async (page) => ({
         data: [page],
         meta: { page, page_size: 1, total: page === 1 ? 3 : 4, pages: 3 },
+      })),
+    ).rejects.toMatchObject({ code: "collection_changed" });
+  });
+  it("rejects oversized collection metadata before fetching additional pages", async () => {
+    const loader = vi.fn(async () => ({
+      data: [],
+      meta: { page: 1, page_size: 100, total: 100001, pages: 1001 },
+    }));
+    await expect(collectPages(loader)).rejects.toMatchObject({
+      code: "collection_limit",
+    });
+    expect(loader).toHaveBeenCalledTimes(1);
+  });
+  it("rejects an upstream pagination loop instead of collecting duplicate pages", async () => {
+    await expect(
+      collectPages(async () => ({
+        data: [1],
+        meta: { page: 1, page_size: 1, total: 2, pages: 2 },
       })),
     ).rejects.toMatchObject({ code: "collection_changed" });
   });

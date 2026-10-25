@@ -1,55 +1,70 @@
 import { ImageResponse } from "next/og";
-export const alt = "Ask & Explore — Good questions. Better discoveries.";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
+export const alt = "Ask & Explore — Discover more. Learn every day.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
-export default function OpenGraphImage() {
+export default async function OpenGraphImage() {
+  const mark = await readFile(
+    path.join(process.cwd(), "public/images/brand/ae-mark.svg"),
+  );
+  const markUrl = `data:image/svg+xml;base64,${mark.toString("base64")}`;
   return new ImageResponse(
     <div
       style={{
-        background: "#fafaf8",
+        background:
+          "linear-gradient(125deg, #f8fbff 0%, #ffffff 55%, #e7f8f3 100%)",
         width: "100%",
         height: "100%",
         display: "flex",
         flexDirection: "column",
         padding: "65px 75px",
-        color: "#171717",
+        color: "#041b3a",
         position: "relative",
       }}
     >
-      <div style={{ display: "flex", fontSize: 30, fontWeight: 700 }}>
-        ask<span style={{ color: "#365cf5" }}>&</span>explore.
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 16,
+          fontSize: 34,
+          fontWeight: 700,
+        }}
+      >
+        {/* ImageResponse renders plain image elements rather than next/image. */}
+        <img src={markUrl} width={90} height={49} alt="" />
+        <span style={{ display: "flex", gap: 8 }}>
+          Ask &amp; <span style={{ color: "#008be9" }}>Explore</span>
+        </span>
       </div>
       <div
         style={{
           display: "flex",
           flexDirection: "column",
-          marginTop: 80,
-          fontFamily: "serif",
-          fontSize: 82,
+          marginTop: 90,
+          fontSize: 76,
+          fontWeight: 700,
           letterSpacing: -3,
           lineHeight: 1.05,
         }}
       >
-        <span>Good questions.</span>
-        <span style={{ color: "#365cf5", fontStyle: "italic" }}>
-          Better discoveries.
-        </span>
+        <span>Discover more.</span>
+        <span style={{ color: "#0562f5" }}>Learn every day.</span>
       </div>
-      <div style={{ fontSize: 19, marginTop: 45, color: "#6f706c" }}>
-        Fresh perspectives. Practical answers. Stay curious.
+      <div style={{ fontSize: 24, marginTop: 35, color: "#607594" }}>
+        Clear answers for curious minds.
       </div>
       <div
         style={{
           position: "absolute",
-          right: 70,
-          top: 170,
-          color: "#365cf5",
-          fontSize: 230,
-          opacity: 0.18,
-          fontFamily: "serif",
+          right: 65,
+          top: 245,
+          display: "flex",
+          opacity: 0.1,
         }}
       >
-        ?
+        <img src={markUrl} width={330} height={178} alt="" />
       </div>
     </div>,
     size,

@@ -4,6 +4,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ContactForm } from "@/components/shared/contact-form";
 import { contactPrefill, contactSchema } from "@/lib/utils/contact-schema";
+import { solveCaptcha } from "./solve-captcha";
 afterEach(() => vi.unstubAllGlobals());
 describe("general contact", () => {
   it("keeps submissions disabled until delivery is explicitly enabled", () => {
@@ -46,6 +47,7 @@ describe("general contact", () => {
       screen.getByLabelText(/Your message/),
       "Please check the range specification in this article.",
     );
+    await solveCaptcha();
     await userEvent.click(screen.getByRole("button", { name: "Send message" }));
     expect(await screen.findByText(/Thanks for/)).toBeInTheDocument();
     const [url, init] = fetch.mock.calls[0];
@@ -80,6 +82,7 @@ describe("general contact", () => {
       screen.getByLabelText(/Your message/),
       "My question about the publication.",
     );
+    await solveCaptcha();
     await userEvent.click(screen.getByRole("button", { name: "Send message" }));
     expect(await screen.findByRole("alert")).toHaveTextContent(
       /couldn’t confirm delivery/,
@@ -102,6 +105,52 @@ describe("general contact", () => {
     );
     await userEvent.click(screen.getByLabelText("General question"));
     expect(screen.queryByLabelText(/Article link/)).not.toBeInTheDocument();
+  });
+  it("blocks blank and incorrect addition answers without losing the message", async () => {
+    const fetch = vi.fn();
+    vi.stubGlobal("fetch", fetch);
+    render(<ContactForm enabled />);
+    await userEvent.type(
+      screen.getByLabelText(/Email address/),
+      "reader@example.com",
+    );
+    await userEvent.type(
+      screen.getByLabelText(/Your message/),
+      "My question about the publication.",
+    );
+    const submit = screen.getByRole("button", { name: "Send message" });
+    await userEvent.click(submit);
+    expect(await screen.findByRole("alert")).toHaveTextContent("Enter the sum");
+    const answer = screen.getByRole("spinbutton");
+    expect(answer).toHaveFocus();
+    await userEvent.type(answer, "99");
+    await userEvent.click(submit);
+    expect(await screen.findByRole("alert")).toHaveTextContent("isn’t correct");
+    expect(fetch).not.toHaveBeenCalled();
+    expect(screen.getByLabelText(/Your message/)).toHaveValue(
+      "My question about the publication.",
+    );
+  });
+  it("refreshes the addition question and clears only its answer", async () => {
+    render(<ContactForm enabled />);
+    await userEvent.type(
+      screen.getByLabelText(/Your message/),
+      "Please explain this topic.",
+    );
+    await solveCaptcha();
+    const answer = screen.getByRole("spinbutton");
+    const previous = answer.getAttribute("id");
+    const label = document.querySelector(`label[for="${previous}"]`)!;
+    const question = label.textContent;
+    await userEvent.click(
+      screen.getByRole("button", { name: "Get a new addition question" }),
+    );
+    expect(label.textContent).not.toBe(question);
+    expect(answer).toHaveValue(null);
+    expect(answer).toHaveFocus();
+    expect(screen.getByLabelText(/Your message/)).toHaveValue(
+      "Please explain this topic.",
+    );
   });
   it("rejects unsafe prefill URLs and validates plain text", () => {
     expect(

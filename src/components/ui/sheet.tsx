@@ -10,7 +10,7 @@ export function Sheet({
   onOpenChange,
 }: {
   trigger: ReactNode;
-  title: string;
+  title: ReactNode;
   children: ReactNode;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;

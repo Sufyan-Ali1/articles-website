@@ -2,6 +2,7 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { TopicForm } from "@/components/shared/topic-form";
+import { solveCaptcha } from "./solve-captcha";
 import { topicFormSchema } from "@/lib/utils/request-schema";
 const blank = {
   topic: "A useful question",
@@ -12,6 +13,37 @@ const blank = {
 };
 afterEach(() => vi.unstubAllGlobals());
 describe("topic suggestions", () => {
+  it("switches starters while retaining the written subject and protecting custom drafts", async () => {
+    const user = userEvent.setup();
+    render(<TopicForm apiUrl="https://api.test" />);
+    const topic = screen.getByLabelText(/what should we explore/i);
+    const explain = screen.getByRole("button", { name: "Explain something" });
+    const compare = screen.getByRole("button", { name: "Compare options" });
+    const choose = screen.getByRole("button", { name: "Help me choose" });
+    await user.click(explain);
+    expect(topic).toHaveValue("How does ");
+    await user.click(compare);
+    expect(topic).toHaveValue("What’s the difference between ");
+    expect(compare).toHaveAttribute("aria-pressed", "true");
+    expect(explain).toHaveAttribute("aria-pressed", "false");
+    await user.click(choose);
+    expect(topic).toHaveValue("How do I choose ");
+    await user.type(topic, "home chargers");
+    await user.click(explain);
+    expect(topic).toHaveValue("How does home chargers");
+    await user.click(compare);
+    expect(topic).toHaveValue("What’s the difference between home chargers");
+    await user.clear(topic);
+    await user.type(topic, "How does");
+    await user.click(choose);
+    expect(topic).toHaveValue("How do I choose ");
+    await user.clear(topic);
+    await user.type(topic, "A question I have already written");
+    await user.click(compare);
+    expect(topic).toHaveValue("A question I have already written");
+    expect(topic).toHaveFocus();
+    expect(compare).toHaveAttribute("aria-pressed", "false");
+  });
   it("enforces limits, plain text, and optional contact details", () => {
     expect(topicFormSchema.safeParse(blank).success).toBe(true);
     for (const values of [
@@ -35,7 +67,7 @@ describe("topic suggestions", () => {
       "https://api.test/api/v1/article-requests",
     );
     await userEvent.click(
-      screen.getByRole("button", { name: /send your suggestion/i }),
+      screen.getByRole("button", { name: /submit request/i }),
     );
     expect(await screen.findByText(/tell us the topic/i)).toBeInTheDocument();
     expect(fetch).not.toHaveBeenCalled();
@@ -55,14 +87,16 @@ describe("topic suggestions", () => {
       screen.getByLabelText(/what should we explore/i),
       "Choosing an electric car",
     );
+    await solveCaptcha();
     await userEvent.click(
-      screen.getByRole("button", { name: /send your suggestion/i }),
+      screen.getByRole("button", { name: /submit request/i }),
     );
     expect(await screen.findByText("Curiosity, received.")).toBeInTheDocument();
     expect(fetch).toHaveBeenCalledWith(
       "https://api.test/api/v1/article-requests",
       expect.objectContaining({
         credentials: "omit",
+        redirect: "error",
         body: JSON.stringify({
           topic: "Choosing an electric car",
           website: "",
@@ -85,8 +119,9 @@ describe("topic suggestions", () => {
       screen.getByLabelText(/what should we explore/i),
       "A question",
     );
+    await solveCaptcha();
     await userEvent.click(
-      screen.getByRole("button", { name: /send your suggestion/i }),
+      screen.getByRole("button", { name: /submit request/i }),
     );
     await waitFor(() =>
       expect(screen.getByRole("alert")).toHaveTextContent(
@@ -97,7 +132,7 @@ describe("topic suggestions", () => {
       "A question",
     );
     expect(
-      screen.getByRole("button", { name: /send your suggestion/i }),
+      screen.getByRole("button", { name: /submit request/i }),
     ).toBeDisabled();
   });
 });

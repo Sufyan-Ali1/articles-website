@@ -158,7 +158,7 @@ const colors = [
 function illustration(index) {
   const [bg, dark, accent] = colors[index % colors.length];
   const isCar = index % 3 === 0;
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760"><rect width="1200" height="760" fill="${bg}"/><circle cx="1050" cy="80" r="340" fill="${accent}" opacity=".35"/><path d="M0 610L1200 470V760H0" fill="${accent}" opacity=".5"/>${isCar ? `<ellipse cx="630" cy="580" rx="390" ry="36" fill="${dark}" opacity=".15"/><path d="M240 496l80-90 120-35h260l150 90 100 25v74H220z" fill="${dark}"/><path d="M390 414l78-27h205l100 63H355z" fill="${bg}" opacity=".8"/><circle cx="380" cy="550" r="52" fill="#292b2c"/><circle cx="803" cy="550" r="52" fill="#292b2c"/><circle cx="380" cy="550" r="26" fill="${accent}"/><circle cx="803" cy="550" r="26" fill="${accent}"/><path d="M235 492h82M865 492h70" stroke="#e6e9d0" stroke-width="12"/>` : `<rect x="285" y="160" width="590" height="365" rx="15" fill="${dark}" transform="rotate(-5 580 350)"/><rect x="307" y="183" width="546" height="317" rx="4" fill="${accent}" transform="rotate(-5 580 350)"/><path d="M230 570l660-58 120 75-780 65z" fill="${dark}"/><rect x="360" y="257" width="200" height="12" rx="6" fill="${bg}" opacity=".6"/><rect x="360" y="292" width="320" height="10" rx="5" fill="${bg}" opacity=".5"/><rect x="360" y="326" width="280" height="10" rx="5" fill="${bg}" opacity=".4"/><circle cx="770" cy="310" r="60" fill="${bg}" opacity=".25"/>`}<path d="M70 70h55m-27-27v55" stroke="${dark}" stroke-width="2" opacity=".5"/></svg>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1200 675"><rect width="1200" height="760" fill="${bg}"/><circle cx="1050" cy="80" r="340" fill="${accent}" opacity=".35"/><path d="M0 610L1200 470V760H0" fill="${accent}" opacity=".5"/>${isCar ? `<ellipse cx="630" cy="580" rx="390" ry="36" fill="${dark}" opacity=".15"/><path d="M240 496l80-90 120-35h260l150 90 100 25v74H220z" fill="${dark}"/><path d="M390 414l78-27h205l100 63H355z" fill="${bg}" opacity=".8"/><circle cx="380" cy="550" r="52" fill="#292b2c"/><circle cx="803" cy="550" r="52" fill="#292b2c"/><circle cx="380" cy="550" r="26" fill="${accent}"/><circle cx="803" cy="550" r="26" fill="${accent}"/><path d="M235 492h82M865 492h70" stroke="#e6e9d0" stroke-width="12"/>` : `<rect x="285" y="160" width="590" height="365" rx="15" fill="${dark}" transform="rotate(-5 580 350)"/><rect x="307" y="183" width="546" height="317" rx="4" fill="${accent}" transform="rotate(-5 580 350)"/><path d="M230 570l660-58 120 75-780 65z" fill="${dark}"/><rect x="360" y="257" width="200" height="12" rx="6" fill="${bg}" opacity=".6"/><rect x="360" y="292" width="320" height="10" rx="5" fill="${bg}" opacity=".5"/><rect x="360" y="326" width="280" height="10" rx="5" fill="${bg}" opacity=".4"/><circle cx="770" cy="310" r="60" fill="${bg}" opacity=".25"/>`}<path d="M70 70h55m-27-27v55" stroke="${dark}" stroke-width="2" opacity=".5"/></svg>`;
 }
 createServer(async (req, res) => {
   const url = new URL(req.url, "http://127.0.0.1:4100");
@@ -267,13 +267,34 @@ createServer(async (req, res) => {
   }
   if (url.pathname.startsWith("/api/v1/articles/")) {
     const slug = url.pathname.split("/").at(-1);
-    const a = articles.find((item) => item.slug === slug && !hidden.has(slug));
+    const readerFixture = [
+      "long-reader",
+      "plain-reader",
+      "image-reader",
+      "security-reader",
+    ].includes(slug);
+    const a = readerFixture
+      ? { ...articles[0], slug, featured_image: null }
+      : articles.find((item) => item.slug === slug && !hidden.has(slug));
     if (!a) return error(404);
     detailReads++;
     return json(200, {
       data: {
         ...a,
-        content_html: `<p>Good decisions start with a little context. This test article explores the questions behind a familiar everyday choice and offers a practical place to begin.</p><h2>The questions worth asking</h2><p>${"Take time to understand what matters in your own situation before comparing the available options. ".repeat(15)}</p><h3>Start with everyday needs</h3><p>List the things you do most often, the things that frustrate you, and the things that would make a meaningful difference.</p><h2>A practical comparison</h2><table><thead><tr><th>Consideration</th><th>What to look for</th></tr></thead><tbody><tr><td>Everyday use</td><td>Reliable, simple, and useful</td></tr><tr><td>Longer term</td><td>Support, maintenance, and flexibility</td></tr></tbody></table><h2>The questions worth asking</h2><p>Compare the context behind a recommendation rather than the headline alone.</p><pre><code class="language-js">const question = "What matters to you?";</code></pre><p><a href="https://example.com/product" rel="sponsored nofollow" target="_blank">A sponsored product link</a></p><blockquote><p>The right question makes the next step a little clearer.</p></blockquote><h2>A useful next step</h2><p>${"Explore at your own pace and keep your own circumstances in mind. ".repeat(20)}</p>`,
+        content_html:
+          slug === "security-reader"
+            ? '<h2>Safe article heading</h2><p>Safe article content remains readable.</p><base href="https://attacker.invalid/"><meta http-equiv="refresh" content="0;url=https://attacker.invalid/redirect"><script>alert("stored-xss")</script><img src="data:image/svg+xml,unsafe" onerror="alert(1)" srcset="https://attacker.invalid/image 2x"><svg onload="alert(1)"></svg><iframe srcdoc="<script>alert(1)</script>"></iframe><p id="main-content" style="position:fixed" data-copy-code="1">Visible text</p>'
+            : slug === "image-reader"
+              ? '<h2>Full images</h2><p>This article includes a complete inline image.</p><figure><img src="/media/0.svg" width="1920" height="1080" alt="Complete inline article image"><figcaption>An uncropped 16:9 image.</figcaption></figure>'
+              : slug === "long-reader"
+                ? Array.from(
+                    { length: 35 },
+                    (_, i) =>
+                      `<h2>Section ${i + 1}</h2><p>${"A useful section of this longer article. ".repeat(30)}</p>`,
+                  ).join("")
+                : slug === "plain-reader"
+                  ? "<p>A short article without headings or a featured image.</p>"
+                  : `<p>Good decisions start with a little context. This test article explores the questions behind a familiar everyday choice and offers a practical place to begin.</p><h2>The questions worth asking</h2><p>${"Take time to understand what matters in your own situation before comparing the available options. ".repeat(15)}</p><h3>Start with everyday needs</h3><p>List the things you do most often, the things that frustrate you, and the things that would make a meaningful difference.</p><h2>A practical comparison</h2><table><thead><tr><th>Consideration</th><th>What to look for</th></tr></thead><tbody><tr><td>Everyday use</td><td>Reliable, simple, and useful</td></tr><tr><td>Longer term</td><td>Support, maintenance, and flexibility</td></tr></tbody></table><h2>The questions worth asking</h2><p>Compare the context behind a recommendation rather than the headline alone.</p><pre><code class="language-js">const question = "What matters to you?";</code></pre><p><a href="https://example.com/product" rel="sponsored nofollow" target="_blank">A sponsored product link</a></p><blockquote><p>The right question makes the next step a little clearer.</p></blockquote><h2>A useful next step</h2><p>${"Explore at your own pace and keep your own circumstances in mind. ".repeat(20)}</p>`,
         meta_title: `${a.title} — An Ask & Explore perspective`,
         meta_description: a.excerpt,
         schema: {

@@ -1,0 +1,9 @@
+{
+  "generator": "Built-in image_gen tool",
+  "assets": [
+    {
+      "file": "terms-hero.webp",
+      "prompt": "Use case: illustration-story. Asset type: wide transparent hero illustration for Ask & Explore Terms and Conditions and legal information pages. Generate only the illustration, no website layout. Landscape 16:9 canvas intended 1920x1080. A friendly adult man with neat dark navy hair wearing a medium blue blazer over a crisp white shirt, seen from the waist up on the right, holding a large white document in his left hand and gently pointing at it with his right index finger. Document readable title exactly 'Terms & Conditions' in dark navy serif lettering across two lines, several simple pale blue horizontal lines below, and a blue circular checkmark near the bottom. Behind the man are very pale sky-blue organic blob shapes and small cloud shapes, a subtle scales-of-justice symbol inside a pale blue circle at upper right, and a small blue leafy plant in a pale pot near the lower left of the document. Style: sophisticated clean 2D editorial illustration with soft gradients, rounded friendly character forms, delicate shadows, restrained blue and navy palette, similar to a professional legal information webpage illustration. Composition: the complete man's head, shoulders, hands and document fully in frame with at least 8% breathing room on every side; wide balanced composition, bottom intentionally ends cleanly at the waist with a soft fade. Transparent background outside the illustration; no rectangular white backdrop. No extra words besides 'Terms & Conditions', no logo, watermark, navigation, UI, buttons, page mockup or cropped head/hands/document."
+    }
+  ]
+}

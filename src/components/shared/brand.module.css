@@ -1,0 +1,24 @@
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.32em;
+  color: #041b3a;
+  font-family: var(--font-geist-sans), Arial, sans-serif;
+  font-weight: 750;
+  line-height: 1.2;
+  letter-spacing: -0.055em;
+  white-space: nowrap;
+}
+.mark {
+  display: block;
+  flex-shrink: 0;
+  width: 1.65em;
+  height: auto;
+}
+.wordmark > span {
+  color: #007bf3;
+  background: linear-gradient(100deg, #0562f5 5%, #008ef1 55%, #00cba9 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}

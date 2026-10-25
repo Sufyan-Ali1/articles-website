@@ -1,7 +1,13 @@
 import { Suspense } from "react";
-import { ArticleListing } from "@/components/articles/article-listing";
-import { PageHeading, GridSkeleton } from "@/components/shared/states";
+import { SearchHero } from "@/components/search/search-hero";
+import {
+  ArchiveContent,
+  ArchiveSkeleton,
+} from "@/components/articles/archive/archive-content";
+import archiveStyles from "@/components/articles/archive/archive.module.css";
+import styles from "@/components/search/search.module.css";
 import { metadata } from "@/lib/seo/metadata";
+import { pageSeo } from "@/lib/content/site-copy";
 import {
   parseFilters,
   filterUrl,
@@ -14,8 +20,8 @@ export async function generateMetadata({
 }) {
   const filters = parseFilters(await searchParams);
   return metadata(
-    filters.search ? `Search: ${filters.search}` : "Search the publication",
-    "Find published articles about the things you’re curious about.",
+    filters.search ? `Search: ${filters.search}` : pageSeo.search.title,
+    pageSeo.search.description,
     filterUrl("/search", filters),
     { noindex: true },
   );
@@ -26,15 +32,24 @@ export default function Search({
   searchParams: Promise<SearchParams>;
 }) {
   return (
-    <div className="container listing-page">
-      <PageHeading
-        eyebrow="Seek something new"
-        title="What are you curious about?"
-        description="What would you like to understand? Search our published stories by title."
-      />
-      <Suspense fallback={<GridSkeleton />}>
-        <ArticleListing searchParams={searchParams} path="/search" searchPage />
+    <div className={`${archiveStyles.page} ${styles.page}`} data-search-page>
+      <Suspense
+        fallback={
+          <div className={styles.heroLoading} aria-label="Loading search" />
+        }
+      >
+        <SearchHero searchParams={searchParams} />
       </Suspense>
+      <div className={`${archiveStyles.shell} ${styles.content}`}>
+        <Suspense fallback={<ArchiveSkeleton showCategories={false} />}>
+          <ArchiveContent
+            searchParams={searchParams}
+            path="/search"
+            showCategories={false}
+            searchPage
+          />
+        </Suspense>
+      </div>
     </div>
   );
 }

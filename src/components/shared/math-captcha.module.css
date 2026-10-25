@@ -1,0 +1,128 @@
+.captcha {
+  min-width: 0;
+  width: 100%;
+  margin: 18px 0 24px;
+  padding: 12px 14px;
+  border: 1px solid #dfe8f5;
+  border-radius: 14px;
+  background: #f3f7fd;
+  color: #243c60;
+}
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.captcha .row .question {
+  flex-shrink: 0;
+  margin: 0;
+  color: #506584;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+.captcha .row .answer {
+  flex: 1 1 0%;
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid #d4e1f2;
+  border-radius: 10px;
+  background: #fff;
+  color: #19365e;
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: center;
+  appearance: textfield;
+}
+.captcha .row .answer::placeholder {
+  color: #8a9bb5;
+}
+.captcha .answer::-webkit-inner-spin-button,
+.captcha .answer::-webkit-outer-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+}
+.captcha .row .answer[aria-invalid="true"] {
+  border-color: #c74848;
+}
+.captcha .row .refresh {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 40px;
+  width: 40px;
+  min-height: 40px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid #dce6f3;
+  border-radius: 10px;
+  background: #fff;
+  color: #0765ed;
+  box-shadow: 0 2px 5px #173f6910;
+  opacity: 1;
+}
+.captcha .row .refresh:hover:not(:disabled) {
+  color: #0765ed;
+  border-color: #a9c9f2;
+  background: #edf5ff;
+}
+.captcha .error {
+  margin: 7px 0 0;
+  color: #b83535;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.captcha:disabled {
+  opacity: 0.7;
+}
+.captcha[data-compact="true"] {
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: #f3f7fdb3;
+}
+.captcha[data-compact="true"] .row {
+  gap: 8px;
+}
+.captcha[data-compact="true"] .row .question {
+  font-size: 12px;
+}
+.captcha[data-compact="true"] .row .answer {
+  flex: 1 1 0%;
+  width: 100%;
+  min-height: 34px;
+  padding: 5px 8px;
+  font-size: 12px;
+}
+.captcha[data-compact="true"] .row .refresh {
+  flex-basis: 30px;
+  width: 30px;
+  min-height: 30px;
+}
+@media (max-width: 640px) {
+  .captcha {
+    padding: 10px;
+    border-radius: 11px;
+  }
+  .captcha .row {
+    gap: 8px;
+  }
+  .captcha .row .question {
+    font-size: 13px;
+  }
+  .captcha .row .answer {
+    min-height: 40px;
+    padding: 8px 6px;
+    font-size: 16px;
+  }
+  .captcha .row .refresh {
+    flex-basis: 32px;
+    width: 32px;
+    min-height: 36px;
+    border-radius: 8px;
+  }
+}

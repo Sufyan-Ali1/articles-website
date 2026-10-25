@@ -1,95 +1,74 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { ArrowUpRight, Search, Asterisk } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { connection } from "next/server";
 import { getClassifications } from "@/lib/api/client";
+import { HeaderSearch } from "./header-search";
+import { Brand } from "@/components/shared/brand";
 import { MobileMenu } from "./mobile-menu";
-import { DesktopNavigation } from "./desktop-navigation";
+import { DesktopNavigation, NavLink } from "./desktop-navigation";
+import styles from "./header.module.css";
+
 export function Logo() {
   return (
     <Link href="/" className="logo" aria-label="Ask and Explore home">
-      <span className="logo-mark">
-        <Asterisk size={25} strokeWidth={2} />
-      </span>
-      <span>
-        ask<span className="text-blue">&</span>explore
-        <span className="logo-dot">.</span>
-      </span>
+      <Brand />
     </Link>
   );
 }
-async function TopicLinks() {
+
+async function CategoryLinks() {
   await connection();
   const categories = await getClassifications("categories")
-    .then((items) => items.filter((c) => c.is_active))
+    .then((items) => items.filter((category) => category.is_active))
     .catch(() => []);
-  const ids = new Set(categories.map((c) => c.id));
-  return (
-    <>
-      {categories
-        .filter((c) => !c.parent_id || !ids.has(c.parent_id))
-        .map((category) => (
-          <Link key={category.id} href={`/category/${category.slug}`}>
-            {category.name}
-            <ArrowUpRight size={16} />
-          </Link>
-        ))}
-    </>
-  );
+  return categories.map((category) => (
+    <NavLink key={category.id} href={`/category/${category.slug}`}>
+      <span>{category.name}</span>
+      <ArrowUpRight size={14} aria-hidden="true" />
+    </NavLink>
+  ));
 }
-async function MobileCategoryLinks() {
-  await connection();
-  const categories = await getClassifications("categories")
-    .then((items) => items.filter((c) => c.is_active).slice(0, 5))
-    .catch(() => []);
-  return (
-    <>
-      {categories.map((category) => (
-        <Link key={category.id} href={`/category/${category.slug}`}>
-          {category.name}
-        </Link>
-      ))}
-    </>
-  );
-}
+
 export function Header() {
   return (
-    <header className="site-header">
-      <div className="container header-inner">
+    <header className={`site-header ${styles.header}`}>
+      <div className={`header-inner ${styles.inner}`}>
         <Logo />
         <Suspense
           fallback={
             <nav className="desktop-nav" aria-label="Main navigation">
-              <Link href="/articles">Latest</Link>
-              <Link href="/categories">Topics</Link>
+              <Link href="/">Home</Link>
+              <Link href="/articles">Articles</Link>
+              <Link href="/categories">Categories</Link>
               <Link href="/about">About</Link>
             </nav>
           }
         >
           <DesktopNavigation>
-            <Suspense
-              fallback={<Link href="/categories">Browse categories</Link>}
-            >
-              <TopicLinks />
+            <NavLink href="/categories">Explore all categories</NavLink>
+            <Suspense>
+              <CategoryLinks />
             </Suspense>
           </DesktopNavigation>
         </Suspense>
         <MobileMenu>
           <Suspense>
-            <MobileCategoryLinks />
+            <CategoryLinks />
           </Suspense>
         </MobileMenu>
         <div className="header-actions">
+          <HeaderSearch />
           <Link
-            href="/search"
-            className="header-search"
-            aria-label="Search articles"
+            href="/request-article"
+            className={styles.requestTopic}
+            aria-label="Request a topic"
           >
-            <Search size={20} />
-            <span className="search-label">Search</span>
-          </Link>
-          <Link href="/request-article" className="header-request">
-            Request a topic <ArrowUpRight size={16} />
+            <span className={styles.requestLabel}>Request a topic</span>
+            <span className={styles.requestCompactLabel} aria-hidden="true">
+              Request
+            </span>
+            <ArrowUpRight size={17} aria-hidden="true" />
           </Link>
         </div>
       </div>

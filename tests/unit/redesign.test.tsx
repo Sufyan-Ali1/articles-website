@@ -36,7 +36,7 @@ describe("discovery and reading refinements", () => {
   });
   it("searches nested categories and restores the root directory", async () => {
     render(<CategoryDirectory categories={categories} previews={{}} />);
-    const input = screen.getByRole("searchbox", { name: "Find a topic" });
+    const input = screen.getByRole("searchbox", { name: "Search categories" });
     await userEvent.type(input, "everyday");
     expect(
       screen.getByRole("heading", { name: "Everyday tech" }),
@@ -46,6 +46,53 @@ describe("discovery and reading refinements", () => {
     ).not.toBeInTheDocument();
     await userEvent.clear(input);
     expect(screen.getByRole("heading", { name: "Technology" })).toBeVisible();
+  });
+  it("shows real totals and searches categories without redundant filter controls", async () => {
+    const user = userEvent.setup();
+    const automotive = {
+      ...categories[0],
+      id: "c",
+      name: "Automotive",
+      slug: "automotive",
+    };
+    const inactive = {
+      ...categories[0],
+      id: "d",
+      name: "Archived topic",
+      slug: "archived",
+      is_active: false,
+    };
+    render(
+      <CategoryDirectory
+        categories={[...categories, automotive, inactive]}
+        previews={{}}
+        counts={{ a: 6, c: 0 }}
+      />,
+    );
+    expect(screen.getByText("6 articles")).toBeVisible();
+    expect(screen.getByText("0 articles")).toBeVisible();
+    expect(
+      screen.queryByRole("heading", { name: "Archived topic" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("group", { name: "Filter categories" }),
+    ).not.toBeInTheDocument();
+    const search = screen.getByRole("searchbox", { name: "Search categories" });
+    await user.type(search, "automotive");
+    expect(screen.getByRole("heading", { name: "Automotive" })).toBeVisible();
+    expect(
+      screen.queryByRole("heading", { name: "Technology" }),
+    ).not.toBeInTheDocument();
+    await user.clear(search);
+    await user.type(search, "no-matching-category");
+    expect(
+      screen.getByRole("heading", { name: "No categories match your search." }),
+    ).toBeVisible();
+    await user.click(
+      screen.getByRole("button", { name: "Show all categories" }),
+    );
+    expect(search).toHaveValue("");
+    expect(screen.getByRole("heading", { name: "Automotive" })).toBeVisible();
   });
   it("wraps code in an accessible copy toolbar without altering the code", () => {
     const result = prepareArticle(

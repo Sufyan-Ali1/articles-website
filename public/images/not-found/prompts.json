@@ -1,0 +1,9 @@
+{
+  "generator": "Built-in image_gen tool",
+  "assets": [
+    {
+      "file": "lost-page.webp",
+      "prompt": "Use case: illustration-story. Asset type: a polished 404 website illustration for Ask & Explore, matching the supplied concept of a friendly lost-page signpost. Generate only the illustration, no webpage, no layout, no navigation, no buttons. Wide landscape 16:9 canvas, intended 1920x1080, transparent background. Main subject: a warm peach-colored wooden signpost planted among a few soft gray rocks, grass and small green leaves. The upper wood-grain arrow points right and has the exact large dark brown text '404'. The lower wood-grain arrow points left and has the exact text 'Page Not Found'. A tiny cheerful blue-and-white songbird with an orange beak perches on top of the post. At the right of the post sits an adorable golden-orange puppy with floppy ears, a cream chest, a blue collar and a round golden tag, gazing upward toward the sign and bird. Behind the subjects is a delicate pale blue and mint watercolor landscape: rolling hills, a winding cream path, distant blue mountains, soft white cloud shapes. Style: premium soft 3D storybook illustration, gently rounded shapes, subtle painted wood grain, natural friendly proportions, soft daylight and gentle shadows, clean details. Composition: signpost slightly left of center, puppy at right; bird, all signs, the whole puppy including paws and tail, and foreground rocks fully inside the frame with 6% breathing room. Landscape softly dissolves to transparency around all outer edges, no hard rectangular backdrop. Avoid photorealism, harsh outlines, extra characters, extra text, watermarks, logos, cropped subjects, UI. Exact sign wording only: '404' and 'Page Not Found'."
+    }
+  ]
+}

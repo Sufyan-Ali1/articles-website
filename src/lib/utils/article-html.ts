@@ -2,15 +2,25 @@ import { parseDocument } from "htmlparser2";
 import { textContent, findAll } from "domutils";
 import render from "dom-serializer";
 import { isTag, type Element } from "domhandler";
+import { sanitizeArticle } from "@/lib/security/article-sanitizer";
 export interface TocHeading {
   id: string;
   text: string;
   level: number;
 }
 export function prepareArticle(html: string, origin?: string) {
-  const document = parseDocument(html);
+  const document = parseDocument(sanitizeArticle(html, origin));
   const headings: TocHeading[] = [];
   const used = new Map<string, number>();
+  const reserved = new Set([
+    "article-content",
+    "main-content",
+    "reading-progress",
+    "newsletter-heading",
+    "header-search-panel",
+    "header-article-search",
+    "categories-panel",
+  ]);
   let sponsored = false;
   const elements = findAll(isTag, document.children);
   // Calculate from content only, before adding interface labels and controls.
@@ -19,19 +29,6 @@ export function prepareArticle(html: string, origin?: string) {
     .split(/\s+/)
     .filter(Boolean).length;
   for (const element of elements) {
-    // Input is sanitized by FastAPI. Strip executable elements defensively at the boundary.
-    if (
-      ["script", "iframe", "object", "embed", "style", "svg", "form"].includes(
-        element.name,
-      )
-    ) {
-      element.children = [];
-      element.name = "span";
-      element.attribs = {};
-    }
-    for (const attr of Object.keys(element.attribs))
-      if (attr.startsWith("on") || attr === "style")
-        delete element.attribs[attr];
     if (/^h[1-6]$/.test(element.name)) {
       if (element.name === "h1") element.name = "h2";
       const text = textContent(element).trim();
@@ -44,14 +41,14 @@ export function prepareArticle(html: string, origin?: string) {
           .replace(/\s+/g, "-") || "section";
       const count = (used.get(base) || 0) + 1;
       used.set(base, count);
-      const id = `${base}${count > 1 ? `-${count}` : ""}`;
+      let id = `${base}${count > 1 ? `-${count}` : ""}`;
+      while (reserved.has(id)) id = `${id}-section`;
+      reserved.add(id);
       element.attribs.id = id;
       if (text && ["h2", "h3"].includes(element.name))
         headings.push({ id, text, level: Number(element.name[1]) });
     }
     if (element.name === "a") {
-      const href = element.attribs.href || "";
-      if (!/^(https?:\/\/|\/(?!\/)|#)/i.test(href)) delete element.attribs.href;
       const rel = new Set((element.attribs.rel || "").split(/\s+/));
       if (rel.has("sponsored")) sponsored = true;
       if (element.attribs.target === "_blank") {
@@ -61,10 +58,6 @@ export function prepareArticle(html: string, origin?: string) {
       element.attribs.rel = [...rel].filter(Boolean).join(" ");
     }
     if (element.name === "img") {
-      const src = element.attribs.src || "";
-      if (!/^(https?:\/\/|\/(?!\/))/i.test(src)) delete element.attribs.src;
-      else if (origin && src.startsWith("/"))
-        element.attribs.src = new URL(src, origin).href;
       element.attribs.loading = "lazy";
       element.attribs.decoding = "async";
       element.attribs.alt ||= "";

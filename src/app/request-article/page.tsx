@@ -1,53 +1,32 @@
-import { Lightbulb, ShieldCheck } from "lucide-react";
 import { TopicForm } from "@/components/shared/topic-form";
-import { CuriosityArt } from "@/components/shared/curiosity-art";
+import { RequestHero } from "@/components/requests/request-hero";
+import { RequestSidebar } from "@/components/requests/request-sidebar";
+import { RequestFaqs } from "@/components/requests/request-faqs";
+import { RequestNewsletter } from "@/components/requests/request-newsletter";
 import { metadata } from "@/lib/seo/metadata";
+import { pageSeo } from "@/lib/content/site-copy";
+import { publicApiUrl } from "@/lib/config";
+import styles from "@/components/requests/request.module.css";
+
 export const generateMetadata = () =>
   metadata(
-    "Request an article",
-    "Have a question worth exploring? Suggest a topic for a future Ask & Explore article.",
+    pageSeo.request.title,
+    pageSeo.request.description,
     "/request-article",
   );
+
 export default function RequestArticle() {
   return (
-    <div className="container request-layout">
-      <div className="request-intro">
-        <div className="eyebrow">
-          <span className="blue-dot" />
-          You ask. We explore.
+    <div className={styles.page} data-request-page>
+      <RequestHero />
+      <div className={styles.shell}>
+        <div className={styles.layout}>
+          <TopicForm apiUrl={publicApiUrl} />
+          <RequestSidebar />
         </div>
-        <h1>
-          A good question deserves <em>a closer look.</em>
-        </h1>
-        <p>
-          An explanation you can’t find. A comparison worth making. Tell us what
-          you’d like to understand.
-        </p>
-        <CuriosityArt compact />
-        <div className="request-note">
-          <h2>
-            <Lightbulb size={16} />
-            Make it your kind of useful.
-          </h2>
-          <p>
-            Be as specific as you like. Tell us what you’re trying to do,
-            understand, or decide. A little context helps us see the question
-            through your eyes.
-          </p>
-        </div>
-        <div className="request-note">
-          <h2>
-            <ShieldCheck size={16} />
-            Shared privately, considered thoughtfully.
-          </h2>
-          <p>
-            Your suggestion isn’t published automatically. Name and email are
-            optional. Please leave out passwords, account details, and other
-            sensitive information.
-          </p>
-        </div>
+        <RequestFaqs />
+        <RequestNewsletter />
       </div>
-      <TopicForm apiUrl={process.env.NEXT_PUBLIC_API_BASE_URL || ""} />
     </div>
   );
 }

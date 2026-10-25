@@ -1,8 +1,31 @@
 "use client";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { ChevronDown } from "lucide-react";
+
+export function NavLink({
+  href,
+  children,
+}: {
+  href: string;
+  children: ReactNode;
+}) {
+  const path = usePathname();
+  const params = useSearchParams();
+  const [target, query] = href.split("?");
+  const type = new URLSearchParams(query).get("article_type");
+  const active =
+    (path === target ||
+      (target === "/articles" && path.startsWith("/articles/"))) &&
+    (!type || params.get("article_type") === type);
+  return (
+    <Link href={href} aria-current={active ? "page" : undefined}>
+      {children}
+    </Link>
+  );
+}
+
 export function DesktopNavigation({ children }: { children: ReactNode }) {
   const path = usePathname();
   const [open, setOpen] = useState(false);
@@ -28,14 +51,10 @@ export function DesktopNavigation({ children }: { children: ReactNode }) {
   }, [open]);
   return (
     <nav className="desktop-nav" aria-label="Main navigation">
-      <Link
-        href="/articles"
-        aria-current={path === "/articles" ? "page" : undefined}
-      >
-        Latest
-      </Link>
+      <NavLink href="/">Home</NavLink>
+      <NavLink href="/articles">Articles</NavLink>
       <div
-        className="topics-dropdown"
+        className="categories-dropdown"
         ref={ref}
         onBlur={(event) => {
           if (!event.currentTarget.contains(event.relatedTarget))
@@ -44,33 +63,33 @@ export function DesktopNavigation({ children }: { children: ReactNode }) {
       >
         <button
           ref={trigger}
+          type="button"
           aria-expanded={open}
-          aria-controls="topics-panel"
+          aria-controls="categories-panel"
           onClick={() => setOpen(!open)}
-          className={path.startsWith("/categor") ? "nav-active" : ""}
+          className={
+            path === "/categories" || path.startsWith("/category/")
+              ? "nav-active"
+              : ""
+          }
         >
-          Topics
+          Categories
           <ChevronDown size={14} />
         </button>
         {open && (
           <div
-            id="topics-panel"
-            className="topics-panel"
+            id="categories-panel"
+            className="categories-panel"
             onClick={(event) => {
               if ((event.target as Element).closest("a")) setOpen(false);
             }}
           >
-            <div className="eyebrow">Follow your curiosity</div>
-            <div className="topics-panel-links">{children}</div>
-            <Link className="topics-all" href="/categories">
-              Explore every topic <span aria-hidden="true">↗</span>
-            </Link>
+            <div className="eyebrow">Explore by topic</div>
+            <div className="category-menu-links">{children}</div>
           </div>
         )}
       </div>
-      <Link href="/about" aria-current={path === "/about" ? "page" : undefined}>
-        About
-      </Link>
+      <NavLink href="/about">About</NavLink>
     </nav>
   );
 }

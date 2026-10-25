@@ -6,7 +6,8 @@ import {
   type ReactNode,
 } from "react";
 import Link from "next/link";
-import { Asterisk, ArrowUpRight } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
+import { BrandMark } from "./brand";
 import { PageHeading } from "./states";
 export function EditorialPage({
   eyebrow,
@@ -78,7 +79,7 @@ export function EditorialPage({
         <div className="editorial-layout">
           <div className="editorial-copy">{content}</div>
           <aside className="editorial-aside">
-            <Asterisk size={35} />
+            <BrandMark />
             <h2>Good questions open new doors.</h2>
             <p>Help shape what we explore next.</p>
             <Link href="/request-article" className="text-link">

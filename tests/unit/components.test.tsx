@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+import Link from "next/link";
 import { render, screen } from "@testing-library/react";
 import { Pagination } from "@/components/articles/pagination";
 import { Filters } from "@/components/search/filters";
@@ -47,12 +48,17 @@ describe("navigation and SEO", () => {
   });
   it("opens and closes accessible mobile navigation", async () => {
     render(
-      <MobileMenu categories={[{ name: "Technology", slug: "technology" }]} />,
+      <MobileMenu>
+        <Link href="/category/technology">Technology</Link>
+      </MobileMenu>,
     );
     await userEvent.click(
       screen.getByRole("button", { name: "Open navigation" }),
     );
     expect(screen.getByRole("dialog")).toBeInTheDocument();
+    await userEvent.click(
+      screen.getByText("Categories", { selector: "summary" }),
+    );
     expect(screen.getByRole("link", { name: "Technology" })).toHaveAttribute(
       "href",
       "/category/technology",
