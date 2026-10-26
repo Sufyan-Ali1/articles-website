@@ -18,18 +18,22 @@ import {
 } from "@/lib/utils/contact-schema";
 import { Button } from "@/components/ui/button";
 import { MathCaptcha, type MathCaptchaHandle } from "./math-captcha";
+import { submitPublicForm } from "@/lib/api/public-submissions";
+import { useSubmissionCooldown } from "@/lib/hooks/use-submission-cooldown";
 import styles from "@/components/contact/contact.module.css";
 export function ContactForm({
-  enabled,
+  apiUrl,
   initialReason = "general",
   articleUrl = "",
   email = "",
 }: {
-  enabled: boolean;
+  apiUrl: string;
   initialReason?: ContactReason;
   articleUrl?: string;
   email?: string;
 }) {
+  const enabled = Boolean(apiUrl);
+  const { seconds, setSeconds } = useSubmissionCooldown();
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
   const captcha = useRef<MathCaptchaHandle>(null);
@@ -52,27 +56,45 @@ export function ContactForm({
       setError("The contact form is not available yet.");
       return;
     }
+    if (seconds) return;
     setError("");
     if (!captcha.current?.validate()) return;
     try {
-      const body = new URLSearchParams({
+      const body = {
         "form-name": "contact",
         ...values,
         article_url: values.reason === "correction" ? values.article_url : "",
-      });
-      const response = await fetch("/__forms.html", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: body.toString(),
-        signal: AbortSignal.timeout(20000),
-      });
-      if (response.status === 429) {
+      };
+      const result = await submitPublicForm(apiUrl, "contact-messages", body);
+      if (result.kind === "limited") {
+        setSeconds(result.seconds);
         setError(
           "Please wait a little before sending another message. Your text is still here.",
         );
         return;
       }
-      if (!response.ok) throw new Error("Contact delivery failed");
+      if (result.kind === "invalid") {
+        const allowed = [
+          "name",
+          "email",
+          "reason",
+          "article_url",
+          "message",
+        ] as const;
+        let focused = false;
+        for (const field of allowed) {
+          if (result.fields.includes(field)) {
+            form.setError(
+              field,
+              { message: "Please check this field and its stated limits." },
+              { shouldFocus: !focused },
+            );
+            focused = true;
+          }
+        }
+        setError("Please check the highlighted fields and try again.");
+        return;
+      }
       form.reset();
       setSent(true);
     } catch {
@@ -119,8 +141,13 @@ export function ContactForm({
       id="contact-message-form"
       name="contact"
       method="post"
-      action="/__forms.html"
+      action={
+        apiUrl
+          ? `${apiUrl.replace(/\/$/, "")}/api/v1/contact-messages`
+          : undefined
+      }
       onSubmit={(event) => void form.handleSubmit(submit)(event)}
+      aria-busy={form.formState.isSubmitting}
       noValidate
       className={`contact-form-panel ${styles.formPanel}`}
       aria-labelledby="contact-form-title"
@@ -153,6 +180,7 @@ export function ContactForm({
       {error && (
         <div className="form-alert" role="alert">
           {error}
+          {seconds > 0 && ` Try again in ${seconds}s.`}
         </div>
       )}
       <div className={styles.field}>
@@ -258,12 +286,12 @@ export function ContactForm({
           {...form.register("bot-field")}
         />
       </div>
-      <MathCaptcha ref={captcha} disabled={!enabled} />
+      <MathCaptcha ref={captcha} disabled={!enabled || seconds > 0} />
       <div className={styles.formBottom}>
         <Button
           className={styles.submitButton}
           type="submit"
-          disabled={!enabled || form.formState.isSubmitting}
+          disabled={!enabled || form.formState.isSubmitting || seconds > 0}
         >
           {form.formState.isSubmitting ? (
             <>
@@ -277,7 +305,7 @@ export function ContactForm({
           ) : (
             <>
               <Send size={19} strokeWidth={1.8} aria-hidden="true" />
-              Send message
+              {seconds > 0 ? `Try again in ${seconds}s` : "Send message"}
             </>
           )}
         </Button>

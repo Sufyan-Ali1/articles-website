@@ -107,14 +107,15 @@ describe("URLs and security configuration", () => {
     const headers = Object.fromEntries(
       securityHeaders({
         production: true,
-        publicApiUrl: "https://api.test",
+        apiUrl: "https://api.test",
         siteUrl: "https://site.test",
       }).map((h) => [h.key, h.value]),
     );
     const csp = headers["Content-Security-Policy"];
     expect(csp).toContain("frame-ancestors 'none'");
     expect(csp).toContain("script-src-attr 'none'");
-    expect(csp).toContain("connect-src 'self' https://api.test");
+    expect(csp).toContain("connect-src 'self'");
+    expect(csp).not.toContain("connect-src 'self' https://api.test");
     expect(csp).toContain("upgrade-insecure-requests");
     expect(csp).not.toContain("unsafe-eval");
     expect(headers["Strict-Transport-Security"]).toBe("max-age=31536000");

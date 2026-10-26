@@ -422,7 +422,7 @@ test("view controls preserve browsing state and search highlights titles", async
   await page.getByRole("link", { name: /Remove filter/ }).click();
   await expect(page).not.toHaveURL(/search=electric/);
 });
-test("contact receives correction context and submits through the Netlify static endpoint", async ({
+test("contact receives correction context and submits to the backend contact endpoint", async ({
   page,
 }) => {
   await page.goto("/articles/electric-car-question");
@@ -437,11 +437,15 @@ test("contact receives correction context and submits through the Netlify static
     "https://ask-explore.test/articles/electric-car-question",
   );
   let submitted = "";
-  await page.route("**/__forms.html", async (route) => {
+  await page.route("**/api/v1/contact-messages", async (route) => {
     submitted = route.request().postData() || "";
     await route.fulfill({
-      status: 200,
-      body: "Accepted by the test submission handler",
+      status: 202,
+      contentType: "application/json",
+      headers: { "Access-Control-Allow-Origin": "http://127.0.0.1:3100" },
+      body: JSON.stringify({
+        data: { message: "Thank you for getting in touch." },
+      }),
     });
   });
   await page.getByLabel(/Email address/).fill("reader@example.com");
@@ -451,13 +455,13 @@ test("contact receives correction context and submits through the Netlify static
   await solveMathCaptcha(page.getByRole("form", { name: "Send Us a Message" }));
   await page.getByRole("button", { name: "Send message", exact: true }).click();
   await expect(page.getByRole("heading", { name: /Thanks for/ })).toBeVisible();
-  expect(new URLSearchParams(submitted).get("form-name")).toBe("contact");
+  expect(JSON.parse(submitted)["form-name"]).toBe("contact");
 });
 test("contact errors preserve input and the topic starter does not replace a draft", async ({
   page,
 }) => {
   await page.goto("/contact");
-  await page.route("**/__forms.html", (route) =>
+  await page.route("**/api/v1/contact-messages", (route) =>
     route.fulfill({ status: 503, body: "Unavailable" }),
   );
   await page.getByLabel(/Email address/).fill("reader@example.com");

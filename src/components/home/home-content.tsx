@@ -385,7 +385,10 @@ export function HomeCallsToAction() {
         <div>
           <p className={styles.eyebrow}>Stay curious</p>
           <h2>Useful Reads for Your Next Decision</h2>
-          <p>Our newsletter is on the way. Browse the latest guides today.</p>
+          <p>
+            Subscribe for future article updates. Browse the latest guides
+            today.
+          </p>
           <NewsletterForm label="Homepage newsletter signup" />
         </div>
         <Leaf

@@ -17,12 +17,9 @@ export function AboutNewsletter() {
       </span>
       <div className={styles.newsletterCopy}>
         <p className={styles.eyebrow}>Stay updated</p>
-        <h2 id="about-newsletter-title">
-          Practical reads, coming to your inbox.
-        </h2>
+        <h2 id="about-newsletter-title">Practical reads. Stay connected.</h2>
         <p>
-          Our newsletter is coming soon. In the meantime, explore the latest
-          articles on the site.
+          Subscribe for future updates about the latest articles on the site.
         </p>
       </div>
       <NewsletterForm label="About page newsletter signup" />

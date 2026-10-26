@@ -1,3 +1,4 @@
+import { backendHeaders } from "./backend-auth";
 import "server-only";
 import { cache } from "react";
 import { cacheLife, cacheTag } from "next/cache";
@@ -54,7 +55,7 @@ async function request<T>(path: string, schema: z.ZodType<T>): Promise<T> {
       cache: "no-store",
       redirect: "error",
       signal: AbortSignal.timeout(15000),
-      headers: { Accept: "application/json" },
+      headers: backendHeaders(),
     });
     if (!response.ok) {
       const parsed = ErrorResponseSchema.safeParse(

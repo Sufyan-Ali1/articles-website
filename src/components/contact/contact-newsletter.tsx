@@ -13,10 +13,9 @@ export function ContactNewsletter() {
       </span>
       <div className={styles.newsletterCopy}>
         <p className={styles.eyebrow}>Stay connected</p>
-        <h2 id="contact-newsletter-title">More useful reads, coming soon.</h2>
+        <h2 id="contact-newsletter-title">Stay connected with new reads.</h2>
         <p>
-          We’re preparing a newsletter for practical guides and new articles.
-          Signup is not available yet.
+          Leave your email for future practical guides and new article updates.
         </p>
       </div>
       <NewsletterForm label="Contact page newsletter signup" />

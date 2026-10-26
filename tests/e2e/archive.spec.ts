@@ -29,8 +29,8 @@ test("article archive keeps the new layout, full images, and category controls o
   const newsletter = archive.getByRole("form", {
     name: "Articles newsletter signup",
   });
-  await expect(newsletter.getByRole("textbox")).toBeDisabled();
-  await expect(newsletter.getByRole("button")).toBeDisabled();
+  await expect(newsletter.getByRole("textbox")).toBeEnabled();
+  await expect(newsletter.getByRole("button")).toBeEnabled();
   for (const width of [1920, 1440, 1024, 834, 760, 640, 390, 320]) {
     await page.setViewportSize({ width, height: 1000 });
     const nav = (await page.locator(".header-inner").boundingBox())!;
@@ -128,7 +128,7 @@ test("article archive category panel fills the viewport and both controls stay a
   expect(await page.evaluate(() => window.scrollY)).toBe(scroll);
   await page.setViewportSize({ width: 1440, height: 900 });
   const newsletter = page.getByRole("region", {
-    name: "Useful guides, coming to your inbox.",
+    name: "Keep up with useful guides.",
   });
   await newsletter.scrollIntoViewIfNeeded();
   const sidebarBox = (await sidebar.boundingBox())!;

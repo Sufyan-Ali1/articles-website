@@ -42,8 +42,8 @@ test("article request page keeps cards below its hero, scrolling guidance, and a
   const newsletter = request.getByRole("form", {
     name: "Article request newsletter signup",
   });
-  await expect(newsletter.getByRole("textbox")).toBeDisabled();
-  await expect(newsletter.getByRole("button")).toBeDisabled();
+  await expect(newsletter.getByRole("textbox")).toBeEnabled();
+  await expect(newsletter.getByRole("button")).toBeEnabled();
   for (const width of [1920, 1440, 1280, 1024, 834, 760, 640, 390, 320]) {
     await page.setViewportSize({ width, height: 1000 });
     const nav = (await page.locator(".header-inner").boundingBox())!;

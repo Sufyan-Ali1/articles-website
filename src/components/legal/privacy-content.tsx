@@ -57,16 +57,16 @@ export const privacySections: LegalSection[] = [
       <>
         <p>
           The contact form collects your email address, message subject, and
-          message, plus any optional name or article link. Netlify Forms
-          processes and stores these messages separately from the article
-          suggestion service. We use contact messages to address enquiries; they
-          are not published or treated as newsletter subscriptions.
+          message, plus any optional name or article link. Our backend receives
+          and stores these messages privately. We use contact messages to
+          address enquiries; they are not published or treated as newsletter
+          subscriptions.
         </p>
         <p>
-          People authorized to manage our Netlify account may review contact
-          submissions. The publication’s operator manages notification settings
-          and retention. Netlify also processes technical information to deliver
-          messages and help prevent spam.
+          Authorized administrators can review contact submissions. The
+          publication’s operator manages access and retention. Contact messages
+          are stored for review; sending a message does not trigger an automated
+          email or guarantee a reply.
         </p>
       </>
     ),
@@ -96,12 +96,25 @@ export const privacySections: LegalSection[] = [
       <>
         <p>
           The site does not include advertising or third-party analytics
-          scripts. The article Save feature stores bookmarks in your browser’s
+          scripts. We use our own traffic measurement to understand which shared
+          links and referring websites bring readers to articles. A signed,
+          HttpOnly cookie remembers a random session identifier and referral
+          information for 30 minutes of inactivity. Opening a different tracking
+          link starts a new attributed session. Article-view records include the
+          article, time, campaign or link placement, and referring domain when
+          available; they do not include your name, email, full referring URL,
+          or IP address. We honor browser Do Not Track and Global Privacy
+          Control signals. These measurements are estimates, not a record of
+          individual identities. The publication operator manages analytics
+          retention. The article Save feature stores bookmarks in your browser’s
           local storage; it does not create an account or sync bookmarks across
           devices. External image providers receive the technical information
           needed to deliver their images. Links to other websites lead to
-          services with their own privacy practices. Newsletter signup is not
-          active, and the disabled signup forms do not accept subscriptions.
+          services with their own privacy practices. When you subscribe, we
+          store your normalized email address and signup date for future article
+          updates. Repeated signup does not create a second subscription. Email
+          delivery is not active yet. Subscribing is optional and is separate
+          from sending a contact message or suggesting a topic.
         </p>
       </>
     ),
@@ -114,11 +127,12 @@ export const privacySections: LegalSection[] = [
     content: (
       <>
         <p>
-          Suggestions and optional contact details may be kept for editorial
-          planning and follow-up. The publication’s operator manages retention
-          and deletion; the website does not provide an automatic deletion
-          schedule. Infrastructure providers may keep technical logs under their
-          own settings and policies.
+          Suggestions, contact messages, and optional contact details may be
+          kept for editorial planning and follow-up. Subscriber emails are kept
+          for future article updates. The publication’s operator manages
+          retention and deletion; the website does not provide an automatic
+          deletion schedule. Infrastructure providers may keep technical logs
+          under their own settings and policies.
         </p>
       </>
     ),

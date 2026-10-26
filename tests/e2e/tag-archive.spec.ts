@@ -26,7 +26,7 @@ test("tag detail shares the category archive layout without a sidebar", async ({
     tag
       .getByRole("form", { name: "Articles newsletter signup" })
       .getByRole("button"),
-  ).toBeDisabled();
+  ).toBeEnabled();
   for (const width of [1920, 1440, 1024, 834, 640, 390, 320]) {
     await page.setViewportSize({ width, height: 1000 });
     const nav = (await page.locator(".header-inner").boundingBox())!;

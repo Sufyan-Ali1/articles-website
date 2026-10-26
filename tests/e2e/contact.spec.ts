@@ -29,8 +29,8 @@ test("contact reference layout keeps the form, information card, FAQs, and compl
   const newsletter = contact.getByRole("form", {
     name: "Contact page newsletter signup",
   });
-  await expect(newsletter.getByRole("textbox")).toBeDisabled();
-  await expect(newsletter.getByRole("button")).toBeDisabled();
+  await expect(newsletter.getByRole("textbox")).toBeEnabled();
+  await expect(newsletter.getByRole("button")).toBeEnabled();
   for (const width of [1920, 1440, 1280, 1024, 834, 760, 640, 390, 320]) {
     await page.setViewportSize({ width, height: 1000 });
     const header = (await page.locator(".header-inner").boundingBox())!;

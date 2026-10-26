@@ -30,7 +30,7 @@ test("category detail shares the article archive design and uses the full width 
     category
       .getByRole("form", { name: "Articles newsletter signup" })
       .getByRole("button"),
-  ).toBeDisabled();
+  ).toBeEnabled();
   for (const width of [1920, 1440, 1024, 834, 640, 390, 320]) {
     await page.setViewportSize({ width, height: 1000 });
     const nav = (await page.locator(".header-inner").boundingBox())!;

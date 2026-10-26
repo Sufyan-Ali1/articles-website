@@ -1,10 +1,13 @@
+import { FormsApiProvider } from "@/components/shared/forms-api-provider";
+import { Suspense } from "react";
+import { TrafficTracker } from "@/components/analytics/traffic-tracker";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
-import { site, isIndexable } from "@/lib/config";
+import { site, isIndexable, formsApiUrl } from "@/lib/config";
 import "./globals.css";
 const newsreader = localFont({
   src: [
@@ -45,14 +48,19 @@ export default function RootLayout({
       className={`${GeistSans.variable} ${GeistMono.variable} ${newsreader.variable}`}
     >
       <body>
-        <a href="#main-content" className="skip-link">
-          Skip to content
-        </a>
-        <Header />
-        <main id="main-content" tabIndex={-1}>
-          {children}
-        </main>
-        <Footer />
+        <FormsApiProvider apiUrl={formsApiUrl}>
+          <a href="#main-content" className="skip-link">
+            Skip to content
+          </a>
+          <Suspense fallback={null}>
+            <TrafficTracker />
+          </Suspense>
+          <Header />
+          <main id="main-content" tabIndex={-1}>
+            {children}
+          </main>
+          <Footer />
+        </FormsApiProvider>
       </body>
     </html>
   );

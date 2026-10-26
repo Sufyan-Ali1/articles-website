@@ -2,14 +2,14 @@ import { configuredApiUrl, safeHttpUrl } from "./urls";
 
 export function securityHeaders({
   production,
-  publicApiUrl,
+  apiUrl,
   siteUrl,
 }: {
   production: boolean;
-  publicApiUrl?: string;
+  apiUrl?: string;
   siteUrl?: string;
 }) {
-  const api = configuredApiUrl(publicApiUrl);
+  const api = configuredApiUrl(apiUrl);
   const apiOrigin = api ? new URL(api).origin : "";
   const secureSite = safeHttpUrl(siteUrl)?.startsWith("https://");
   const directives = [
@@ -21,12 +21,12 @@ export function securityHeaders({
     "style-src 'self' 'unsafe-inline'",
     `img-src 'self' data: blob: https:${apiOrigin.startsWith("http:") ? ` ${apiOrigin}` : ""}`,
     "font-src 'self'",
-    `connect-src 'self'${apiOrigin ? ` ${apiOrigin}` : ""}${production ? "" : " ws: wss:"}`,
+    `connect-src 'self'${production ? "" : " ws: wss:"}`,
     "object-src 'none'",
     "base-uri 'self'",
     "frame-src 'none'",
     "frame-ancestors 'none'",
-    `form-action 'self'${apiOrigin ? ` ${apiOrigin}` : ""}`,
+    "form-action 'self'",
     ...(production && secureSite && !apiOrigin.startsWith("http:")
       ? ["upgrade-insecure-requests"]
       : []),

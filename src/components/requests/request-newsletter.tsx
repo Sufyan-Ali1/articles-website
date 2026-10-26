@@ -13,9 +13,7 @@ export function RequestNewsletter() {
       </span>
       <div className={styles.newsletterCopy}>
         <p className={styles.eyebrow}>Stay curious</p>
-        <h2 id="request-newsletter-title">
-          Useful guides. A newsletter on the way.
-        </h2>
+        <h2 id="request-newsletter-title">Useful guides. Stay in the loop.</h2>
       </div>
       <NewsletterForm label="Article request newsletter signup" />
     </section>

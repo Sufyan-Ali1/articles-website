@@ -31,6 +31,10 @@ describe("public API boundary", () => {
     expect(url.searchParams.get("search")).toBe("a & b");
     expect(url.searchParams.has("status")).toBe(false);
     expect(fetch.mock.calls[0][1]).not.toHaveProperty("headers.Authorization");
+    expect(fetch.mock.calls[0][1].headers["X-API-User"]).toBe("test-website");
+    expect(fetch.mock.calls[0][1].headers["X-API-Key"]).toBe(
+      "test-only-api-key-over-32-characters-long",
+    );
     expect(fetch.mock.calls[0][1]).toMatchObject({ redirect: "error" });
   });
   it("keeps backend errors distinct from successful empty results", async () => {

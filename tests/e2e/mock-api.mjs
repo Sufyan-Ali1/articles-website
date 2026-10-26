@@ -208,6 +208,19 @@ createServer(async (req, res) => {
   }
   if (outage || url.searchParams.get("search") === "simulate-outage")
     return error(503);
+  if (url.pathname === "/api/v1/contact-messages" && req.method === "POST") {
+    if (
+      !body.email ||
+      !body.message ||
+      !["general", "correction", "privacy"].includes(body.reason)
+    )
+      return error(422);
+    return json(202, { data: { message: "Thank you for getting in touch." } });
+  }
+  if (url.pathname === "/api/v1/subscriptions" && req.method === "POST") {
+    if (!body.email || !body.email.includes("@")) return error(422);
+    return json(202, { data: { message: "Thank you for subscribing." } });
+  }
   if (url.pathname === "/api/v1/article-requests" && req.method === "POST") {
     if (body.topic === "rate-limit-test") {
       res.setHeader("Retry-After", "60");

@@ -13,12 +13,10 @@ export function ArchiveNewsletter() {
       </span>
       <div className={styles.newsletterCopy}>
         <p className={styles.eyebrow}>Stay in the loop</p>
-        <h2 id="archive-newsletter-title">
-          Useful guides, coming to your inbox.
-        </h2>
+        <h2 id="archive-newsletter-title">Keep up with useful guides.</h2>
         <p>
-          Our newsletter is coming soon. Find your next guide in the article
-          library while we get it ready.
+          Save your email for future article updates, and explore the library
+          for your next guide today.
         </p>
       </div>
       <NewsletterForm label="Articles newsletter signup" />

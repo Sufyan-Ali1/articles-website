@@ -1,4 +1,5 @@
 "use client";
+import { NewsletterForm } from "@/components/shared/newsletter-form";
 
 import { useState, useSyncExternalStore } from "react";
 import { Bookmark, Printer } from "lucide-react";
@@ -102,26 +103,15 @@ export function NewsletterSignup() {
           </span>
           <div>
             <p className={styles.newsletterEyebrow}>Stay in the loop</p>
-            <h2 id="newsletter-heading">Useful reads in your inbox</h2>
+            <h2 id="newsletter-heading">Stay in the loop</h2>
           </div>
         </div>
-        <p>A newsletter for practical guides is on the way.</p>
-        <form className={styles.newsletterForm} aria-label="Newsletter signup">
-          <div className={styles.newsletterFields}>
-            <input
-              type="email"
-              aria-label="Your email address"
-              placeholder="Your email address"
-              disabled
-            />
-            <button type="submit" disabled>
-              Subscribe
-            </button>
-          </div>
-        </form>
-        <p className={styles.newsletterNotice}>
-          Coming soon. This form is not accepting subscriptions yet.
-        </p>
+        <p>Sign up for future guides and new article updates.</p>
+        <NewsletterForm
+          formClassName={styles.newsletterForm}
+          fieldsClassName={styles.newsletterFields}
+          noteClassName={styles.newsletterNotice}
+        />
       </div>
     </section>
   );

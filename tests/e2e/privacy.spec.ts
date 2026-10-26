@@ -23,7 +23,7 @@ test("privacy page uses an illustrated hero and numbered sections while retainin
     "The site does not include advertising or third-party analytics",
   );
   await expect(privacy.getByRole("article")).toContainText(
-    "Netlify Forms processes and stores these messages separately",
+    "Our backend receives and stores these messages privately",
   );
   await expect(privacy.getByRole("article")).toContainText(
     "you can suggest a topic without contact details.",

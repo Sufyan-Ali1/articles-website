@@ -1,3 +1,4 @@
+import { backendCredentialsReady } from "@/lib/api/backend-auth";
 import "server-only";
 import {
   configuredApiUrl,
@@ -28,6 +29,7 @@ export const isIndexable =
   Boolean(process.env.SITE_URL?.startsWith("https://")) &&
   (process.env.CONTEXT === undefined || process.env.CONTEXT === "production");
 export const imageHosts = exactImageHosts(process.env.IMAGE_REMOTE_HOSTS);
-export const publicApiUrl = configuredApiUrl(
-  process.env.NEXT_PUBLIC_API_BASE_URL,
-);
+export const formsApiUrl =
+  configuredApiUrl(process.env.API_BASE_URL) && backendCredentialsReady()
+    ? "/"
+    : "";

@@ -1,9 +1,9 @@
 import { defineConfig, devices } from "@playwright/test";
 const env = {
+  API_USER: "e2e-website",
+  API_KEY: "e2e-only-api-key-over-32-characters-long",
   API_BASE_URL: "http://127.0.0.1:4100",
-  NEXT_PUBLIC_API_BASE_URL: "http://127.0.0.1:4100",
   SITE_URL: "https://ask-explore.test",
-  CONTACT_FORM_ENABLED: "true",
   NEXTJS_REVALIDATION_SECRET:
     "e2e-independent-revalidation-secret-over-32-chars",
 };

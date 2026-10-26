@@ -221,7 +221,7 @@ test("long contents scroll independently and follow the current article section"
   await expect(page.locator(".article-hero")).toHaveCount(0);
 });
 
-test("reference reader provides progress, persistent saving, sharing, and a disabled newsletter design", async ({
+test("reference reader provides progress, persistent saving, sharing, and an active subscription form", async ({
   page,
 }) => {
   await page.goto("/articles/electric-car-question");
@@ -255,10 +255,10 @@ test("reference reader provides progress, persistent saving, sharing, and a disa
     page
       .getByRole("form", { name: "Newsletter signup", exact: true })
       .getByRole("button", { name: "Subscribe" }),
-  ).toBeDisabled();
+  ).toBeEnabled();
   await expect(
     page
       .getByRole("form", { name: "Newsletter signup", exact: true })
       .getByRole("textbox", { name: "Your email address" }),
-  ).toBeDisabled();
+  ).toBeEnabled();
 });

@@ -2,7 +2,7 @@ import { connection } from "next/server";
 import { ContactForm } from "@/components/shared/contact-form";
 import { contactPrefill } from "@/lib/utils/contact-schema";
 import type { SearchParams } from "@/lib/utils/filters";
-import { site } from "@/lib/config";
+import { formsApiUrl, site } from "@/lib/config";
 import styles from "./contact.module.css";
 
 export async function ContactFormArea({
@@ -17,7 +17,7 @@ export async function ContactFormArea({
   return (
     <ContactForm
       key={JSON.stringify(prefill)}
-      enabled={process.env.CONTACT_FORM_ENABLED === "true"}
+      apiUrl={formsApiUrl}
       initialReason={prefill.reason}
       articleUrl={prefill.articleUrl}
       email={email}

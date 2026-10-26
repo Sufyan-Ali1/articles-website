@@ -78,7 +78,7 @@ test("combined homepage renders distinct stories, active topics, and the version
   ]) {
     await expect(
       page.getByRole("form", { name }).getByRole("button"),
-    ).toBeDisabled();
+    ).toBeEnabled();
   }
   await page.evaluate(() => document.fonts.ready);
   await page

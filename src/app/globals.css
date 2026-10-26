@@ -3078,3 +3078,11 @@ mark {
     --site-gutter: 16px;
   }
 }
+
+/* Keep signup feedback and long addresses within compact/mobile cards. */
+.publication-newsletter-fields input {
+  min-width: 0;
+}
+.publication-newsletter-note {
+  overflow-wrap: anywhere;
+}

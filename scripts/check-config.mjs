@@ -1,4 +1,4 @@
-const required = ["API_BASE_URL", "NEXT_PUBLIC_API_BASE_URL", "SITE_URL"];
+const required = ["API_BASE_URL", "SITE_URL"];
 let invalid = false;
 for (const key of required) {
   try {
@@ -19,6 +19,12 @@ for (const key of required) {
     );
     invalid = true;
   }
+}
+if (!process.env.API_USER || (process.env.API_KEY || "").length < 32) {
+  console.error(
+    "API_USER and API_KEY: configure matching server-side backend credentials (key >=32 characters).",
+  );
+  invalid = true;
 }
 if ((process.env.NEXTJS_REVALIDATION_SECRET || "").length < 32) {
   console.error(

@@ -24,7 +24,7 @@ const nextConfig: NextConfig = {
         source: "/:path*",
         headers: securityHeaders({
           production: process.env.NODE_ENV === "production",
-          publicApiUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
+          apiUrl: process.env.API_BASE_URL,
           siteUrl: process.env.SITE_URL,
         }),
       },

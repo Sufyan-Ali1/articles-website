@@ -149,7 +149,7 @@ export function Footer() {
           <div className={styles.newsletterColumn}>
             <h2>Stay in Touch</h2>
             <p>
-              Our newsletter is on the way.
+              Subscribe for future article updates.
               <br />
               Browse the latest articles today.
             </p>
