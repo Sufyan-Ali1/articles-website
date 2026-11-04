@@ -65,12 +65,13 @@ test("reader panels stay anchored while reading without edge controls", async ({
     await expect
       .poll(async () => Math.round((await panel.boundingBox())!.y))
       .toBe(82);
-    expect(
-      await panel.evaluate((node) => ({
-        scroll: node.scrollHeight > node.clientHeight,
-        overflow: getComputedStyle(node).overflowY,
-      })),
-    ).toEqual({ scroll: false, overflow: "visible" });
+    if ((await panel.getAttribute("data-side")) === "related") {
+      await expect(panel).toHaveCSS("overflow-y", "auto");
+    } else {
+      expect(
+        await panel.evaluate((node) => node.scrollHeight > node.clientHeight),
+      ).toBe(false);
+    }
   }
   await page.screenshot({ path: testInfo.outputPath("reader-sticky.png") });
   await page
@@ -100,10 +101,69 @@ test("reader panels stay anchored while reading without edge controls", async ({
   expect(
     (await page.locator('aside[data-side="contents"]').boundingBox())!.height,
   ).toBeLessThanOrEqual(154);
-  await expect(page.locator('aside[data-side="related"]')).toHaveAttribute(
-    "data-tall",
-    "true",
+  await expect(page.locator('aside[data-side="related"]')).toHaveCSS(
+    "position",
+    "sticky",
   );
+  expect(
+    (await page.locator('aside[data-side="related"]').boundingBox())!.height,
+  ).toBeLessThanOrEqual(154);
+});
+
+test("desktop sidebars have equal widths and overflowing recommendations stay sticky", async ({
+  page,
+  isMobile,
+}, testInfo) => {
+  test.skip(isMobile, "Desktop sidebar layout");
+  for (const [width, height] of [
+    [1200, 650],
+    [1280, 800],
+    [1440, 800],
+    [1920, 900],
+  ]) {
+    await page.setViewportSize({ width, height });
+    await page.goto("/articles/long-reader");
+    await expect(page.locator("#article-content")).toBeVisible();
+    await page.evaluate(() => document.fonts.ready);
+    const left = page.locator('aside[data-side="contents"]');
+    const right = page.locator('aside[data-side="related"]');
+    await expect(left).toHaveCount(1);
+    await expect(right).toHaveCount(1);
+    const leftBox = (await left.boundingBox())!;
+    const rightBox = (await right.boundingBox())!;
+    expect(Math.abs(leftBox.width - rightBox.width)).toBeLessThan(1);
+    const top = await right.evaluate((node) =>
+      parseFloat(getComputedStyle(node).top),
+    );
+    for (const offset of [600, 1600]) {
+      await page.evaluate(
+        (y) => window.scrollTo({ top: y, behavior: "instant" }),
+        offset,
+      );
+      await expect
+        .poll(async () => Math.round((await right.boundingBox())!.y))
+        .toBe(Math.round(top));
+    }
+    expect((await right.boundingBox())!.height).toBeLessThanOrEqual(
+      height - top - 24,
+    );
+    const button = right.getByRole("button", {
+      name: "Subscribe to newsletter",
+    });
+    await expect(button.locator("svg")).toHaveCount(0);
+    if (width === 1440) {
+      const position = await page.evaluate(() => scrollY);
+      await right.evaluate((node) => {
+        node.scrollTop = node.scrollHeight;
+      });
+      expect(await right.evaluate((node) => node.scrollTop)).toBeGreaterThan(0);
+      await expect(button).toBeInViewport();
+      expect(await page.evaluate(() => scrollY)).toBe(position);
+      await page.screenshot({
+        path: testInfo.outputPath("equal-sticky-sidebars.png"),
+      });
+    }
+  }
 });
 
 test("reader adapts to tablet, mobile, and zoom-sized viewports", async ({

@@ -561,7 +561,6 @@
   background: #11254a;
   padding: 11px 16px;
   font-size: 12px;
-  opacity: 0.85;
 }
 .newsletter :global(.publication-newsletter-note) {
   color: #8b9ab0;

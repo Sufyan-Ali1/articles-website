@@ -108,6 +108,7 @@ export function NewsletterSignup() {
         </div>
         <p>Sign up for future guides and new article updates.</p>
         <NewsletterForm
+          showArrow={false}
           formClassName={styles.newsletterForm}
           fieldsClassName={styles.newsletterFields}
           noteClassName={styles.newsletterNotice}

@@ -171,7 +171,10 @@ async function ArticleContent({ params }: Props) {
               {tags.length > 0 && (
                 <nav className="article-tags" aria-label="Article tags">
                   {tags.map((tag) => (
-                    <Link key={tag.id} href={`/tag/${tag.slug}`}>
+                    <Link
+                      key={tag.id}
+                      href={`/articles?${new URLSearchParams({ tag: tag.slug })}`}
+                    >
                       {tag.name}
                     </Link>
                   ))}
@@ -193,7 +196,7 @@ async function ArticleContent({ params }: Props) {
         <RelatedArticlesPanel
           key={slug}
           slug={slug}
-          category={category?.slug}
+          article={article}
           title={article.title}
         />
       </div>

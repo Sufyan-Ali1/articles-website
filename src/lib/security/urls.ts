@@ -1,5 +1,28 @@
 const localHosts = new Set(["localhost", "127.0.0.1", "[::1]"]);
 
+// Publication-owned public assets are optimized without a deployment env toggle.
+export const articleImagePattern = {
+  protocol: "https" as const,
+  hostname: "res.cloudinary.com",
+  pathname: "/k4ncios2/image/upload/**",
+};
+
+export function isPublicationImage(value: string) {
+  try {
+    const url = new URL(value);
+    return (
+      url.protocol === "https:" &&
+      url.hostname === articleImagePattern.hostname &&
+      url.pathname.startsWith("/k4ncios2/image/upload/") &&
+      !url.username &&
+      !url.password &&
+      !url.port
+    );
+  } catch {
+    return false;
+  }
+}
+
 export function safeHttpUrl(value: string | null | undefined): string | null {
   if (!value || value.length > 2048 || /[\u0000-\u0020\u007f\\]/.test(value))
     return null;

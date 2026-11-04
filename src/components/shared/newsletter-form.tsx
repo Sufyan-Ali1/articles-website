@@ -25,6 +25,7 @@ export function NewsletterForm({
   formClassName = "",
   fieldsClassName = "",
   noteClassName = "",
+  showArrow = true,
 }: {
   compact?: boolean;
   label?: string;
@@ -32,6 +33,7 @@ export function NewsletterForm({
   formClassName?: string;
   fieldsClassName?: string;
   noteClassName?: string;
+  showArrow?: boolean;
 }) {
   const configuredApiUrl = useFormsApiUrl();
   const apiUrl = suppliedApiUrl ?? configuredApiUrl;
@@ -126,7 +128,8 @@ export function NewsletterForm({
                   <ArrowRight size={18} aria-hidden="true" />
                 ) : (
                   <>
-                    Subscribe <ArrowRight size={15} aria-hidden="true" />
+                    Subscribe{" "}
+                    {showArrow && <ArrowRight size={15} aria-hidden="true" />}
                   </>
                 )}
               </button>
@@ -156,7 +159,7 @@ export function NewsletterForm({
           >
             {unavailable
               ? "Subscriptions are temporarily unavailable. Please check back soon."
-              : "Sign up for future article updates. Emails are not being sent yet."}
+              : "Subscribe for new articles and practical guides."}
           </p>
         </>
       )}

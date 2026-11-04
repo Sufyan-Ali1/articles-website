@@ -465,7 +465,6 @@
   color: white;
   background: #102449;
   font-size: 12px;
-  opacity: 0.85;
 }
 .newsletter :global(.publication-newsletter-note) {
   color: #8494ac;

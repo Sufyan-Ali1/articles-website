@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       ...(isIndexable
-        ? { allow: "/", disallow: ["/api/", "/search"] }
+        ? { allow: "/", disallow: ["/api/"] }
         : { disallow: "/" }),
     },
     ...(isIndexable ? { sitemap: new URL("/sitemap.xml", site.url).href } : {}),

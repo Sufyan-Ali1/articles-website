@@ -1,7 +1,11 @@
 import type { MetadataRoute } from "next";
 import { connection } from "next/server";
 import { headers } from "next/headers";
-import { getClassifications, getSitemapArticles } from "@/lib/api/client";
+import {
+  getArticles,
+  getClassifications,
+  getSitemapArticles,
+} from "@/lib/api/client";
 import { isIndexable, site } from "@/lib/config";
 
 const staticPaths = [
@@ -47,11 +51,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // These helpers follow every API page and share the webhook-invalidated cache.
   // Let API failures propagate rather than publish an incomplete successful XML.
-  const [articles, categories, tags] = await Promise.all([
+  const [articles, categories] = await Promise.all([
     getSitemapArticles(),
     getClassifications("categories"),
-    getClassifications("tags"),
   ]);
+  // Use actual archive totals: parent-category inclusion differs by backend.
+  // Fail on upstream errors instead of treating an unavailable archive as empty.
+  const populated = new Set(
+    await Promise.all(
+      categories
+        .filter((c) => c.is_active && validSlug(c.slug, 180))
+        .map(async (c) => {
+          const result = await getArticles({ category: c.slug, page_size: 1 });
+          return result.meta.total > 0 ? c.id : null;
+        }),
+    ),
+  );
   const items: MetadataRoute.Sitemap = [
     ...staticPaths.map((path) => ({ url: new URL(path, origin).href })),
     ...articles
@@ -61,16 +76,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         lastModified: lastModified(article.updated_at, article.published_at),
       })),
     ...categories
-      .filter((c) => c.is_active && validSlug(c.slug, 180))
+      .filter(
+        (c) => c.is_active && populated.has(c.id) && validSlug(c.slug, 180),
+      )
       .map((c) => ({
         url: new URL(`/category/${c.slug}`, origin).href,
         lastModified: lastModified(c.updated_at, c.created_at),
-      })),
-    ...tags
-      .filter((t) => t.is_active && validSlug(t.slug, 180))
-      .map((t) => ({
-        url: new URL(`/tag/${t.slug}`, origin).href,
-        lastModified: lastModified(t.updated_at, t.created_at),
       })),
   ];
   const unique = new Map<string, MetadataRoute.Sitemap[number]>();

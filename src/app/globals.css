@@ -129,6 +129,35 @@ mark {
   min-width: 0;
   width: 100%;
 }
+.publication-newsletter-fields > button {
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+.publication-newsletter-form
+  .publication-newsletter-fields
+  > button:not(:disabled) {
+  opacity: 1;
+}
+.publication-newsletter-form .publication-newsletter-fields > button:disabled {
+  opacity: 0.55;
+}
+.publication-newsletter-fields > button:not(:disabled):hover,
+.publication-newsletter-fields > button:not(:disabled):focus-visible {
+  background-color: #0758bd;
+  border-color: #0758bd;
+  box-shadow: 0 3px 10px #0758bd33;
+}
+.publication-newsletter-fields > button:not(:disabled):focus-visible {
+  outline: 3px solid #80b7ff;
+  outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .publication-newsletter-fields > button {
+    transition: none;
+  }
+}
 .skip-link {
   position: fixed;
   left: 16px;

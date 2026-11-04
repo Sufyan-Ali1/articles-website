@@ -132,15 +132,15 @@ test("category hierarchy, direct membership, tags, and not found", async ({
   await expect(page.locator(".results-info")).toContainText("15 articles");
   await expect(
     page.getByRole("link", { name: "Next", exact: true }),
-  ).toHaveAttribute("href", "/tag/practical-choices?page=2");
+  ).toHaveAttribute("href", "/articles?tag=practical-choices&page=2");
   await page.getByRole("link", { name: "Next", exact: true }).click();
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     "href",
-    "https://ask-explore.test/tag/practical-choices?page=2",
+    "https://ask-explore.test/articles?tag=practical-choices&page=2",
   );
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
     "content",
-    /^index, follow$/,
+    /^noindex, follow$/,
   );
 
   await page.goto("/category/archived-topic");
@@ -247,7 +247,7 @@ test("sitemap, robots, static pages, and mobile navigation", async ({
   );
   expect(xml).not.toContain("archived-topic");
   expect(xml).not.toContain("/search");
-  expect(await (await request.get("/robots.txt")).text()).toContain(
+  expect(await (await request.get("/robots.txt")).text()).not.toContain(
     "Disallow: /search",
   );
   for (const path of [

@@ -773,7 +773,6 @@
   color: #fff;
   padding: 10px 14px;
   font-size: 11px;
-  opacity: 0.7;
 }
 .home :global(.publication-newsletter-note) {
   font-size: 10px !important;

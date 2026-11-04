@@ -10,11 +10,8 @@ import {
   X,
 } from "lucide-react";
 import { SearchSort } from "@/components/search/search-sort";
-import {
-  getArticles,
-  getClassifications,
-  searchArticles,
-} from "@/lib/api/client";
+import { getClassifications } from "@/lib/api/client";
+import { checkArchivePage, getArchiveResult } from "@/lib/seo/archives";
 import {
   parseFilters,
   filterUrl,
@@ -71,9 +68,7 @@ function ArchiveState({
               ? "Explore all articles"
               : searchPage
                 ? "Start a new search"
-                : path.startsWith("/tag/")
-                  ? "Explore tag articles"
-                  : "Explore category articles"}
+                : "Explore category articles"}
           <ArrowRight size={16} aria-hidden="true" />
         </Link>
       )}
@@ -125,13 +120,11 @@ export async function ArchiveContent({
     getClassifications("article-types")
       .then((items) => items.filter((type) => type.is_active))
       .catch(() => []),
-    (shouldFetch
-      ? filters.search
-        ? searchArticles(filters)
-        : getArticles(filters)
-      : Promise.resolve(null)
-    ).catch(() => null),
+    (shouldFetch ? getArchiveResult(filters) : Promise.resolve(null)).catch(
+      () => null,
+    ),
   ]);
+  if (result) checkArchivePage(filters, result);
   const start = result?.data.length
     ? (result.meta.page - 1) * result.meta.page_size + 1
     : 0;

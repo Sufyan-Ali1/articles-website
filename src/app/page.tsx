@@ -1,5 +1,6 @@
 import { Suspense } from "react";
-import { metadata } from "@/lib/seo/metadata";
+import { metadata, safeJsonLd } from "@/lib/seo/metadata";
+import { websiteStructuredData } from "@/lib/seo/structured-data";
 import { pageSeo } from "@/lib/content/site-copy";
 import { HomeContent } from "@/components/home/home-content";
 import { GridSkeleton } from "@/components/shared/states";
@@ -11,6 +12,12 @@ export const generateMetadata = () =>
 export default function Home() {
   return (
     <div className={styles.home} data-homepage>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: safeJsonLd(websiteStructuredData()),
+        }}
+      />
       <Suspense
         fallback={
           <div className={`${styles.shell} ${styles.loading}`}>

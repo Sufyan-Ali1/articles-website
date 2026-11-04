@@ -104,7 +104,6 @@
   color: white;
   border: 1px solid #0969d1;
   border-radius: 6px;
-  opacity: 0.7;
   padding: 8px;
 }
 .footer :global(.publication-newsletter-note) {

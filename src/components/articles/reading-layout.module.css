@@ -18,7 +18,8 @@
 }
 
 .layout {
-  --related-width: 310px;
+  --sidebar-width: 272px;
+  --related-width: var(--sidebar-width);
   display: grid;
   grid-template-columns: var(--contents-width, 0px) minmax(0, 1fr) var(
       --related-width,
@@ -28,7 +29,7 @@
   padding: 18px 0 24px;
 }
 .layout[data-has-contents="true"] {
-  --contents-width: 272px;
+  --contents-width: var(--sidebar-width);
 }
 .column {
   grid-column: 2;
@@ -287,9 +288,11 @@
   display: flex;
   flex-direction: column;
   min-height: max(100px, calc(100dvh - var(--reader-top) - 24px));
-}
-.panel[data-side="related"][data-tall="true"] {
-  position: static;
+  max-height: max(100px, calc(100dvh - var(--reader-top) - 24px));
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #b7bcc4 transparent;
 }
 .panelSurface {
   min-height: 0;
@@ -309,6 +312,10 @@
   display: flex;
   flex-direction: column;
   flex: 1;
+}
+.panel[data-side="related"] .panelSurface {
+  min-height: auto;
+  flex-shrink: 0;
 }
 .panel[data-side="related"] .relatedList {
   flex: 1;
@@ -596,7 +603,8 @@
   border-radius: 7px;
   color: #fff;
   font-size: 11px;
-  opacity: 0.75;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 .newsletter p.newsletterNotice {
   font-size: 10px;
@@ -729,11 +737,8 @@
 }
 
 @media (max-width: 1279px) {
-  .layout[data-has-contents="true"] {
-    --contents-width: 232px;
-  }
   .layout {
-    --related-width: 270px;
+    --sidebar-width: 232px;
   }
   .relatedStory {
     grid-template-columns: 76px minmax(0, 1fr);
@@ -776,6 +781,8 @@
     position: static;
     display: block;
     min-height: 0;
+    max-height: none;
+    overflow-y: visible;
     grid-column: 2;
     grid-row: 2;
     margin: 20px 0 0;

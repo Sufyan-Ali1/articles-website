@@ -39,7 +39,10 @@ for (const route of routes) {
         width: (node as HTMLImageElement).naturalWidth,
         height: (node as HTMLImageElement).naturalHeight,
       }));
-      expect(intrinsic.width / intrinsic.height).toBeCloseTo(16 / 9, 3);
+      // Encoded image heights may round by one pixel; the displayed frame is exact.
+      expect(
+        Math.abs(intrinsic.height - (intrinsic.width * 9) / 16),
+      ).toBeLessThanOrEqual(1);
       const imageBox = (await image.boundingBox())!;
       expect(Math.abs(imageBox.width - box.width)).toBeLessThan(1);
       expect(Math.abs(imageBox.height - box.height)).toBeLessThan(1);

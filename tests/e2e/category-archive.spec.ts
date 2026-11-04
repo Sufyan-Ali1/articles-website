@@ -124,14 +124,12 @@ test("category article filters, resets, and page changes stay within the categor
     .click();
   await expect(page).toHaveURL(/\/category\/technology\?view=list$/);
   await expect(category.locator("[data-archive-story]")).toHaveCount(6);
-  await page.goto("/category/technology?page=2");
-  await expect(category.locator("[data-archive-story]")).toHaveCount(0);
-  await expect(category.locator(".results-info")).toContainText(
-    "6 articles available",
+  const missingPage = await page.goto("/category/technology?page=2");
+  expect(missingPage?.status()).toBe(404);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    /Can’t Find This Page/,
   );
-  await category
-    .getByRole("link", { name: "Explore category articles", exact: true })
-    .click();
+  await page.goto("/category/technology");
   await expect(page).toHaveURL(/\/category\/technology$/);
   await expect(category.locator("[data-archive-story]")).toHaveCount(6);
   await page.goto("/category/everyday-tech");

@@ -8,6 +8,7 @@ import { ArchiveNewsletter } from "@/components/articles/archive/archive-newslet
 import styles from "@/components/articles/archive/archive.module.css";
 import { metadata } from "@/lib/seo/metadata";
 import { pageSeo } from "@/lib/content/site-copy";
+import { checkArchivePage, getArchiveResult } from "@/lib/seo/archives";
 import {
   filterUrl,
   parseFilters,
@@ -19,6 +20,8 @@ export async function generateMetadata({
   searchParams: Promise<SearchParams>;
 }) {
   const filters = parseFilters(await searchParams);
+  const result = await getArchiveResult(filters).catch(() => null);
+  if (result) checkArchivePage(filters, result);
   const filtered = Boolean(
     filters.search ||
     filters.category ||
@@ -30,7 +33,7 @@ export async function generateMetadata({
     pageSeo.articles.title,
     pageSeo.articles.description,
     filterUrl("/articles", filters),
-    { noindex: filtered },
+    { noindex: filtered || !result || result.meta.total === 0 },
   );
 }
 export default function Articles({

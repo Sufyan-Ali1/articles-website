@@ -1,6 +1,6 @@
 import type { NextConfig } from "next";
 import { securityHeaders } from "./src/lib/security/headers";
-import { exactImageHosts } from "./src/lib/security/urls";
+import { articleImagePattern, exactImageHosts } from "./src/lib/security/urls";
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
@@ -10,13 +10,14 @@ const nextConfig: NextConfig = {
     dangerouslyAllowLocalIP: false,
     dangerouslyAllowSVG: false,
     contentSecurityPolicy: "default-src 'none'; script-src 'none'; sandbox;",
-    remotePatterns: exactImageHosts(process.env.IMAGE_REMOTE_HOSTS).map(
-      (hostname) => ({
+    remotePatterns: [
+      articleImagePattern,
+      ...exactImageHosts(process.env.IMAGE_REMOTE_HOSTS).map((hostname) => ({
         protocol: "https" as const,
         hostname,
         pathname: "/**",
-      }),
-    ),
+      })),
+    ],
   },
   async headers() {
     return [
@@ -33,7 +34,16 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   async redirects() {
     return [
-      { source: "/tags/:slug", destination: "/tag/:slug", permanent: true },
+      {
+        source: "/tags/:slug",
+        destination: "/articles?tag=:slug",
+        permanent: true,
+      },
+      {
+        source: "/tag/:slug",
+        destination: "/articles?tag=:slug",
+        permanent: true,
+      },
     ];
   },
   partialPrefetching: true,

@@ -3,11 +3,15 @@ import { ArrowUpRight } from "lucide-react";
 import type { ArticleSummary } from "@/types/api";
 import { formatDate } from "@/lib/utils";
 import { imageHosts } from "@/lib/config";
+import { isPublicationImage } from "@/lib/security/urls";
 import { ArticleImage } from "./article-image";
 export type CardVariant = "lead" | "standard" | "compact" | "row";
 export function optimizedImage(src: string | null) {
   try {
-    return Boolean(src && imageHosts.includes(new URL(src).hostname));
+    return Boolean(
+      src &&
+      (isPublicationImage(src) || imageHosts.includes(new URL(src).hostname)),
+    );
   } catch {
     return false;
   }

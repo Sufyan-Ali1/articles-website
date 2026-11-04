@@ -2,6 +2,8 @@ import { Suspense, type ReactNode } from "react";
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { getArticles } from "@/lib/api/client";
+import type { ArticleSummary } from "@/types/api";
+import { selectRelatedArticles } from "@/lib/utils/related-articles";
 import { optimizedImage } from "./article-card";
 import { ArticleImage } from "./article-image";
 import { NewsletterSignup, ReaderActions } from "./reader-actions";
@@ -75,44 +77,41 @@ export function RelatedArticlesPanelSkeleton() {
 
 export function RelatedArticlesPanel({
   slug,
-  category,
+  article,
   title,
 }: {
   slug: string;
-  category?: string;
+  article: ArticleSummary;
   title: string;
 }) {
   return (
     <RelatedArticlesShell slug={slug} title={title}>
       <Suspense fallback={<RelatedArticlesSkeleton />}>
-        <RelatedArticles slug={slug} category={category} />
+        <RelatedArticles article={article} />
       </Suspense>
     </RelatedArticlesShell>
   );
 }
 
-async function RelatedArticles({
-  slug,
-  category,
-}: {
-  slug: string;
-  category?: string;
-}) {
-  let stories = await getArticles({ category, page_size: 6 })
-    .then((result) =>
-      result.data.filter((article) => article.slug !== slug).slice(0, 5),
-    )
-    .catch(() => []);
-  if (stories.length < 5 && category) {
-    const recent = await getArticles({ page_size: 6 })
-      .then((result) => result.data)
-      .catch(() => []);
-    const seen = new Set([slug, ...stories.map((story) => story.slug)]);
-    stories = [
-      ...stories,
-      ...recent.filter((story) => !seen.has(story.slug)),
-    ].slice(0, 5);
-  }
+async function RelatedArticles({ article }: { article: ArticleSummary }) {
+  const filters = [
+    ...article.tags
+      .filter((t) => t.is_active)
+      .slice(0, 3)
+      .map((t) => ({ tag: t.slug })),
+    ...article.categories
+      .filter((c) => c.is_active)
+      .slice(0, 3)
+      .map((c) => ({ category: c.slug })),
+  ];
+  const candidates = await Promise.all(
+    filters.map((filter) =>
+      getArticles({ ...filter, page_size: 20 })
+        .then((result) => result.data)
+        .catch(() => []),
+    ),
+  );
+  const stories = selectRelatedArticles(article, candidates.flat());
   if (!stories.length)
     return (
       <p className={styles.relatedEmpty}>

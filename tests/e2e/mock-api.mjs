@@ -31,6 +31,10 @@ const inactive = {
   parent_id: null,
 };
 const tag = classification(201, "Practical choices", "practical-choices");
+const empty = {
+  ...classification(105, "Empty topic", "empty-topic"),
+  parent_id: null,
+};
 const types = [
   classification(301, "Tutorials", "tutorial"),
   classification(302, "Reviews", "review"),
@@ -319,7 +323,7 @@ createServer(async (req, res) => {
     });
   }
   for (const [collection, values] of [
-    ["categories", [technology, automotive, everyday, inactive]],
+    ["categories", [technology, automotive, everyday, inactive, empty]],
     ["tags", [tag]],
     ["article-types", types],
   ]) {

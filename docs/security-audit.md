@@ -1,89 +1,103 @@
-# Ask & Explore security audit
+# Security audit
 
-Audit date: October 25, 2026. Status: fixes applied locally; deployment has not been performed.
+Audit date: 25 October 2026. Fixes were applied locally at that time; production deployment was not verified. This shorter report keeps the original findings and limits. Package versions and test counts below are historical results, not fresh scans.
 
-## Scope and method
+The review covered this Next.js frontend and the adjacent `Blogs_Backend` FastAPI service. Tests used local fixtures, without a production database, real uploads or live load tests. This was not a security certification or proof of an attack.
 
-Reviewed the Next.js application, shared components, route handlers, HTML rendering, URL/query handling, API decoders, caching, metadata/JSON-LD, image optimization, forms, environment configuration, dependencies, deployment files, and tests. Reviewed the adjacent `Blogs_Backend` FastAPI service: authentication, authorization, refresh sessions, SQLAlchemy queries, public/private response models, rich-text sanitization, request protection, uploads, Cloudinary, database TLS configuration, and revalidation integration.
+Later frontend work added a submission gateway, analytics routes and an SEO proxy. Forms now use FastAPI, not the old Netlify Forms setup.
 
-The frontend has no login, database client, upload endpoint, middleware/proxy, or application Server Actions. Its only custom API route is the bearer-protected revalidation webhook. Authentication, database writes, and media uploads belong to FastAPI; contact delivery belongs to Netlify Forms. Testing used local fixtures and the existing backend test suite, without a production database, real uploads, destructive requests, or load testing against live systems.
+## Findings and solutions
 
-The review follows the risk and control areas in [OWASP Top 10:2025](https://owasp.org/www-project-top-ten/) and [OWASP ASVS](https://owasp.org/www-project-application-security-verification-standard/). It is not an ASVS certification or a guarantee that no undiscovered vulnerability exists. Installed Next.js data-security and CSP guides were read before implementation.
+### SEC-01 — Old certificate bundle · Critical upstream advisory
 
-## Findings and fixes
+**Issue:** The local backend environment had `certifi 2026.7.22`, although requirements already specified the corrected bundle. Production exposure and any interception were unverified.
 
-| ID     | Severity and exposure                                                                       | Finding                                                                                                                                                                                                                                                                                                                     | Fix and evidence                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-| ------ | ------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| SEC-01 | **Critical upstream advisory; local environment confirmed, production exposure unverified** | The backend virtual environment had `certifi 2026.7.22`, containing affected certificate-authority trust material. The repository already required the corrected bundle, so this was installed-environment drift. This does not demonstrate interception or compromise of application credentials.                          | Updated the local environment to `certifi 2026.10.19`, matching `requirements.txt`. The final installed-package audit is clean. See the [maintainer advisory](https://github.com/certifi/python-certifi/security/advisories/GHSA-6q48-6c7w-9gw2). Verify the deployed environment uses the corrected bundle too.                                                                                                                                           |
-| SEC-02 | **Medium; requires unsafe HTML from the publishing API**                                    | The frontend's HTML blacklist retained active document elements such as `base`, `meta`, and `link`, as well as uncontrolled attributes. Arbitrary IDs could collide with reader controls. FastAPI already sanitizes stored HTML, reducing the reachable attack surface; no live published-content exploit was demonstrated. | Replaced the blacklist with `sanitize-html 2.18.1`, an explicit tag/attribute/scheme allowlist, a nesting limit, safe link relationships, and unique generated heading IDs. Active embeds, forms, event handlers, styles, arbitrary IDs/classes/data attributes, and alternate image-source attributes are removed. Safe tables, code, headings, details, images, and sponsored links remain. Malicious-markup unit and desktop/mobile browser tests pass. |
-| SEC-03 | **Medium; availability impact conditional on abnormal upstream responses**                  | API response bodies were buffered as unrestricted JSON. Collection walks trusted response pagination beyond their original page-count guard. A broken or compromised upstream could amplify memory use or repeatedly return the wrong page.                                                                                 | Added an 8 MiB streamed response limit, strict UTF-8 decoding, bounded record fields/arrays, page-identity and consistency checks, a 100,000-record/1,000-page ceiling, and a 32 MiB aggregate collection budget. Oversized or inconsistent responses fail rather than become partial successful content. Tests cover dishonest/missing content lengths, oversized metadata, and repeated pages.                                                           |
-| SEC-04 | **Medium upstream advisory; tracing instrumentation required for request exposure**         | `requirements.txt` pinned `opentelemetry-api 1.45.0`, affected by unbounded `tracestate` parsing. The reviewed service does not directly enable the affected tracing extraction path; deployment instrumentation could enable it.                                                                                           | Updated the adjacent backend dependency pin and local environment to `1.45.1`. Requirements and installed-environment advisory scans are clean; backend tests pass. See [GHSA-xcq7-p3pf-p88h](https://github.com/open-telemetry/opentelemetry-python/security/advisories/GHSA-xcq7-p3pf-p88h).                                                                                                                                                             |
-| SEC-05 | **Build-tool advisories of varying severity; malicious package input required**             | The local backend environment retained `pip 22.3` and `setuptools 65.5.0`, with published installation/download advisories. These are not demonstrated remotely reachable website flaws. Some advisories are platform-specific.                                                                                             | Updated local tooling to `pip 26.2.2` and `setuptools 84.1.0`. The repository's Dockerfile already pins patched pip; its production dependencies are installed separately from this local environment. The final installed-package scan is clean. One example is the [setuptools legacy-installation advisory](https://github.com/pypa/setuptools/security/advisories/GHSA-xmj3-9gf7-h52w).                                                                |
+**Solution:** Updated the local environment to `2026.10.19`. Check the installed production package too. [Advisory](https://github.com/certifi/python-certifi/security/advisories/GHSA-6q48-6c7w-9gw2).
 
-### SEC-06: credentialed response cache protection — Low
+### SEC-02 — Unsafe article HTML could pass through · Medium
 
-Authenticated taxonomy reads use the same backend route paths as public reads. The middleware only marked known administrative/authentication paths and mutations `no-store`; credentialed taxonomy GETs lacked that explicit directive. Standard shared caches already restrict Authorization-bearing responses, so this is a confirmed cache-control gap rather than a demonstrated public disclosure.
+**Issue:** The old blacklist allowed document elements and uncontrolled attributes/IDs. This required unsafe publishing data; no live exploit was shown. Backend sanitizing already reduced exposure.
 
-Updated `Blogs_Backend/app/core/middleware.py` to apply `no-store` whenever an Authorization or Cookie header is present, as well as to the existing private routes and mutations. It replaces conflicting route cache directives rather than appending a duplicate. Five database-independent regression cases verify bearer reads, cookie-bearing reads, administrative reads, mutations, and preservation of anonymous public cache behavior. Backend lint, types, and tests pass.
+**Solution:** Added `sanitize-html 2.18.1` with an explicit list of allowed tags, attributes and URL schemes, nesting limits and unique heading IDs. Scripts, active embeds, event handlers, forms and arbitrary styles/IDs are removed. Safe tables, code, images and sponsored links remain. Unit/browser attack tests passed.
 
-Additional preventive hardening, without a claim of demonstrated exploitation:
+### SEC-03 — API responses could use too much memory · Medium
 
-- Added an enforced CSP, production HTTPS HSTS, same-origin opener isolation, and additional browser permission restrictions. Retained frame denial, MIME sniffing protection, safe referrer policy, and disabled framework branding. Browser tests verify actual production-server response headers and normal hydration.
-- Centralized safe HTTP(S) URL handling; reject credentials, control characters, ambiguous backslashes, protocol-relative article URLs, and malformed image allowlists. API configuration requires HTTPS except explicit loopback development hosts, and cannot contain query/fragment credentials or the duplicated `/api/v1` suffix. Server configuration is marked `server-only`; only the validated public submission origin reaches the browser.
-- Disabled upstream API redirects and image-optimizer redirects. Image optimization requires exact approved HTTPS hosts; private-IP access and SVG optimization remain disabled. Direct external images are browser requests, not arbitrary server fetches.
-- Updated Next.js `16.4.2 → 16.4.3`, React/React DOM `19.3.0 → 19.3.1`, and matching Next ESLint configuration. The starting Next version was already above the fixes described in the [October 14 security update](https://nextjs.org/blog/nextjs-security-update-october-14-2026); this is not a claim that this project contained those critical framework flaws. Both before and after npm scans reported zero known advisories.
-- Added explicit Node `>=22.12.0` support to match the sanitizer's runtime requirement. The deployment already selects Node 22.
+**Issue:** Very large JSON or dishonest/repeated pagination from a broken upstream could cause excessive work.
 
-## Controls reviewed without a confirmed new flaw
+**Solution:** Limit each response to 8 MiB, validate UTF-8 and field/array sizes, check page identity/totals, and stop collection reads at 1,000 pages, 100,000 records or 32 MiB total. Bad responses fail instead of becoming partial successful content. Regression tests passed.
 
-| Area                                   | Reviewed behavior and limits of the conclusion                                                                                                                                                                                                                                                                                                                                                         |
-| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| XSS and content integrity              | React escapes ordinary text. Raw article HTML now passes the allowlist boundary. JSON-LD escapes script-closing characters. Generated code-copy controls remain application-owned. Safe URL checks cover image and metadata destinations.                                                                                                                                                              |
-| CSRF and CORS                          | The webhook requires an independent bearer secret, not ambient cookies. Public topic suggestions use JSON and omit credentials. Backend browser-session mutations use CSRF checks and configured origins. Contact is intentionally public; cross-origin spam is an abuse-control concern, not an authenticated account mutation. Deployment CORS must still be checked.                                |
-| Authentication and authorization       | FastAPI checks JWT claims and the active database user/role; uses Argon2id, hashed refresh sessions, rotation, expiry, and revocation; and separates public/admin resources. Source and available tests were reviewed. Database-backed integration tests did not run.                                                                                                                                  |
-| SQL/NoSQL injection and access control | No NoSQL client is present. Reviewed SQLAlchemy operations bind data, constrain sorting, and escape search wildcards. Public article queries require published state; private request details and administrative fields are excluded from public responses. No raw user-controlled SQL path was found.                                                                                                 |
-| SSRF and redirects                     | No user-supplied general-purpose server URL fetcher was found. API/revalidation destinations are operator configuration. Browser navigation uses internal paths or validated URLs; the plural-tag redirect has a fixed destination. Network egress policy remains an infrastructure control.                                                                                                           |
-| Uploads                                | No frontend upload endpoint. FastAPI's authenticated media flow checks supported file signatures, size, ownership/roles, and fixed Cloudinary behavior. Real provider uploads/deletes were not exercised.                                                                                                                                                                                              |
-| Caching and Server Components          | Detail reads remain request-scoped and uncached across requests; public collection caching has bounded freshness and allowlisted invalidation. Private backend responses use `no-store`. No middleware-only authorization gate or application Server Action was found. Tests check unpublished/missing articles and webhook authentication.                                                            |
-| Secrets and errors                     | Targeted source/asset scans found no credential literals matching the checked patterns. `.env*` tracking was checked: only the example is tracked. Settings were inspected without displaying secret values. API errors remain generic to readers. This is not a full Git-history, cloud-account, log, or built-production-artifact secret audit. No application credential was confirmed compromised. |
-| Abuse protection                       | FastAPI bounds request bodies/time, login attempts, suggestion frequency, and duplicate tracking. Browser addition checks are deliberately **not** treated as authoritative CAPTCHA. Netlify contact delivery is provider-managed and disabled unless explicitly enabled.                                                                                                                              |
+### SEC-04 — OpenTelemetry parsing advisory · Medium
 
-## Verification results
+**Issue:** Backend `opentelemetry-api 1.45.0` had unbounded `tracestate` parsing. Exposure required tracing setup not directly enabled in the reviewed service.
 
-| Check                                            | Result                                                                                                                                                       |
-| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `npm run lint`                                   | Passed                                                                                                                                                       |
-| `npm run typecheck`                              | Passed                                                                                                                                                       |
-| `npm run format:check`                           | Passed after formatting the new documentation                                                                                                                |
-| `npm test`                                       | **82 passed**, 14 files                                                                                                                                      |
-| `npm run test:e2e`                               | **128 passed**, 6 intentional device-specific skips, Chromium desktop and mobile; a further **12 focused checks passed** after submission redirect hardening |
-| Production build                                 | Passed as part of the E2E server startup with Next.js 16.4.3                                                                                                 |
-| `npm audit`                                      | **0 known advisories**, including development dependencies                                                                                                   |
-| `npm ls --depth=0`                               | Passed; no invalid top-level dependency tree                                                                                                                 |
-| Backend `ruff check app scripts tests`           | Passed                                                                                                                                                       |
-| Backend `mypy app scripts`                       | Passed, 52 source files                                                                                                                                      |
-| Backend `pytest`                                 | **89 passed**, 29 skipped pending a disposable PostgreSQL test database                                                                                      |
-| Python requirements and installed-package audits | **0 known advisories** after fixes                                                                                                                           |
+**Solution:** Updated the adjacent backend pin and local environment to `1.45.1`. Historical scans/tests passed. Verify the deployed version. [Advisory](https://github.com/open-telemetry/opentelemetry-python/security/advisories/GHSA-xcq7-p3pf-p88h).
 
-The first browser run found outdated copy and viewport expectations from earlier design/content work. Assertions were updated to the actual intended copy and existing mobile spacing; the full suite was rerun successfully. Existing behavior tests were retained. Newly added tests cover rich-text attacks, browser execution prevention, URL restrictions, headers, response limits, and pagination abuse. Browser fixtures are test-only and never become production fallback content.
+### SEC-05 — Old local package tools · Varying advisory severity
 
-Backend tests ran on the available local Python 3.11 environment; the deployment specifies Python 3.12. A production image build and PostgreSQL integration run remain necessary before release. Audit scratch logs are under `/private/tmp/articles-security-*`, not committed application assets.
+**Issue:** Local `pip 22.3` and `setuptools 65.5.0` had installation/download advisories requiring malicious package input. This was not a demonstrated remote website flaw.
 
-## Remaining deployment work and risks
+**Solution:** Updated local tools to `pip 26.2.2` and `setuptools 84.1.0`. The Dockerfile already pinned patched pip. Verify the real production image separately. [Example advisory](https://github.com/pypa/setuptools/security/advisories/GHSA-xmj3-9gf7-h52w).
 
-1. **Deploy both services.** Rebuild the frontend lockfile/configuration changes and deploy the backend's updated `requirements.txt` and credentialed-cache middleware. Verify installed package versions and repeat advisory scans in the actual deployment image; local virtual-environment updates do not patch a running service. Require Node 22.12+ and the backend's supported Python 3.12+ runtime.
-2. **Verify production settings and delivery.** Run `npm run check:config` with deployment variables. Confirm HTTPS, exact API/image origins, backend production mode, secure cookie attributes, exact credentialed CORS origins, trusted proxy settings, database certificate verification, webhook delivery, and final edge-response headers. No cloud configuration was changed during this audit.
-3. **Protect public endpoints at the edge.** Backend rate limits are process-local; multiple workers/replicas multiply their effective allowance and restarts reset counters. Use an edge/WAF limit or shared atomic limiter when scaling. Confirm Netlify Forms spam controls, payload limits, authorized dashboard access, retention, and notification delivery before enabling contact submissions. The addition check and client validation are bypassable and do not replace these controls.
-4. **CSP is intentionally compatible with partial prerendering.** It allows inline bootstrap scripts/styles and HTTPS external images, while blocking inline event handlers and external script origins. It is not a strict nonce/hash CSP. A nonce policy would require a rendering/cache strategy change; [Next.js documents its incompatibility with PPR](https://nextjs.org/docs/app/guides/content-security-policy). Retain the HTML sanitizer regardless. External image providers still receive normal image-request metadata.
-5. **Complete isolated integration verification.** Provision a disposable PostgreSQL database ending in `_test`, run the skipped database/session tests, and exercise staging authentication/cookies, actual Cloudinary uploads, Netlify delivery, and publish/unpublish webhooks. Do not point destructive integration fixtures at production.
-6. **Operational monitoring and scale.** Monitor rejected/oversized API responses, repeated 429s, webhook failures, and dependency advisories. Partition sitemap/source processing before its documented collection/byte limits are approached; exceeding limits intentionally fails instead of producing a partial sitemap.
-7. **Credential handling.** No application secret was confirmed leaked, so no specific key is labeled compromised. If separate history/cloud/log scans find exposure, revoke and rotate the affected credential, update both ends of integrations, and invalidate affected sessions. Keep secrets out of `NEXT_PUBLIC_*`, client props, logs, and Git.
+### SEC-06 — Credentialed taxonomy responses lacked no-store · Low
 
-## Primary references
+**Issue:** Some authenticated taxonomy reads lacked explicit cache protection. No public data leak was demonstrated; shared caches already restrict Authorization responses.
 
-- [Next.js data security](https://nextjs.org/docs/app/guides/data-security)
-- [OWASP XSS prevention guidance](https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html)
-- [OWASP CSP guidance](https://cheatsheetseries.owasp.org/cheatsheets/Content_Security_Policy_Cheat_Sheet.html)
-- [sanitize-html maintainer documentation](https://github.com/apostrophecms/apostrophe/tree/main/packages/sanitize-html)
+**Solution:** Updated adjacent backend middleware to replace cache rules with `no-store` whenever Authorization or Cookie is present, plus existing private routes/mutations. Five tests covered these cases and anonymous public caching.
 
-Severity reflects the affected component and observed prerequisites, not evidence that production has been exploited. Advisory scanners report known published issues; a clean scan does not establish the absence of unknown vulnerabilities.
+## Other protection added
+
+- Added CSP, production HSTS and browser restrictions; retained frame denial, MIME protection and a safe referrer policy.
+- Restricted API/image URLs: reject embedded credentials, control characters, unsafe schemes and malformed hosts. API URLs require HTTPS except local loopback development.
+- Disabled upstream/image redirects and private-IP/SVG optimization. Optimized remote images need explicit approved hosts; server secrets stay server-only.
+- Updated Next.js `16.4.2 → 16.4.3` and React `19.3.0 → 19.3.1`. This does not mean the starting version had the referenced critical Next.js flaws.
+- Required Node 22.12 or newer.
+
+CSP allows inline startup scripts/styles for partial prerendering. It blocks inline event handlers and unapproved script hosts. It is not a strict nonce policy; changing that requires a rendering/cache review. Keep HTML sanitizing either way. External image services still receive normal image requests.
+
+## Reviewed without a new confirmed flaw
+
+React text escaping, script-safe JSON-LD, parameterized database queries, published-only article access, backend roles/sessions, upload checks, webhook authentication and bounded caching were reviewed. No general user-controlled server URL fetcher or frontend upload route was found.
+
+Targeted scans found no confirmed exposed application secret. Full Git history, cloud settings, production artifacts and logs were not audited. No database-backed integration or real Cloudinary operation was completed. Browser maths checks are bypassable and do not replace server abuse controls.
+
+## Results recorded on 25 October
+
+| Check                                             | Historical result                                                           |
+| ------------------------------------------------- | --------------------------------------------------------------------------- |
+| Frontend lint, types, format and production build | Passed.                                                                     |
+| Unit tests                                        | 82 passed in 14 files.                                                      |
+| Browser tests                                     | 128 passed, 6 intended skips; 12 further focused checks passed.             |
+| npm audit / dependency tree                       | No known advisories; no invalid top-level dependencies.                     |
+| Backend lint / types                              | Passed; 52 files checked by mypy.                                           |
+| Backend tests                                     | 89 passed; 29 skipped because a disposable PostgreSQL database was missing. |
+| Python requirement/installed-package scans        | No known advisories after local fixes.                                      |
+
+Backend tests used Python 3.11; deployment targets Python 3.12+. A clean scan does not rule out unknown problems. Later SEO/form checks are recorded in [implementation](../IMPLEMENTATION.md).
+
+## Remaining work
+
+**Issue:** Local fixes do not patch running services.
+
+**Solution:** Deploy both services, verify installed versions and repeat scans in the actual image. Use Node 22.12+ and supported Python 3.12+.
+
+**Issue:** Production security settings and delivery remain unverified.
+
+**Solution:** Run `npm run check:config`. Check HTTPS, exact API/image origins, secure cookies, exact credentialed CORS origins, trusted proxies, database certificate checks, response headers and webhooks. Verify actual form storage, retention, access and notifications; old Netlify Forms activation steps no longer apply.
+
+**Issue:** Process-local rate limits reset on restart and multiply across workers.
+
+**Solution:** Add an edge limit or shared atomic limiter when scaling. Keep payload limits and server-side validation.
+
+**Issue:** Database, session, upload and webhook integration checks were incomplete.
+
+**Solution:** Use a disposable PostgreSQL database ending in `_test`; run skipped tests and staging flows. Never point destructive fixtures at production.
+
+**Issue:** Failures or growth can exceed current limits.
+
+**Solution:** Monitor rejected/large responses, 429s, webhook failures and advisories. Split sitemap processing before size limits; do not hide failures with partial output.
+
+**Issue:** Future scans might find an exposed credential. No leak was confirmed here.
+
+**Solution:** If exposure is found, revoke/rotate that credential, update integrations and invalidate affected sessions. Keep secrets out of browser props, logs and Git.
+
+References: [Next.js data security](https://nextjs.org/docs/app/guides/data-security), [CSP](https://nextjs.org/docs/app/guides/content-security-policy), [OWASP XSS guidance](https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html), [sanitize-html](https://github.com/apostrophecms/apostrophe/tree/main/packages/sanitize-html).

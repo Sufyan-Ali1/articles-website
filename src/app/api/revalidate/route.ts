@@ -75,7 +75,6 @@ export async function POST(request: Request) {
     revalidatePath("/search");
     revalidatePath("/categories");
     revalidatePath("/category/[slug]", "page");
-    revalidatePath("/tag/[slug]", "page");
     revalidatePath("/sitemap.xml");
     for (const slug of parsed.data.slugs) revalidatePath(`/articles/${slug}`);
     if (!parsed.data.event.startsWith("article."))

@@ -1,40 +1,61 @@
-# Implementation report
+# Implementation status
 
-## Delivered
+Updated 4 November 2026. “Fixed locally” means the code is changed here; production deployment still needs checking.
 
-Ask & Explore now has a complete public App Router frontend in `src/`. The existing backend was inspected and left unchanged. Production code contains no demo articles, private API access, authentication tokens, or contact API.
+## Built
 
-All requested routes are implemented: home, articles directory/detail, categories directory/detail, tag detail, search, topic request, about, contact, privacy, terms, and disclaimer. Shared interfaces include editorial article cards, responsive media/fallbacks, nested category discovery, URL-based filters and pagination, mobile navigation, loading skeletons, empty/error states, and not-found handling.
+The website has article and category pages, search, filters, mobile navigation, contact and topic forms, newsletter signup, policies and error pages. Articles have safe HTML, contents links, reading progress, sharing and browser bookmarks. See [README](README.md) for setup.
 
-The article experience includes 740px reading typography, safe HTML processing, responsive tables and code, unique heading anchors, desktop/mobile TOC, reading progress, copy/native sharing, reading-time estimation, author/dates, tags, related stories, and sponsored-link notices.
+## Fixed locally
 
-The API layer uses real `/api/v1` routes and validates `{data}`, `{data,meta}`, and `{error}` contracts. Public classifications are anonymous and active-only. Searches match published article titles. Topic suggestions use direct public POSTs, client plus backend validation, an empty honeypot, 202 feedback, 422 field handling, and 429 `Retry-After` support.
+**Issue:** Tag pages added many small pages to the sitemap.
 
-SEO includes metadata overrides, Open Graph/Twitter, canonical URLs, safely serialized backend JSON-LD and breadcrumbs, a generated brand social image, complete paginated sitemap sources, and preview/search indexing rules. Public article detail reads are uncached; listings/classifications have short explicit caches. The revalidation receiver validates bearer authentication and the actual backend event contract before immediate tag expiry and current/previous-slug plus discovery-route invalidation.
+**Solution:** Both tag URL formats redirect to the article filter. Tags are excluded from the sitemap.
 
-## Verification
+**Issue:** Empty categories could be indexed.
 
-- 36 Vitest/React Testing Library tests passed.
-- 28 Playwright tests passed across Chromium desktop and mobile, including a production build, tablet screenshots, 320px overflow checks, Contact delivery/error flows with intercepted provider responses, discovery views, API outages, missing/inactive classifications, filtering/pagination, request success/validation/rate limits, unpublished article visibility, and revalidation security.
-- TypeScript, ESLint, Prettier, `git diff --check`, and a separate production build without backend configuration passed.
-- The production dependency audit returned zero vulnerabilities. The full audit reports the documented unpatched development-only `braces` advisory through the Next.js lint toolchain.
-- Desktop, tablet, mobile, and article-reading screenshots were inspected. A small mobile headline adjustment keeps the introductory phrase together at typical phone widths.
-- Local, unthrottled fixture measurements before that typography adjustment recorded LCP of 340ms desktop / 336ms mobile and CLS 0. The observed mobile interaction duration was 32ms. These are synthetic diagnostics, not production Core Web Vitals or field INP guarantees.
+**Solution:** Empty categories use `noindex` and are excluded from the sitemap.
 
-The test API and illustrated test stories are isolated in `tests/e2e`; they are never used by production code. Browser artifacts are available in `test-results/` and `playwright-report/` after running the suite.
+**Issue:** Missing articles/categories and page numbers beyond the last page could return HTTP 200.
 
-## Launch dependencies and contract limitations
+**Solution:** Early checks return 404 for confirmed missing content and invalid archive pages.
 
-Production API URLs, canonical domain, and the shared webhook secret remain intentionally unconfigured. `npm run check:config` currently fails for those missing values, as expected. Configure them using `.env.example` and the README's Netlify instructions, then verify deployed connectivity, CORS, webhook delivery, approved image hosts, and HTTPS. The site has not been deployed or tested against a live production backend.
+**Issue:** Large article images were served at their original size.
 
-Add approved public contact details and review operator/legal information before public launch. Contact methods are omitted until configured.
+**Solution:** Approved publication images use responsive Next.js image sizes and WebP.
 
-Article summaries have no reading-time field, so cards omit reading time instead of fetching every body. Sponsored-link detection is based on actual HTML relationships; the backend provides no explicit affiliate flag. Backend view counts reflect API requests rather than unique visitors. Missed webhooks can briefly leave listing summaries stale, while new detail requests still enforce backend visibility. The backend has no durable webhook retry queue. Sitemap partitioning is needed before exceeding the documented 50,000-URL limit.
+**Issue:** Related articles could be unrelated recent posts.
 
-See `README.md` for setup, environment variables, deployment steps, caching behavior, API integration details, and repeatable checks.
+**Solution:** Results need shared active tags, or matching topic words within a shared active category. Fewer than five results are allowed.
 
-## Editorial redesign
+**Issue:** Robots blocked search pages from showing Google their `noindex` rule.
 
-Implemented a variable Newsreader/Geist design system, original decorative SVG artwork, four article-card layouts, story-led home sections, accessible Topics dropdown, dark footer, grid/list browsing with active chips, highlighted search matches, searchable nested categories, distinctive category/tag layouts, article code copying and correction links, bespoke About and Contact pages, and anchored legal documents. Empty, error, loading and narrow mobile layouts share the same visual language.
+**Solution:** Search crawling is allowed; search pages still use `noindex`.
 
-Contact is a separately configured Netlify Forms integration. The static form definition is in `public/__forms.html`; the form remains disabled unless `CONTACT_FORM_ENABLED=true`. Registration, notification setup, and a real delivered submission require Netlify production access and remain deployment dependencies. Automated contact tests use intercepted responses and never deliver external messages. See README activation steps.
+**Issue:** The homepage had no WebSite schema.
+
+**Solution:** Added the real site name and URL. Article schema still comes from the backend, as requested.
+
+**Issue:** The article's right sidebar stopped being sticky and had a different width.
+
+**Solution:** Both sidebars share a width; the right panel stays sticky and scrolls inside on desktop. Its Subscribe arrow was removed.
+
+**Issue:** Signup copy was confusing and buttons looked disabled.
+
+**Solution:** Signup now says “Subscribe for new articles and practical guides.” Enabled buttons have full opacity and visible hover/focus colors, including the homepage and footer.
+
+## Checks already recorded
+
+Earlier checks passed 114 unit tests, TypeScript and lint. Form checks passed 34 desktop/mobile browser tests using a test backend. Public form routes returned the expected 422 response for empty data. No valid production messages or subscriptions were sent.
+
+These are earlier results, not new test runs from this document edit. Full production saving, email delivery, indexing and speed remain unverified.
+
+## Still needs work
+
+- Correct placeholder article schema and author details in the backend. Do not replace backend schema in the frontend.
+- Add missing hero image descriptions in the CMS and replace the dead FTC citation.
+- Decide whether to publish Digital Safety articles or retire the empty category. All seven category descriptions were checked in the live output and are now distinct.
+- Deploy and verify the local fixes. Check Google Search Console, real-user speed, account settings and full form delivery.
+- Review optional article improvements with the owner. No article content changes are authorized by the current documentation task.
+
+See [owner actions](SEO_OWNER_ACTIONS.md) for steps and [SEO issues](SEO_AUDIT_REPORT.md) for the original issue IDs.
