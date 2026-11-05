@@ -1,3 +1,4 @@
+import publication from "./publication.json";
 import { backendCredentialsReady } from "@/lib/api/backend-auth";
 import "server-only";
 import {
@@ -20,8 +21,7 @@ if (
 
 export const site = {
   name: "Ask & Explore",
-  description:
-    "Practical guides, product comparisons and how-to articles on technology, cars and everyday life. Understand your options and choose with confidence.",
+  description: publication.description,
   url: configuredSite.replace(/\/$/, ""),
   email: process.env.CONTACT_EMAIL || "",
 };
@@ -33,3 +33,7 @@ export const formsApiUrl =
   configuredApiUrl(process.env.API_BASE_URL) && backendCredentialsReady()
     ? "/"
     : "";
+
+if (process.env.CONTEXT === "production" && site.url !== publication.origin) {
+  throw new Error("Production SITE_URL must match publication.origin");
+}

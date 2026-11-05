@@ -46,7 +46,6 @@ export function Header() {
           }
         >
           <DesktopNavigation>
-            <NavLink href="/categories">Explore all categories</NavLink>
             <Suspense>
               <CategoryLinks />
             </Suspense>

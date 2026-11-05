@@ -30,7 +30,7 @@ export function DesktopNavigation({ children }: { children: ReactNode }) {
   const path = usePathname();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const trigger = useRef<HTMLButtonElement>(null);
+  const trigger = useRef<HTMLAnchorElement>(null);
   useEffect(() => {
     if (!open) return;
     const close = (event: KeyboardEvent) => {
@@ -56,17 +56,30 @@ export function DesktopNavigation({ children }: { children: ReactNode }) {
       <div
         className="categories-dropdown"
         ref={ref}
+        onPointerEnter={(event) => {
+          if (event.pointerType === "mouse") setOpen(true);
+        }}
+        onPointerLeave={(event) => {
+          if (event.pointerType === "mouse") setOpen(false);
+        }}
         onBlur={(event) => {
           if (!event.currentTarget.contains(event.relatedTarget))
             setOpen(false);
         }}
       >
-        <button
+        <Link
+          href="/categories"
           ref={trigger}
-          type="button"
           aria-expanded={open}
           aria-controls="categories-panel"
-          onClick={() => setOpen(!open)}
+          aria-current={path === "/categories" ? "page" : undefined}
+          onClick={() => setOpen(false)}
+          onKeyDown={(event) => {
+            if (event.key === "ArrowDown" || event.key === " ") {
+              event.preventDefault();
+              setOpen(true);
+            }
+          }}
           className={
             path === "/categories" || path.startsWith("/category/")
               ? "nav-active"
@@ -74,8 +87,8 @@ export function DesktopNavigation({ children }: { children: ReactNode }) {
           }
         >
           Categories
-          <ChevronDown size={14} />
-        </button>
+          <ChevronDown size={14} aria-hidden="true" />
+        </Link>
         {open && (
           <div
             id="categories-panel"

@@ -1,3 +1,4 @@
+import { AuthorName } from "@/components/authors/author-name";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import type { ArticleSummary } from "@/types/api";
@@ -102,7 +103,7 @@ export function ArticleCard({
             {article.author && (
               <>
                 <span className="meta-dot">·</span>
-                {article.author.name}
+                <AuthorName author={article.author} />
               </>
             )}
           </span>

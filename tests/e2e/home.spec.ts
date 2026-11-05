@@ -6,7 +6,7 @@ test("combined homepage renders distinct stories, active topics, and the version
 }, testInfo) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-    /Practical Guides.*Smarter Everyday Choices/,
+    /Ask & Explore.*Practical Guides.*Clear Answers/,
   );
   await expect(
     page.getByRole("heading", { name: "Latest Articles", exact: true }),
@@ -89,7 +89,7 @@ test("combined homepage renders distinct stories, active topics, and the version
     fullPage: true,
   });
   if (!isMobile) {
-    await page.getByRole("button", { name: "Categories", exact: true }).click();
+    await page.locator(".categories-dropdown > a").hover();
     await expect(page.locator("#categories-panel")).toBeVisible();
     await page.keyboard.press("Escape");
     await expect(page.locator("#categories-panel")).toBeHidden();

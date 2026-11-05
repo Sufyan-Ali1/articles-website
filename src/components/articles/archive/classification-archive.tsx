@@ -1,3 +1,5 @@
+import { safeJsonLd } from "@/lib/seo/metadata";
+import { pageStructuredData } from "@/lib/seo/structured-data";
 import { Suspense } from "react";
 import { connection } from "next/server";
 import { classificationCopy } from "@/lib/content/site-copy";
@@ -25,6 +27,18 @@ export async function ClassificationArchive({
   );
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: safeJsonLd(
+            pageStructuredData(
+              `/${kind}/${item.slug}`,
+              item.name,
+              "CollectionPage",
+            ),
+          ),
+        }}
+      />
       <ArchiveHero
         eyebrow={kind === "tag" ? "Filed under" : "Explore the topic"}
         title={item.name}

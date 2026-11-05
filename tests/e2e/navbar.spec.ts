@@ -38,7 +38,7 @@ test("all page routes share the new navbar and never render the legacy navbar", 
       "Articles",
       "About",
     ]);
-    await expect(header.locator(".categories-dropdown > button")).toHaveText(
+    await expect(header.locator(".categories-dropdown > a")).toHaveText(
       "Categories",
     );
     const appearance = await header.evaluate((node) => {
@@ -74,7 +74,7 @@ test("all page routes share the new navbar and never render the legacy navbar", 
     } else {
       await expect(header.locator(".header-search-form")).toBeVisible();
       await expect(
-        header.getByRole("button", { name: "Categories", exact: true }),
+        header.getByRole("link", { name: "Categories", exact: true }),
       ).toBeVisible();
       await expect(
         header.getByRole("link", { name: "Latest", exact: true }),
@@ -105,13 +105,13 @@ test("navbar categories and editable search support keyboard navigation and subm
   );
   await page.goto("/category/technology");
   const header = page.locator(".site-header");
-  const categories = header.getByRole("button", {
+  const categories = header.getByRole("link", {
     name: "Categories",
     exact: true,
   });
   await expect(categories).toHaveClass(/nav-active/);
   await categories.focus();
-  await page.keyboard.press("Enter");
+  await page.keyboard.press("ArrowDown");
   await expect(page.locator("#categories-panel")).toBeVisible();
   await expect(
     page
@@ -121,6 +121,18 @@ test("navbar categories and editable search support keyboard navigation and subm
   await page.keyboard.press("Escape");
   await expect(categories).toBeFocused();
   await expect(page.locator("#categories-panel")).toHaveCount(0);
+  await categories.hover();
+  await expect(page.locator("#categories-panel")).toBeVisible();
+  await expect(
+    page
+      .locator("#categories-panel")
+      .getByRole("link", { name: /Explore all/i }),
+  ).toHaveCount(0);
+  await header.getByRole("link", { name: "Home", exact: true }).hover();
+  await expect(page.locator("#categories-panel")).toHaveCount(0);
+  await categories.click();
+  await expect(page).toHaveURL(/\/categories$/);
+
   await header.getByRole("link", { name: "Articles", exact: true }).click();
   await expect(page).toHaveURL(/\/articles$/);
   await expect(
@@ -244,11 +256,16 @@ test("mobile navigation provides the main links and expandable categories", asyn
   const menu = page.getByRole("dialog");
   for (const name of ["Home", "Articles", "About"])
     await expect(menu.getByRole("link", { name, exact: true })).toBeVisible();
-  await menu.locator("summary").filter({ hasText: "Categories" }).click();
   await expect(
-    menu.getByRole("link", { name: "Explore all categories", exact: true }),
-  ).toBeVisible();
+    menu.getByRole("link", { name: "Categories", exact: true }),
+  ).toHaveAttribute("href", "/categories");
+  await menu.getByRole("button", { name: "Toggle category dropdown" }).click();
+  await expect(menu.getByRole("link", { name: /Explore all/i })).toHaveCount(0);
   await menu.getByRole("link", { name: "Technology", exact: true }).click();
   await expect(page).toHaveURL(/\/category\/technology$/);
+  await expect(menu).toBeHidden();
+  await page.getByRole("button", { name: "Open navigation" }).click();
+  await menu.getByRole("link", { name: "Categories", exact: true }).click();
+  await expect(page).toHaveURL(/\/categories$/);
   await expect(menu).toBeHidden();
 });

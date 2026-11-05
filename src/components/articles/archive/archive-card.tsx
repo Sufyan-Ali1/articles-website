@@ -1,3 +1,4 @@
+import { AuthorName } from "@/components/authors/author-name";
 import Link from "next/link";
 import { CalendarDays } from "lucide-react";
 import type { ArticleSummary } from "@/types/api";
@@ -79,7 +80,9 @@ export function ArchiveCard({
               <span className={styles.avatar} aria-hidden="true">
                 {initials}
               </span>
-              <span>{article.author.name}</span>
+              <span>
+                <AuthorName author={article.author} />
+              </span>
             </span>
           )}
           {article.published_at && (

@@ -57,7 +57,7 @@ describe("navigation and SEO", () => {
     );
     expect(screen.getByRole("dialog")).toBeInTheDocument();
     await userEvent.click(
-      screen.getByText("Categories", { selector: "summary" }),
+      screen.getByRole("button", { name: "Toggle category dropdown" }),
     );
     expect(screen.getByRole("link", { name: "Technology" })).toHaveAttribute(
       "href",

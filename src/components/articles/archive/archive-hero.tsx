@@ -4,7 +4,7 @@ import styles from "./archive.module.css";
 export function ArchiveHero({
   eyebrow = "All articles",
   title = "Explore Our Articles",
-  description = "Find a useful answer, compare your options, or learn how something works. Browse our technology, automotive, and everyday-life articles by topic or format.",
+  description = "Browse how-to guides, product comparisons, and buying guides from Ask & Explore. Explore technology tips, car advice, and everyday solutions by topic or article type.",
 }: {
   eyebrow?: string;
   title?: string;

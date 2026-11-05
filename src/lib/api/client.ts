@@ -1,3 +1,4 @@
+import { isPublishedArticle } from "@/lib/utils/article-publication";
 import { backendHeaders } from "./backend-auth";
 import "server-only";
 import { cache } from "react";
@@ -120,6 +121,10 @@ export const getArticle = cache(async (slug: string) => {
     `articles/${encodeURIComponent(slug)}`,
     z.object({ data: ArticleResponseSchema }),
   );
+  // Public detail routes never render drafts or scheduled articles, even if
+  // an upstream response unexpectedly contains one.
+  if (!isPublishedArticle(result.data))
+    throw new ApiError(404, "not_found", "Article not found.");
   return result.data;
 });
 async function getCachedClassification(collection: Collection, slug: string) {

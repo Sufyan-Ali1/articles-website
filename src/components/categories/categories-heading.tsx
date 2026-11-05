@@ -6,9 +6,9 @@ export function CategoriesHeading() {
       <p className={styles.eyebrow}>Discover by topic</p>
       <h1>Explore Categories</h1>
       <p className={styles.introduction}>
-        Start with a topic that matters to you. Find technology guides, car
-        buying advice, product comparisons, and practical ideas for everyday
-        life.
+        Browse guides by topic on Ask &amp; Explore. Choose a category for
+        technology guides, car buying advice, digital safety tips, lifestyle
+        ideas, or travel planning.
       </p>
     </header>
   );

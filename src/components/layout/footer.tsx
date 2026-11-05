@@ -166,6 +166,7 @@ export function Footer() {
           </span>
           <nav aria-label="Footer legal links">
             <Link href="/about">About</Link>
+            <Link href="/authors/editorial-team">Editorial Team</Link>
             <Link href="/privacy">Privacy</Link>
             <Link href="/terms">Terms</Link>
             <Link href="/disclaimer">Disclosures</Link>

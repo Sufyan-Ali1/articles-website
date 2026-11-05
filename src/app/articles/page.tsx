@@ -6,7 +6,8 @@ import {
 } from "@/components/articles/archive/archive-content";
 import { ArchiveNewsletter } from "@/components/articles/archive/archive-newsletter";
 import styles from "@/components/articles/archive/archive.module.css";
-import { metadata } from "@/lib/seo/metadata";
+import { pageStructuredData } from "@/lib/seo/structured-data";
+import { metadata, safeJsonLd } from "@/lib/seo/metadata";
 import { pageSeo } from "@/lib/content/site-copy";
 import { checkArchivePage, getArchiveResult } from "@/lib/seo/archives";
 import {
@@ -33,7 +34,9 @@ export async function generateMetadata({
     pageSeo.articles.title,
     pageSeo.articles.description,
     filterUrl("/articles", filters),
-    { noindex: filtered || !result || result.meta.total === 0 },
+    {
+      noindex: filtered || !result || result.meta.total === 0,
+    },
   );
 }
 export default function Articles({
@@ -43,6 +46,18 @@ export default function Articles({
 }) {
   return (
     <div className={styles.page} data-articles-page>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: safeJsonLd(
+            pageStructuredData(
+              "/articles",
+              pageSeo.articles.title,
+              "CollectionPage",
+            ),
+          ),
+        }}
+      />
       <ArchiveHero />
       <div className={`${styles.shell} ${styles.content}`}>
         <Suspense fallback={<ArchiveSkeleton />}>

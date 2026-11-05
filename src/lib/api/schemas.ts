@@ -34,7 +34,20 @@ export const CategoryResponseSchema = z.object({
   parent_id: z.union([z.string(), z.null()]),
 });
 
+// Optional during rolling deployments: older public API responses omit these.
+const ArticleKeywordFields = {
+  primary_keywords: z
+    .array(z.string().trim().min(1).max(300))
+    .max(100)
+    .optional(),
+  secondary_keywords: z
+    .array(z.string().trim().min(1).max(300))
+    .max(100)
+    .optional(),
+};
+
 export const ArticleSummarySchema = z.object({
+  ...ArticleKeywordFields,
   id: identity,
   title: z.string().min(1).max(300),
   slug: slug(350),
@@ -53,6 +66,7 @@ export const ArticleSummarySchema = z.object({
 });
 
 export const ArticleResponseSchema = z.object({
+  ...ArticleKeywordFields,
   id: identity,
   title: z.string().min(1).max(300),
   slug: slug(350),

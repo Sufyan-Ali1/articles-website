@@ -1,0 +1,21 @@
+{
+  "generator": "Built-in image_gen tool",
+  "assets": [
+    {
+      "file": "hero",
+      "prompt": "Create one polished soft dimensional 3D editorial illustration for Ask & Explore website. An open navy blue laptop with a white document on screen, a small stack of blue and cream books, a white coffee cup and a green potted plant. Cohesive cobalt blue, navy, white and pale blue palette, subtle green accents, soft studio lighting, rounded shapes, elegant minimal materials, gentle contact shadows. Isolated on a genuinely transparent background. Wide 3:2 composition with all objects fully visible and generous padding. No lettering, no text, no logos, no watermark. Not a web page or collage."
+    },
+    {
+      "file": "about",
+      "prompt": "Create one polished soft dimensional 3D editorial illustration for Ask & Explore website. A neat stack of two blue hardcover books, a small green potted plant and a glowing warm yellow lightbulb hovering above the books. Cohesive cobalt blue, navy, white and pale blue palette, subtle green accents, soft studio lighting, rounded shapes, elegant minimal materials, gentle contact shadows. Isolated on a genuinely transparent background. Wide 3:2 composition with all objects fully visible and generous padding. No lettering, no text, no logos, no watermark. Not a web page or collage."
+    },
+    {
+      "file": "standards",
+      "prompt": "Create one polished soft dimensional 3D editorial illustration for Ask & Explore website. A blue clipboard with white paper showing three simple green checkmarks, with a blue shield beside it. Cohesive cobalt blue, navy, white and pale blue palette, subtle green accents, soft studio lighting, rounded shapes, elegant minimal materials, gentle contact shadows. Isolated on a genuinely transparent background. Wide 3:2 composition with all objects fully visible and generous padding. No lettering, no text, no logos, no watermark. Not a web page or collage."
+    },
+    {
+      "file": "updates",
+      "prompt": "Create one polished soft dimensional 3D editorial illustration for Ask & Explore website. A blue and white desk calendar, a small green potted plant, and a blue circular refresh arrow emblem. Cohesive cobalt blue, navy, white and pale blue palette, subtle green accents, soft studio lighting, rounded shapes, elegant minimal materials, gentle contact shadows. Isolated on a genuinely transparent background. Wide 3:2 composition with all objects fully visible and generous padding. No lettering, no text, no logos, no watermark. Not a web page or collage."
+    }
+  ]
+}

@@ -497,7 +497,7 @@ test("topic directory, desktop topics menu, and policy anchors", async ({
     page.getByRole("heading", { name: "Everyday tech", exact: true }),
   ).toBeVisible();
   if (!isMobile) {
-    await page.getByRole("button", { name: "Categories", exact: true }).click();
+    await page.locator(".categories-dropdown > a").hover();
     await expect(page.locator("#categories-panel")).toBeVisible();
     await page.keyboard.press("Escape");
     await expect(page.locator("#categories-panel")).not.toBeVisible();

@@ -44,17 +44,17 @@ describe("shared navigation", () => {
     render(
       <DesktopNavigation>
         <NavLink href="/category/technology">Technology</NavLink>
-        <NavLink href="/categories">Explore all categories</NavLink>
       </DesktopNavigation>,
     );
     expect(screen.getByRole("link", { name: "Home" })).toBeVisible();
     expect(screen.getByRole("link", { name: "Articles" })).toBeVisible();
     expect(screen.getByRole("link", { name: "About" })).toBeVisible();
-    const categories = screen.getByRole("button", {
+    const categories = screen.getByRole("link", {
       name: "Categories",
     });
     expect(categories).toHaveClass("nav-active");
-    await userEvent.click(categories);
+    expect(categories).toHaveAttribute("href", "/categories");
+    await userEvent.hover(categories);
     expect(screen.getByRole("link", { name: "Technology" })).toHaveAttribute(
       "aria-current",
       "page",

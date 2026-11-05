@@ -9,7 +9,7 @@ test("category directory matches the new layout and keeps complete images across
     "Explore Categories",
   );
   const cards = directory.locator("[data-category-card]");
-  await expect(cards).toHaveCount(2);
+  await expect(cards).toHaveCount(3);
   await expect(
     directory.locator('[data-category-card="technology"]'),
   ).toContainText("6 articles");
@@ -89,10 +89,10 @@ test("category searches, empty states, and exploration links work without redund
   ).toBeVisible();
   await directory.getByRole("button", { name: "Show all categories" }).click();
   await expect(search).toHaveValue("");
-  await expect(directory.locator("[data-category-card]")).toHaveCount(2);
+  await expect(directory.locator("[data-category-card]")).toHaveCount(3);
   await search.fill("everyday");
   await directory.getByRole("button", { name: "Clear search" }).click();
-  await expect(directory.locator("[data-category-card]")).toHaveCount(2);
+  await expect(directory.locator("[data-category-card]")).toHaveCount(3);
   await directory
     .getByRole("link", { name: "Explore Technology articles", exact: true })
     .click();
@@ -108,7 +108,7 @@ test("unavailable category previews fall back to complete local topic photos", a
   await page.route("http://127.0.0.1:4100/media/**", (route) => route.abort());
   await page.goto("/categories");
   const directory = page.locator("[data-categories-page]");
-  await expect(directory.locator("[data-category-card]")).toHaveCount(2);
+  await expect(directory.locator("[data-category-card]")).toHaveCount(3);
   for (const image of await directory.getByRole("img").all()) {
     await image.scrollIntoViewIfNeeded();
     await expect(image).toHaveAttribute("src", /images%2Fabout%2F/);
@@ -183,7 +183,7 @@ test("category search becomes a centered glass overlay after the original leaves
   await search.getByRole("button", { name: "Clear search" }).click();
   await expect(input).toHaveValue("");
   await expect(input).toBeFocused();
-  await expect(directory.locator("[data-category-card]")).toHaveCount(2);
+  await expect(directory.locator("[data-category-card]")).toHaveCount(3);
   await input.fill("nothing-matches-this");
   await expect(
     directory.getByRole("heading", {
@@ -207,7 +207,7 @@ test("category search becomes a centered glass overlay after the original leaves
   await expect(input).toBeFocused();
   await expect(input).toHaveValue("automotive");
   await directory.getByRole("button", { name: "Clear search" }).click();
-  await expect(directory.locator("[data-category-card]")).toHaveCount(2);
+  await expect(directory.locator("[data-category-card]")).toHaveCount(3);
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.evaluate(
     (top) => window.scrollTo({ top, behavior: "instant" }),

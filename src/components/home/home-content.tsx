@@ -1,3 +1,4 @@
+import { AuthorName } from "@/components/authors/author-name";
 import Link from "next/link";
 import { connection } from "next/server";
 import {
@@ -195,7 +196,11 @@ function StoryMeta({ article }: { article: ArticleSummary }) {
           </time>
         </span>
       )}
-      {article.author && <span>{article.author.name}</span>}
+      {article.author && (
+        <span>
+          <AuthorName author={article.author} />
+        </span>
+      )}
     </div>
   );
 }
@@ -298,16 +303,16 @@ function Hero({ article }: { article?: ArticleSummary }) {
       <div className={styles.heroCopy}>
         <p className={styles.eyebrow}>Technology, cars &amp; everyday life</p>
         <h1>
+          Ask &amp; Explore
+          <br />
           Practical Guides.
           <br />
-          Clear Answers.
-          <br />
-          <em>Smarter Everyday Choices.</em>
+          <em>Clear Answers.</em>
         </h1>
         <p className={styles.heroDescription}>
-          Choosing a laptop, comparing cars, or solving an everyday problem?
-          Find practical how-to guides, product comparisons, and clear
-          explanations to help you decide what works for you.
+          Ask &amp; Explore offers practical technology guides, car buying
+          advice, product comparisons, digital safety tips, travel ideas, and
+          everyday solutions to help you understand your options.
         </p>
         <Link href="/articles" className={styles.primaryButton}>
           Explore Latest Articles

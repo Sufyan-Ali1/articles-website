@@ -13,6 +13,7 @@ const staticPaths = [
   "/articles",
   "/categories",
   "/about",
+  "/authors/editorial-team",
   "/contact",
   "/request-article",
   "/privacy",

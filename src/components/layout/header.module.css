@@ -38,7 +38,7 @@
   font-weight: 550;
 }
 .header :global(.desktop-nav > a),
-.header :global(.categories-dropdown > button) {
+.header :global(.categories-dropdown > a) {
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -72,19 +72,19 @@
   position: relative;
   flex-shrink: 0;
 }
-.header :global(.categories-dropdown > button) {
+.header :global(.categories-dropdown > a) {
   gap: 7px;
   border: 0;
   background: transparent;
   color: inherit;
 }
-.header :global(.categories-dropdown > button[aria-expanded="true"]) {
+.header :global(.categories-dropdown > a[aria-expanded="true"]) {
   color: #0865cc;
 }
-.header :global(.categories-dropdown > button.nav-active) {
+.header :global(.categories-dropdown > a.nav-active) {
   color: #0865cc;
 }
-.header :global(.categories-dropdown > button[aria-expanded="true"] > svg) {
+.header :global(.categories-dropdown > a[aria-expanded="true"] > svg) {
   transform: rotate(180deg);
 }
 .header :global(.categories-panel) {
@@ -219,31 +219,36 @@
 .requestCompactLabel {
   display: none;
 }
-.mobileCategories summary {
+.mobileCategoryHeading {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 44px;
-  padding: 10px 0;
   border-bottom: 1px solid #e6edf7;
-  font-size: 17px;
   color: #18345c;
-  list-style: none;
-  cursor: pointer;
 }
-.mobileCategories summary::-webkit-details-marker {
-  display: none;
+.mobileCategories .mobileCategoryHeading > a {
+  flex: 1;
+  border: 0;
 }
-.mobileCategories[open] summary svg {
+.mobileCategoryHeading > button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  background: transparent;
+  border: 0;
+  color: inherit;
+}
+.mobileCategoryHeading > button[aria-expanded="true"] svg {
   transform: rotate(180deg);
 }
-.mobileCategories > div {
+.mobileCategoryPanel {
   padding: 5px 10px 7px;
   margin-top: 7px;
   background: #f6f9ff;
   border-radius: 10px;
 }
-.mobileCategories > div a {
+.mobileCategoryPanel a {
   font-size: 14px;
   padding: 10px 8px;
   border-color: #e7eef8;

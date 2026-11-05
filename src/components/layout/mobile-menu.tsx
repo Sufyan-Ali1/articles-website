@@ -7,6 +7,7 @@ import { Brand } from "@/components/shared/brand";
 import styles from "./header.module.css";
 export function MobileMenu({ children }: { children?: React.ReactNode }) {
   const [open, setOpen] = useState(false);
+  const [categoriesOpen, setCategoriesOpen] = useState(false);
   return (
     <div className="mobile-menu">
       <Sheet
@@ -29,16 +30,28 @@ export function MobileMenu({ children }: { children?: React.ReactNode }) {
           <span className="menu-group-label">Read & discover</span>
           <Link href="/">Home</Link>
           <Link href="/articles">Articles</Link>
-          <details className={styles.mobileCategories}>
-            <summary>
-              Categories
-              <ChevronDown size={17} aria-hidden="true" />
-            </summary>
-            <div>
-              <Link href="/categories">Explore all categories</Link>
-              {children}
+          <div className={styles.mobileCategories}>
+            <div className={styles.mobileCategoryHeading}>
+              <Link href="/categories">Categories</Link>
+              <button
+                type="button"
+                aria-label="Toggle category dropdown"
+                aria-expanded={categoriesOpen}
+                aria-controls="mobile-categories-panel"
+                onClick={() => setCategoriesOpen(!categoriesOpen)}
+              >
+                <ChevronDown size={17} aria-hidden="true" />
+              </button>
             </div>
-          </details>
+            {categoriesOpen && (
+              <div
+                id="mobile-categories-panel"
+                className={styles.mobileCategoryPanel}
+              >
+                {children}
+              </div>
+            )}
+          </div>
           <Link href="/about">About</Link>
           <Link href="/search">Search</Link>
           <span className="menu-group-label">The publication</span>

@@ -1,10 +1,12 @@
+import { articleMetadata, articleStructuredData } from "@/lib/seo/article";
+import { AuthorName } from "@/components/authors/author-name";
 import { Suspense } from "react";
 import Link from "next/link";
 import { connection } from "next/server";
 import { ArrowUpRight } from "lucide-react";
 import { getArticle, apiOrigin } from "@/lib/api/client";
 import { orNotFound } from "@/lib/api/not-found";
-import { metadata, safeJsonLd } from "@/lib/seo/metadata";
+import { safeJsonLd } from "@/lib/seo/metadata";
 import { prepareArticle } from "@/lib/utils/article-html";
 import { formatDate } from "@/lib/utils";
 import {
@@ -29,47 +31,16 @@ type Props = { params: Promise<{ slug: string }> };
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
   const article = await orNotFound(getArticle(slug));
-  return metadata(
-    article.meta_title || article.title,
-    article.meta_description ||
-      article.excerpt ||
-      `Read ${article.title} at Ask & Explore.`,
-    `/articles/${article.slug}`,
-    {
-      article: true,
-      image: article.featured_image,
-      published: article.published_at,
-      modified: article.updated_at,
-      author: article.author?.name,
-    },
-  );
+  return articleMetadata(article);
 }
 async function ArticleContent({ params }: Props) {
   await connection();
   const { slug } = await params;
   const article = await orNotFound(getArticle(slug));
+  const schema = articleStructuredData(article);
   const body = prepareArticle(article.content_html, apiOrigin());
   const category = article.categories.find((c) => c.is_active);
   const tags = article.tags.filter((t) => t.is_active);
-  const breadcrumbs = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: site.url },
-      {
-        "@type": "ListItem",
-        position: 2,
-        name: "Articles",
-        item: new URL("/articles", site.url).href,
-      },
-      {
-        "@type": "ListItem",
-        position: 3,
-        name: article.title,
-        item: new URL(`/articles/${article.slug}`, site.url).href,
-      },
-    ],
-  };
   return (
     <>
       <ReadingProgress key={slug} />
@@ -86,6 +57,7 @@ async function ArticleContent({ params }: Props) {
               ...(category
                 ? [{ label: category.name, href: `/category/${category.slug}` }]
                 : []),
+              { label: article.title },
             ]}
           />
           <header className="article-header">
@@ -109,7 +81,7 @@ async function ArticleContent({ params }: Props) {
                   {article.author && (
                     <span className="article-author">
                       <span className={styles.byLabel}>By</span>{" "}
-                      {article.author.name}
+                      <AuthorName author={article.author} />
                     </span>
                   )}
                   <div className={styles.dateLine}>
@@ -200,16 +172,12 @@ async function ArticleContent({ params }: Props) {
           title={article.title}
         />
       </div>
-      {article.schema && (
+      {schema && (
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: safeJsonLd(article.schema) }}
+          dangerouslySetInnerHTML={{ __html: safeJsonLd(schema) }}
         />
       )}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: safeJsonLd(breadcrumbs) }}
-      />
     </>
   );
 }

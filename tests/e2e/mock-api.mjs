@@ -140,6 +140,8 @@ const articles = topics.map(([title, slug, category, excerpt], i) => ({
   excerpt,
   featured_image: `http://127.0.0.1:4100/media/${i % 5}.svg`,
   featured_image_alt: `Editorial illustration for ${title}`,
+  primary_keywords: ["practical guide"],
+  secondary_keywords: ["everyday decisions", "Practical Guide"],
   author: { id: id(401), name: "Test Editor" },
   article_type: types[i % types.length],
   categories: [category],
@@ -289,6 +291,8 @@ createServer(async (req, res) => {
       "plain-reader",
       "image-reader",
       "security-reader",
+      "draft-reader",
+      "scheduled-reader",
     ].includes(slug);
     const a = readerFixture
       ? { ...articles[0], slug, featured_image: null }
@@ -298,6 +302,9 @@ createServer(async (req, res) => {
     return json(200, {
       data: {
         ...a,
+        ...(slug === "plain-reader"
+          ? { primary_keywords: [], secondary_keywords: [] }
+          : {}),
         content_html:
           slug === "security-reader"
             ? '<h2>Safe article heading</h2><p>Safe article content remains readable.</p><base href="https://attacker.invalid/"><meta http-equiv="refresh" content="0;url=https://attacker.invalid/redirect"><script>alert("stored-xss")</script><img src="data:image/svg+xml,unsafe" onerror="alert(1)" srcset="https://attacker.invalid/image 2x"><svg onload="alert(1)"></svg><iframe srcdoc="<script>alert(1)</script>"></iframe><p id="main-content" style="position:fixed" data-copy-code="1">Visible text</p>'
@@ -312,12 +319,37 @@ createServer(async (req, res) => {
                 : slug === "plain-reader"
                   ? "<p>A short article without headings or a featured image.</p>"
                   : `<p>Good decisions start with a little context. This test article explores the questions behind a familiar everyday choice and offers a practical place to begin.</p><h2>The questions worth asking</h2><p>${"Take time to understand what matters in your own situation before comparing the available options. ".repeat(15)}</p><h3>Start with everyday needs</h3><p>List the things you do most often, the things that frustrate you, and the things that would make a meaningful difference.</p><h2>A practical comparison</h2><table><thead><tr><th>Consideration</th><th>What to look for</th></tr></thead><tbody><tr><td>Everyday use</td><td>Reliable, simple, and useful</td></tr><tr><td>Longer term</td><td>Support, maintenance, and flexibility</td></tr></tbody></table><h2>The questions worth asking</h2><p>Compare the context behind a recommendation rather than the headline alone.</p><pre><code class="language-js">const question = "What matters to you?";</code></pre><p><a href="https://example.com/product" rel="sponsored nofollow" target="_blank">A sponsored product link</a></p><blockquote><p>The right question makes the next step a little clearer.</p></blockquote><h2>A useful next step</h2><p>${"Explore at your own pace and keep your own circumstances in mind. ".repeat(20)}</p>`,
-        meta_title: `${a.title} — An Ask & Explore perspective`,
-        meta_description: a.excerpt,
+        published_at:
+          slug === "draft-reader"
+            ? null
+            : slug === "scheduled-reader"
+              ? "2999-01-01T00:00:00Z"
+              : a.published_at,
+        meta_title:
+          slug === "plain-reader"
+            ? null
+            : `${a.title} — An Ask & Explore perspective`,
+        meta_description: slug === "plain-reader" ? null : a.excerpt,
         schema: {
           "@context": "https://schema.org",
-          "@type": "Article",
-          headline: a.title,
+          "@graph": [
+            {
+              "@type": "BlogPosting",
+              "@id": `https://ask-explore.test/#article-${a.id}`,
+              headline: a.title,
+              url: `https://ask-explore.test/articles/${slug}`,
+              publisher: { "@id": "https://ask-explore.test/#organization" },
+              ...(slug === "plain-reader"
+                ? {}
+                : { keywords: ["practical guide", "everyday decisions"] }),
+            },
+            {
+              "@type": "Organization",
+              "@id": "https://ask-explore.test/#organization",
+              name: "Ask & Explore",
+              url: "https://ask-explore.test/",
+            },
+          ],
         },
       },
     });

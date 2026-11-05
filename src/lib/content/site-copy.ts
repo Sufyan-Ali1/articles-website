@@ -1,24 +1,24 @@
 // Shared editorial copy for the global English-language publication.
 export const pageSeo = {
   home: {
-    title: "Practical Guides, Reviews & Everyday Advice",
+    title: "Ask & Explore | Practical Guides, Reviews & Advice",
     description:
-      "Explore practical guides, product comparisons and how-to articles on technology, cars and everyday life. Get clear answers for your next decision.",
+      "Explore Ask & Explore for practical technology guides, car advice, product comparisons, digital safety tips, travel ideas, and everyday solutions.",
   },
   articles: {
     title: "Articles, How-To Guides & Product Comparisons",
     description:
-      "Browse guides, reviews and product comparisons on technology, cars and everyday life. Filter by topic or article type to find the answers you need.",
+      "Browse how-to guides, product comparisons and buying guides on Ask & Explore. Find technology tips, car advice and everyday solutions by topic or article type.",
   },
   categories: {
-    title: "Browse Topics: Technology, Cars & Everyday Life",
+    title: "Browse Guides by Topic: Technology, Cars & Everyday Life",
     description:
-      "Find your next read by topic. Explore technology guides, car buying advice, product comparisons and practical ideas for everyday life.",
+      "Browse Ask & Explore guides by topic: technology, cars, digital safety, lifestyle and travel. Choose a category to find related articles and buying advice.",
   },
   about: {
-    title: "About Us & Our Editorial Approach",
+    title: "About Ask & Explore: Our Editorial Approach",
     description:
-      "Learn about Ask & Explore, the topics we cover and our approach to clear, practical articles that help you understand your options and make informed choices.",
+      "Learn about Ask & Explore, our editorial approach, and the technology guides, car buying advice and product comparisons we publish for everyday decisions.",
   },
   contact: {
     title: "Contact Us: Questions, Feedback & Corrections",

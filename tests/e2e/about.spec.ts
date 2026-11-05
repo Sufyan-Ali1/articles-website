@@ -5,9 +5,10 @@ test("About presents the new sections with complete images across screen sizes",
 }, testInfo) => {
   test.setTimeout(60000);
   await page.goto("/about");
+  await expect(page).toHaveTitle("About Ask & Explore: Our Editorial Approach");
   const about = page.locator("[data-about-page]");
   await expect(about.getByRole("heading", { level: 1 })).toHaveText(
-    "Clear answers for everyday decisions.",
+    "About Ask & Explore",
   );
   await expect(about.getByRole("region")).toHaveCount(7);
   await expect(page.locator(".site-header")).toHaveCount(1);

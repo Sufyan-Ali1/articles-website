@@ -53,11 +53,11 @@ test("article schema is preserved from the backend and homepage identifies the w
   const schemas = await page
     .locator('script[type="application/ld+json"]')
     .allTextContents();
-  expect(schemas).toHaveLength(2);
+  expect(schemas).toHaveLength(1);
   const article = schemas
-    .map((s) => JSON.parse(s))
-    .find((s) => s["@type"] === "Article");
-  expect(article).toEqual(backend.data.schema);
+    .flatMap((s) => JSON.parse(s)["@graph"] || [])
+    .find((s) => s["@type"] === "BlogPosting");
+  expect(article).toEqual(backend.data.schema["@graph"][0]);
   await page.goto("/");
   const website = await page
     .locator('script[type="application/ld+json"]')
@@ -66,6 +66,166 @@ test("article schema is preserved from the backend and homepage identifies the w
   expect(JSON.parse(website!)).toMatchObject({
     "@type": "WebSite",
     name: "Ask & Explore",
-    url: "https://ask-explore.test",
+    url: "https://ask-explore.test/",
   });
+});
+
+test("homepage sends branded metadata, content and linked schemas in server HTML", async ({
+  page,
+  request,
+}) => {
+  const title = "Ask & Explore | Practical Guides, Reviews & Advice";
+  const description =
+    "Explore Ask & Explore for practical technology guides, car advice, product comparisons, digital safety tips, travel ideas, and everyday solutions.";
+  for (const agent of ["Mozilla/5.0", "Googlebot"]) {
+    const response = await request.get("/", {
+      headers: { "User-Agent": agent },
+    });
+    expect(response.status()).toBe(200);
+    expect(response.headers()["x-robots-tag"] || "").not.toContain("noindex");
+    const html = await response.text();
+    const result = await page.evaluate((source) => {
+      const doc = new DOMParser().parseFromString(source, "text/html");
+      return {
+        titles: [...doc.querySelectorAll("title")].map((n) => n.textContent),
+        canonical: [...doc.querySelectorAll('link[rel="canonical"]')].map((n) =>
+          n.getAttribute("href"),
+        ),
+        tags: [...doc.querySelectorAll("meta")].map((n) => ({
+          name: n.getAttribute("name") || n.getAttribute("property"),
+          content: n.getAttribute("content"),
+        })),
+        headings: [...doc.querySelectorAll("h1")].map((n) => n.textContent),
+        schemas: [
+          ...doc.querySelectorAll('script[type="application/ld+json"]'),
+        ].map((n) => JSON.parse(n.textContent || "null")),
+        links: doc.querySelectorAll('a[href^="/articles/"]').length,
+      };
+    }, html);
+    expect(result.titles).toEqual([title]);
+    expect(result.canonical).toEqual(["https://ask-explore.test/"]);
+    for (const [name, content] of Object.entries({
+      description,
+      robots: "index, follow, max-image-preview:large",
+      "og:title": title,
+      "og:description": description,
+      "og:url": "https://ask-explore.test/",
+      "og:site_name": "Ask & Explore",
+      "twitter:title": title,
+      "twitter:description": description,
+      "twitter:card": "summary_large_image",
+    })) {
+      expect(result.tags.filter((tag) => tag.name === name)).toEqual([
+        { name, content },
+      ]);
+    }
+    expect(result.headings).toHaveLength(1);
+    expect(result.headings[0]).toContain("Ask & Explore");
+    expect(result.links).toBeGreaterThan(0);
+    expect(result.schemas).toHaveLength(2);
+    const website = result.schemas.find((s) => s["@type"] === "WebSite");
+    const organization = result.schemas.find(
+      (s) => s["@type"] === "Organization",
+    );
+    expect(website).toMatchObject({
+      name: "Ask & Explore",
+      alternateName: "Ask and Explore",
+      publisher: { "@id": organization["@id"] },
+    });
+    expect(organization).toMatchObject({
+      name: "Ask & Explore",
+      url: "https://ask-explore.test",
+      logo: "https://askandexplore.com/images/brand/ae-mark.svg",
+    });
+  }
+});
+
+test("article metadata and publisher are generated for optional-field fallbacks and public pages", async ({
+  page,
+  request,
+}) => {
+  for (const slug of ["electric-car-question", "plain-reader"]) {
+    const backend = await (
+      await request.get(`http://127.0.0.1:4100/api/v1/articles/${slug}`)
+    ).json();
+    const response = await request.get(`/articles/${slug}`, {
+      headers: { "User-Agent": "Googlebot" },
+    });
+    expect(response.status()).toBe(200);
+    await page.setContent(await response.text());
+    await expect(page.locator('meta[property="og:title"]')).toHaveAttribute(
+      "content",
+      backend.data.meta_title || backend.data.title,
+    );
+    await expect(page.locator('meta[property="og:type"]')).toHaveAttribute(
+      "content",
+      "article",
+    );
+    await expect(page.locator('meta[property="og:url"]')).toHaveAttribute(
+      "content",
+      `https://ask-explore.test/articles/${slug}`,
+    );
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
+      "content",
+      "index, follow, max-image-preview:large",
+    );
+    // The existing mock images are SVGs; social networks require raster images.
+    await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute(
+      "content",
+      "summary",
+    );
+    const schemas = await page
+      .locator('script[type="application/ld+json"]')
+      .allTextContents();
+    const article = schemas
+      .flatMap((s) => JSON.parse(s)["@graph"] || [])
+      .find((s) => s["@type"] === "BlogPosting");
+    await expect(page.locator('meta[name="keywords"]')).toHaveCount(0);
+    if (slug === "plain-reader") expect(article).not.toHaveProperty("keywords");
+    else
+      expect(article.keywords).toEqual([
+        "practical guide",
+        "everyday decisions",
+      ]);
+    expect(article.publisher).toEqual({
+      "@id": "https://ask-explore.test/#organization",
+    });
+  }
+  for (const path of [
+    "/",
+    "/categories",
+    "/articles",
+    "/category/technology",
+    "/about",
+  ]) {
+    await page.goto(path);
+    await expect(page.locator("html")).toHaveAttribute("lang", "en");
+    await expect(page.locator('meta[property="og:type"]')).toHaveAttribute(
+      "content",
+      "website",
+    );
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
+      "content",
+      "index, follow, max-image-preview:large",
+    );
+    const schemas = (
+      await page.locator('script[type="application/ld+json"]').allTextContents()
+    ).flatMap((s) => {
+      const value = JSON.parse(s);
+      return value["@graph"] || [value];
+    });
+    expect(
+      schemas.some(
+        (s) =>
+          s.publisher?.["@id"] === "https://ask-explore.test/#organization",
+      ),
+    ).toBe(true);
+  }
+  for (const slug of ["draft-reader", "scheduled-reader"]) {
+    const response = await request.get(`/articles/${slug}`);
+    const html = await response.text();
+    expect(html).toContain("noindex");
+    expect(html).not.toContain('id="article-content"');
+    expect(html).not.toContain('"@type":"BlogPosting"');
+  }
 });
