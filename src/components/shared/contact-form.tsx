@@ -165,14 +165,14 @@ export function ContactForm({
       </p>
       {!enabled && (
         <div className={styles.notice} role="status">
-          The contact form is being connected.{" "}
+          The contact form is temporarily unavailable.{" "}
           {email ? (
             <a href={`mailto:${email}`}>Email the publication instead.</a>
           ) : (
             <>
               For an article idea,{" "}
-              <Link href="/request-article">suggest a topic</Link>. General
-              enquiries will be available here once delivery is connected.
+              <Link href="/request-article">suggest a topic</Link>. Please try
+              again later for general enquiries.
             </>
           )}
         </div>

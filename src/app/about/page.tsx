@@ -9,15 +9,35 @@ import { AboutMission } from "@/components/about/about-mission";
 import { EditorialPrinciples } from "@/components/about/editorial-principles";
 import { AboutExploreCta } from "@/components/about/about-explore-cta";
 import { AboutNewsletter } from "@/components/about/about-newsletter";
-import { pageStructuredData } from "@/lib/seo/structured-data";
+import { aboutStructuredData } from "@/lib/seo/about";
 import { metadata, safeJsonLd } from "@/lib/seo/metadata";
 import { pageSeo } from "@/lib/content/site-copy";
 import styles from "@/components/about/about.module.css";
 
-export const generateMetadata = () => ({
-  ...metadata(pageSeo.about.title, pageSeo.about.description, "/about"),
-  title: { absolute: pageSeo.about.title },
-});
+export const generateMetadata = () => {
+  const base = metadata(
+    pageSeo.about.title,
+    pageSeo.about.description,
+    "/about",
+    {
+      image: "/images/about/workspace.webp",
+    },
+  );
+  return {
+    ...base,
+    title: { absolute: pageSeo.about.title },
+    openGraph: {
+      ...base.openGraph,
+      title: pageSeo.about.ogTitle,
+      description: pageSeo.about.ogDescription,
+    },
+    twitter: {
+      ...base.twitter,
+      title: pageSeo.about.ogTitle,
+      description: pageSeo.about.ogDescription,
+    },
+  };
+};
 
 export default function About() {
   return (
@@ -25,9 +45,7 @@ export default function About() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: safeJsonLd(
-            pageStructuredData("/about", pageSeo.about.title, "AboutPage"),
-          ),
+          __html: safeJsonLd(aboutStructuredData()),
         }}
       />
       <div className={styles.shell}>

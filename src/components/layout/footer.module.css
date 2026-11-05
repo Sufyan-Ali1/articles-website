@@ -16,7 +16,7 @@
 }
 .brand {
   display: inline-block;
-  font-family: Georgia, serif;
+  font-family: var(--type-sans);
   font-size: 23px;
   font-weight: 600;
   letter-spacing: -0.9px;
@@ -28,7 +28,7 @@
 .newsletterColumn p {
   color: #7c8799;
   font-size: 12px;
-  line-height: 1.65;
+  line-height: var(--type-body-leading);
   margin-bottom: 14px;
 }
 .utilityLinks {
@@ -58,9 +58,9 @@
 }
 .linkColumn h2,
 .newsletterColumn h2 {
-  font-family: Georgia, serif;
+  font-family: var(--type-sans);
   font-size: 13px;
-  font-weight: 700;
+  font-weight: var(--type-heading-weight);
   color: #17243c;
   margin: 2px 0 9px;
 }

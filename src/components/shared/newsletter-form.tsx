@@ -26,6 +26,8 @@ export function NewsletterForm({
   fieldsClassName = "",
   noteClassName = "",
   showArrow = true,
+  buttonText = "Subscribe",
+  helperText = "Subscribe to receive new articles and practical guides by email.",
 }: {
   compact?: boolean;
   label?: string;
@@ -34,6 +36,8 @@ export function NewsletterForm({
   fieldsClassName?: string;
   noteClassName?: string;
   showArrow?: boolean;
+  helperText?: string;
+  buttonText?: string;
 }) {
   const configuredApiUrl = useFormsApiUrl();
   const apiUrl = suppliedApiUrl ?? configuredApiUrl;
@@ -80,7 +84,8 @@ export function NewsletterForm({
           className={`publication-newsletter-note ${noteClassName}`}
           role="status"
         >
-          You’re subscribed. We’ve saved your email for future article updates.
+          You’re subscribed. We’ll send new articles and practical guides to
+          your inbox.
         </p>
       ) : (
         <>
@@ -109,7 +114,11 @@ export function NewsletterForm({
               <button
                 type="submit"
                 disabled={disabled}
-                aria-label="Subscribe to newsletter"
+                aria-label={
+                  buttonText === "Subscribe"
+                    ? "Subscribe to newsletter"
+                    : buttonText
+                }
               >
                 {form.formState.isSubmitting ? (
                   <>
@@ -128,7 +137,7 @@ export function NewsletterForm({
                   <ArrowRight size={18} aria-hidden="true" />
                 ) : (
                   <>
-                    Subscribe{" "}
+                    {buttonText}{" "}
                     {showArrow && <ArrowRight size={15} aria-hidden="true" />}
                   </>
                 )}
@@ -159,7 +168,7 @@ export function NewsletterForm({
           >
             {unavailable
               ? "Subscriptions are temporarily unavailable. Please check back soon."
-              : "Subscribe for new articles and practical guides."}
+              : helperText}
           </p>
         </>
       )}

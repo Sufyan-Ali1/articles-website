@@ -7,20 +7,15 @@ import {
   CalendarDays,
   CarFront,
   Compass,
-  Cpu,
-  GitCompareArrows,
-  Heart,
-  HouseWifi,
   LaptopMinimal,
   Leaf,
-  Lightbulb,
   Mail,
   MessageSquareText,
   Plane,
   Send,
   ShoppingCart,
+  ShieldCheck,
   Sparkles,
-  Star,
   TrendingUp,
   type LucideIcon,
 } from "lucide-react";
@@ -41,129 +36,85 @@ import styles from "./home.module.css";
 type Topic = {
   name: string;
   description: string;
+  shortDescription: string;
   href: string;
   icon: LucideIcon;
   tone: string;
 };
-function topicDetails(name: string, slug: string) {
-  const text = `${name} ${slug}`;
-  if (/smart.?home|automation/i.test(text))
-    return {
-      icon: HouseWifi,
-      tone: "violet",
-      description: "Smart home setup, device compatibility, and everyday use.",
-    };
-  if (/electronic|gadget|hardware/i.test(text))
-    return {
-      icon: Cpu,
-      tone: "violet",
-      description:
-        "Device features, electronics comparisons, and setup advice.",
-    };
-  if (/tech|software|digital/i.test(text))
-    return {
-      icon: LaptopMinimal,
-      tone: "blue",
-      description:
-        "Device comparisons, software tips, and practical tech guides.",
-    };
-  if (/auto|car|motor/i.test(text))
-    return {
-      icon: CarFront,
-      tone: "orange",
-      description:
-        "Car buying advice, ownership costs, and maintenance guides.",
-    };
-  if (/travel|destination/i.test(text))
-    return {
-      icon: Plane,
-      tone: "teal",
-      description:
-        "Trip planning, destination ideas, and practical travel tips.",
-    };
-  if (/buying/i.test(text))
-    return {
-      icon: ShoppingCart,
-      tone: "green",
-      description: "Compare features and costs before your next purchase.",
-    };
-  if (/review/i.test(text))
-    return {
-      icon: Star,
-      tone: "amber",
-      description: "Product features, useful context, and everyday tradeoffs.",
-    };
-  if (/tutorial|how.to/i.test(text))
-    return {
-      icon: Lightbulb,
-      tone: "violet",
-      description: "Clear steps for everyday tasks and common tech problems.",
-    };
-  if (/guide/i.test(text))
-    return {
-      icon: BookOpen,
-      tone: "blue",
-      description: "Practical guides to help you understand your options.",
-    };
-  if (/comparison/i.test(text))
-    return {
-      icon: GitCompareArrows,
-      tone: "teal",
-      description: "Compare the details that matter for your needs and budget.",
-    };
-  if (/health/i.test(text))
-    return {
-      icon: Heart,
-      tone: "rose",
-      description:
-        "Clear explainers and practical ideas for everyday wellbeing.",
-    };
-  if (/lifestyle|life|home/i.test(text))
-    return {
-      icon: Leaf,
-      tone: "green",
-      description:
-        "Ideas for your home, daily routines, and personal productivity.",
-    };
-  return {
-    icon: Compass,
+const homeTopics = [
+  {
+    name: "Automotive",
+    shortDescription: "Car buying & ownership tips",
+    icon: CarFront,
+    tone: "orange",
+    pattern: /auto|car|motor/i,
+    description:
+      "Explore car buying advice, electric and hybrid vehicle comparisons, ownership costs, and practical information to help you understand your next vehicle decision.",
+  },
+  {
+    name: "Technology",
+    shortDescription: "AI tools & tech guides",
+    icon: LaptopMinimal,
     tone: "blue",
-    description: "Explore practical guides and clear explanations by topic.",
-  };
-}
+    pattern: /tech|software/i,
+    description:
+      "Discover technology guides covering AI tools, laptops, software, digital productivity, and practical ways to make better use of everyday tech.",
+  },
+  {
+    name: "Buying Guides",
+    shortDescription: "Product features & prices",
+    icon: ShoppingCart,
+    tone: "green",
+    pattern: /buying.?guides?/i,
+    description:
+      "Compare product features, prices, performance, and important trade-offs before choosing products that fit your budget and needs.",
+  },
+  {
+    name: "Lifestyle",
+    shortDescription: "Focus & daily routines",
+    icon: Leaf,
+    tone: "green",
+    pattern: /lifestyle|everyday.?life|home.?living/i,
+    description:
+      "Find practical lifestyle tips for reducing screen time, improving focus, managing digital habits, and building better everyday routines.",
+  },
+  {
+    name: "Digital Safety",
+    shortDescription: "Privacy & account security",
+    icon: ShieldCheck,
+    tone: "violet",
+    pattern: /digital.?safety|online.?safety|cyber.?security/i,
+    description:
+      "Learn about online privacy, account security, phishing scams, and practical steps to protect your information and stay safer online.",
+  },
+  {
+    name: "Travel",
+    shortDescription: "Flight deals & travel tips",
+    icon: Plane,
+    tone: "teal",
+    pattern: /travel|destination/i,
+    description:
+      "Explore travel planning guides, cheap flight tips, fare comparisons, price alerts, and helpful advice for avoiding unnecessary booking costs.",
+  },
+];
 function topicsFrom(
   categories: CategoryResponse[],
   types: ClassificationResponse[],
 ): Topic[] {
-  const active = categories.filter((category) => category.is_active);
-  const ids = new Set(active.map((category) => category.id));
-  const roots = active.filter(
-    (category) => !category.parent_id || !ids.has(category.parent_id),
-  );
-  return [
-    ...roots.map((category) => ({
-      ...topicDetails(category.name, category.slug),
-      name: category.name,
-      description:
-        category.description ||
-        topicDetails(category.name, category.slug).description,
-      href: `/category/${category.slug}`,
-    })),
-    ...types
-      .filter(
-        (type) =>
-          type.is_active &&
-          /guide|review|tutorial|how.to|comparison/i.test(
-            `${type.name} ${type.slug}`,
-          ),
-      )
-      .map((type) => ({
-        ...topicDetails(type.name, type.slug),
-        name: type.name,
-        description: topicDetails(type.name, type.slug).description,
-        href: `/articles?article_type=${type.slug}`,
-      })),
-  ].slice(0, 6);
+  return homeTopics.map(({ pattern, ...topic }) => {
+    const matches = (item: ClassificationResponse) =>
+      item.is_active && pattern.test(`${item.name} ${item.slug}`);
+    const category = categories.find(matches);
+    const type = types.find(matches);
+    return {
+      ...topic,
+      href: category
+        ? `/category/${category.slug}`
+        : type
+          ? `/articles?article_type=${type.slug}`
+          : `/search?search=${encodeURIComponent(topic.name)}`,
+    };
+  });
 }
 
 function StoryImage({
@@ -253,7 +204,7 @@ function SectionHeading({
   title,
   description,
   href,
-  label = "View all articles",
+  label = "View All Articles",
   popular = false,
 }: {
   title: string;
@@ -301,18 +252,17 @@ function Hero({ article }: { article?: ArticleSummary }) {
       data-has-feature={Boolean(article)}
     >
       <div className={styles.heroCopy}>
-        <p className={styles.eyebrow}>Technology, cars &amp; everyday life</p>
+        <p className={styles.eyebrow}>
+          Guides, Comparisons &amp; Everyday Advice
+        </p>
         <h1>
-          Ask &amp; Explore
-          <br />
-          Practical Guides.
-          <br />
-          <em>Clear Answers.</em>
+          Ask &amp; Explore: Practical Guides &amp; <em>Everyday Advice</em>
         </h1>
         <p className={styles.heroDescription}>
-          Ask &amp; Explore offers practical technology guides, car buying
-          advice, product comparisons, digital safety tips, travel ideas, and
-          everyday solutions to help you understand your options.
+          Explore practical technology guides, car buying advice, product
+          comparisons, digital safety tips, travel planning ideas, and lifestyle
+          articles. Ask &amp; Explore helps you understand your options, compare
+          important details, and find useful answers to everyday questions.
         </p>
         <Link href="/articles" className={styles.primaryButton}>
           Explore Latest Articles
@@ -324,11 +274,13 @@ function Hero({ article }: { article?: ArticleSummary }) {
             <Compass size={18} />
             <Sparkles size={18} />
           </span>
-          <p>
-            Understand your options.
-            <br />
-            Find your next useful step.
-          </p>
+          <div>
+            <h2>Understand Your Options. Find Your Next Useful Step.</h2>
+            <p>
+              Explore clear explanations, how-to guides, and useful comparisons
+              across the topics that matter to you.
+            </p>
+          </div>
         </div>
       </div>
       {article && (
@@ -364,10 +316,10 @@ export function HomeCallsToAction() {
         <MessageSquareText size={31} />
         <div>
           <h2>Request an Article</h2>
+          <h3>Have a Question We Haven&apos;t Covered?</h3>
           <p>
-            Can’t find the answer you need?
-            <br />
-            Suggest a question for a future guide.
+            Looking for a helpful explanation or comparison? Suggest a topic you
+            would like Ask &amp; Explore to cover in a future article.
           </p>
           <Link href="/request-article" className={styles.outlineButton}>
             Suggest a Topic
@@ -388,13 +340,16 @@ export function HomeCallsToAction() {
       <div className={styles.newsletterCard}>
         <Mail size={31} />
         <div>
-          <p className={styles.eyebrow}>Stay curious</p>
+          <p className={styles.eyebrow}>Stay Curious</p>
           <h2>Useful Reads for Your Next Decision</h2>
           <p>
-            Subscribe for future article updates. Browse the latest guides
-            today.
+            Join our list to receive new Ask &amp; Explore articles, practical
+            guides, and useful comparisons by email.
           </p>
-          <NewsletterForm label="Homepage newsletter signup" />
+          <NewsletterForm
+            label="Homepage newsletter signup"
+            buttonText="Sign Up for Updates"
+          />
         </div>
         <Leaf
           className={styles.newsletterLeaf}
@@ -474,14 +429,14 @@ export async function HomeContent() {
             <div className={styles.topicStrip}>
               {topics
                 .slice(0, 5)
-                .map(({ name, href, icon: Icon, description, tone }) => (
+                .map(({ name, href, icon: Icon, shortDescription, tone }) => (
                   <Link key={href} href={href} data-tone={tone}>
                     <span className={styles.stripIcon} aria-hidden="true">
                       <Icon size={23} strokeWidth={1.8} />
                     </span>
                     <span>
                       <strong>{name}</strong>
-                      <small>{description}</small>
+                      <small>{shortDescription}</small>
                     </span>
                   </Link>
                 ))}
@@ -501,9 +456,9 @@ export async function HomeContent() {
           <section className={styles.section} aria-label="Explore by Category">
             <SectionHeading
               title="Explore by Category"
-              description="Choose a topic to find practical advice, how-to guides, and useful comparisons."
+              description="Browse six topics to find practical guides, helpful comparisons, and explanations that match your interests."
               href="/categories"
-              label="View all categories"
+              label="View All Categories"
             />
             <div className={styles.categoryGrid}>
               {topics.map(({ name, href, description, icon: Icon, tone }) => (
@@ -530,7 +485,7 @@ export async function HomeContent() {
           <section className={styles.section} aria-label="Latest Articles">
             <SectionHeading
               title="Latest Articles"
-              description="New guides and clear explanations for the questions behind your next decision."
+              description="Discover recently published Ask & Explore guides, comparisons, and clear explanations covering technology, cars, digital safety, travel, and everyday life."
               href="/articles"
             />
             <div className={styles.articleGrid}>
@@ -542,14 +497,10 @@ export async function HomeContent() {
         )}
         <section className={styles.section} aria-label="Editor's Picks">
           <SectionHeading
-            title="Editor’s Picks"
-            description={
-              stories.editorsAreFeatured
-                ? "Featured guides and perspectives selected for your next read."
-                : "Start with these published articles while we prepare our next featured selections."
-            }
+            title="Editor's Picks"
+            description="Explore selected Ask & Explore articles featuring practical advice, useful explanations, and comparisons worth reading."
             href="/articles"
-            label="Explore more stories"
+            label="Explore More Stories"
           />
           {stories.editors.length ? (
             <div className={styles.editorsGrid}>
@@ -639,9 +590,9 @@ export async function HomeContent() {
         >
           <SectionHeading
             title="Popular with Readers"
-            description="See which published articles have received the most views."
+            description="Discover the Ask & Explore articles readers have viewed most."
             href="/articles?sort=-view_count"
-            label="View all popular"
+            label="View All Popular Articles"
             popular
           />
           {stories.popular.length ? (
@@ -674,16 +625,19 @@ export async function HomeContent() {
             </SectionEmpty>
           )}
         </section>
-        <section className={styles.section} aria-label="Reviews & Guides">
+        <section
+          className={styles.section}
+          aria-label="Buying Guides & Comparisons"
+        >
           <SectionHeading
-            title="Reviews & Guides"
-            description="Compare features, understand the tradeoffs, and work out what fits your needs."
+            title="Buying Guides & Comparisons"
+            description="Explore product comparisons and buying guides that explain features, costs, benefits, and trade-offs to help you make informed choices."
             href={
               guideTypes[0]
                 ? `/articles?article_type=${guideTypes[0].slug}`
                 : "/articles"
             }
-            label="Explore all guides"
+            label="Explore All Guides"
           />
           {stories.guides.length ? (
             <div className={styles.articleGrid}>

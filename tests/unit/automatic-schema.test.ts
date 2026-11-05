@@ -31,8 +31,27 @@ describe("backend-owned schema", () => {
     expect(output).not.toContain("<");
     expect(JSON.parse(output)).toEqual(value);
   });
-  it("keeps profile disabled until public verification", () => {
-    expect(editorialProfileSchema()).toBeNull();
+  it("publishes a connected profile graph with the shared author identity", () => {
+    const schema = editorialProfileSchema();
+    expect(schema?.["@context"]).toBe("https://schema.org");
+    const graph = schema!["@graph"];
+    expect(graph.map((node) => node["@type"])).toEqual([
+      "ProfilePage",
+      "Organization",
+      "Organization",
+      "WebSite",
+    ]);
+    const ids = new Set(graph.map((node) => node["@id"]));
+    function checkReferences(value: unknown) {
+      if (!value || typeof value !== "object") return;
+      if (Array.isArray(value)) return value.forEach(checkReferences);
+      const node = value as Record<string, unknown>;
+      if (Object.keys(node).length === 1 && typeof node["@id"] === "string") {
+        expect(ids.has(node["@id"])).toBe(true);
+      }
+      Object.values(node).forEach(checkReferences);
+    }
+    graph.forEach(checkReferences);
   });
 });
 

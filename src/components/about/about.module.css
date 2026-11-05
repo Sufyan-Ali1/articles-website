@@ -2,8 +2,8 @@
   background: #fff;
 }
 .page {
-  --about-ink: #0b1630;
-  --about-muted: #5e6c85;
+  --about-ink: var(--text-heading);
+  --about-muted: var(--text-body);
   --about-blue: #0865cc;
   color: var(--about-ink);
   background:
@@ -18,33 +18,33 @@
 .page h2,
 .page h3 {
   color: var(--about-ink);
-  font-family: var(--font-geist-sans), Arial, sans-serif;
+  font-family: var(--type-sans);
   margin: 0;
 }
 .page h2 {
-  font-size: clamp(27px, 2.8vw, 38px);
-  font-weight: 650;
-  line-height: 1.2;
-  letter-spacing: -1.4px;
+  font-size: var(--type-section-title);
+  font-weight: var(--type-heading-weight);
+  line-height: var(--type-heading-leading);
+  letter-spacing: var(--type-heading-tracking);
   text-wrap: balance;
 }
 .page h3 {
   font-size: 17px;
-  font-weight: 650;
-  letter-spacing: -0.45px;
-  line-height: 1.35;
+  font-weight: var(--type-heading-weight);
+  letter-spacing: var(--type-heading-tracking);
+  line-height: var(--type-heading-leading);
 }
 .page p {
   color: var(--about-muted);
-  font-size: 16px;
-  line-height: 1.65;
+  font-size: var(--type-body);
+  line-height: var(--type-body-leading);
   margin: 14px 0 0;
 }
 .page .eyebrow {
   color: #4774ad;
-  font-size: 11px;
+  font-size: var(--type-eyebrow);
   line-height: 1.5;
-  letter-spacing: 2.2px;
+  letter-spacing: var(--type-eyebrow-tracking);
   font-weight: 650;
   text-transform: uppercase;
   margin: 0 0 18px;
@@ -61,15 +61,15 @@
 }
 .page h1 {
   max-width: 13ch;
-  font-size: clamp(40px, 4.5vw, 64px);
-  font-weight: 680;
-  line-height: 1.08;
-  letter-spacing: -3px;
+  font-size: var(--type-page-title);
+  font-weight: var(--type-heading-weight);
+  line-height: var(--type-heading-leading);
+  letter-spacing: var(--type-heading-tracking);
   text-wrap: balance;
 }
 .page .heroDescription {
-  font-size: clamp(17px, 1.45vw, 20px);
-  line-height: 1.6;
+  font-size: var(--type-body);
+  line-height: var(--type-body-leading);
   max-width: 43ch;
   margin-top: 23px;
 }
@@ -88,7 +88,7 @@
 }
 .introduction {
   display: grid;
-  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
   gap: clamp(28px, 4vw, 62px);
   align-items: center;
   padding-block: 44px 48px;
@@ -96,14 +96,28 @@
   border-bottom: 1px solid #e9eef5;
 }
 .introductionCopy h2 {
-  max-width: 17ch;
+  max-width: 24ch;
 }
 .introductionCopy > p:last-child {
-  max-width: 44ch;
+  max-width: 56ch;
+}
+.introductionCopy a {
+  color: var(--about-blue);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.introductionCopy a:hover {
+  text-decoration-thickness: 2px;
+}
+.introductionCopy a:focus-visible {
+  outline: 2px solid var(--about-blue);
+  outline-offset: 3px;
+  border-radius: 2px;
 }
 .qualityGrid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
 }
 .qualityCard {
@@ -117,7 +131,7 @@
 }
 .qualityCard p {
   font-size: 14px;
-  line-height: 1.65;
+  line-height: var(--type-body-leading);
   margin-top: 11px;
 }
 .iconCircle {
@@ -165,7 +179,7 @@
 }
 .topicGrid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 22px;
 }
 .topicCard {
@@ -197,7 +211,7 @@
   display: flex;
   align-items: center;
   gap: 9px;
-  font-size: 16px;
+  font-size: var(--type-body);
 }
 .topicIcon {
   display: inline-flex;
@@ -212,7 +226,7 @@
 }
 .topicCopy p {
   font-size: 13px;
-  line-height: 1.65;
+  line-height: var(--type-body-leading);
   margin: 13px 0 18px;
 }
 .topicAction {
@@ -335,7 +349,7 @@
 }
 .exploreCopy p:not(.eyebrow) {
   max-width: 43ch;
-  font-size: 16px;
+  font-size: var(--type-body);
 }
 .primaryButton {
   display: inline-flex;
@@ -375,7 +389,7 @@
 }
 .newsletterCopy h2 {
   font-size: 23px;
-  letter-spacing: -0.7px;
+  letter-spacing: var(--type-heading-tracking);
 }
 .newsletterCopy p:last-child {
   font-size: 13px;
@@ -480,7 +494,7 @@
     padding: 18px;
   }
   .topicCopy h3 {
-    font-size: 16px;
+    font-size: var(--type-body);
   }
   .mission {
     grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
@@ -513,8 +527,8 @@
     padding-bottom: 34px;
   }
   .page h1 {
-    font-size: clamp(38px, 6vw, 50px);
-    letter-spacing: -1.8px;
+    font-size: var(--type-page-title);
+    letter-spacing: var(--type-heading-tracking);
     max-width: 16ch;
   }
   .heroCopy {
@@ -560,12 +574,12 @@
     padding-bottom: 28px;
   }
   .page h2 {
-    font-size: 28px;
-    letter-spacing: -1px;
+    font-size: var(--type-section-title);
+    letter-spacing: var(--type-heading-tracking);
   }
   .page .eyebrow {
-    font-size: 10px;
-    letter-spacing: 1.8px;
+    font-size: var(--type-eyebrow);
+    letter-spacing: var(--type-eyebrow-tracking);
     margin-bottom: 14px;
   }
   .qualityGrid {
@@ -637,7 +651,7 @@
   }
   .newsletterCopy h2 {
     font-size: 22px;
-    letter-spacing: -0.7px;
+    letter-spacing: var(--type-heading-tracking);
   }
   .newsletterCopy p:last-child {
     font-size: 12px;

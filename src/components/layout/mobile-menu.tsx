@@ -59,7 +59,7 @@ export function MobileMenu({ children }: { children?: React.ReactNode }) {
           <Link href="/disclaimer">Editorial disclosures</Link>
           <span className="menu-group-label">Have a question?</span>
           <Link href="/request-article" className="text-blue">
-            Request a topic <ArrowUpRight size={20} />
+            Request a Topic <ArrowUpRight size={20} />
           </Link>
         </nav>
       </Sheet>

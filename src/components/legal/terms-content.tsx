@@ -97,14 +97,32 @@ export const termsPage: LegalPageConfig = {
     },
     {
       id: "external-websites",
-      title: "External websites",
+      title: "Advertising and external websites",
       content: (
         <>
+          <p>
+            The site may display advertisements, including ads served through
+            Google AdSense, and may include sponsored or affiliate links.
+            Advertising helps fund the publication. An ad’s appearance does not
+            mean we endorse the advertiser or guarantee its claims. You do not
+            need to click an ad or make a purchase to read our articles. Do not
+            generate automated or artificial ad views or clicks, or click
+            repeatedly to increase advertising revenue.
+          </p>
           <p>
             External links are provided for context or convenience. Linked
             websites have their own terms, availability, and privacy practices.
             Read our <Link href="/disclaimer">disclosures</Link> for information
             about commercial links.
+          </p>
+          <p>
+            Purchases or other dealings with advertisers and external sellers
+            are subject to their own terms. Check the seller, price, return
+            policy, and suitability before providing information or paying. Our{" "}
+            <Link href="/privacy">Privacy Policy</Link> explains advertising
+            cookies and available privacy choices. Using the website does not by
+            itself give consent to optional advertising cookies or waive your
+            applicable privacy or consumer rights.
           </p>
         </>
       ),
@@ -125,6 +143,7 @@ export const termsPage: LegalPageConfig = {
     },
   ],
   note: {
+    updatedAt: "2026-11-05",
     title: "Questions about these terms?",
     description: "Use our Contact page for a question about these terms.",
     link: { href: "/contact", label: "Contact us" },

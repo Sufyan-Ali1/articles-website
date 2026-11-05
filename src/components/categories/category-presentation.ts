@@ -7,6 +7,7 @@ import {
   Leaf,
   Plane,
   ShoppingCart,
+  ShieldCheck,
   type LucideIcon,
 } from "lucide-react";
 
@@ -27,6 +28,20 @@ export function categoryPresentation({
   slug: string;
 }): Presentation {
   const text = `${name} ${slug}`;
+  if (
+    /digital.?safety|online.?safety|cyber.?security|online.?privacy|account.?security/i.test(
+      text,
+    )
+  )
+    return {
+      icon: ShieldCheck,
+      tone: "violet",
+      image: "workspace",
+      alt: "A laptop, coffee, and books in a sunlit workspace.",
+      description:
+        "Online privacy, account security, phishing scams, and practical steps to protect your information and stay safer online.",
+      priority: 4,
+    };
   if (/smart.?home|automation/i.test(text))
     return {
       icon: HouseWifi,

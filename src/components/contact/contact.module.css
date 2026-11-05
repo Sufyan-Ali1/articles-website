@@ -3,8 +3,8 @@
 }
 .page,
 .formPanel {
-  --contact-ink: #0b1731;
-  --contact-muted: #677995;
+  --contact-ink: var(--text-heading);
+  --contact-muted: var(--text-body);
   --contact-blue: #0765ed;
   color: var(--contact-ink);
 }
@@ -27,24 +27,24 @@
 }
 .eyebrow {
   color: #0865e8;
-  font-size: 11px;
+  font-size: var(--type-eyebrow);
   font-weight: 650;
   line-height: 1.5;
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: var(--type-eyebrow-tracking);
   margin: 0 0 16px;
 }
 .hero h1 {
-  font-family: var(--font-geist-sans), Arial, sans-serif;
-  font-size: clamp(44px, 4.8vw, 68px);
-  font-weight: 700;
-  line-height: 1.1;
-  letter-spacing: -2.8px;
+  font-family: var(--type-sans);
+  font-size: var(--type-page-title);
+  font-weight: var(--type-heading-weight);
+  line-height: var(--type-heading-leading);
+  letter-spacing: var(--type-heading-tracking);
   margin: 0;
 }
 .heroDescription {
-  font-size: clamp(16px, 1.5vw, 20px);
-  line-height: 1.65;
+  font-size: var(--type-body);
+  line-height: var(--type-body-leading);
   color: #5c708d;
   max-width: 48ch;
   margin: 20px 0 0;
@@ -90,17 +90,17 @@
 .faqs h2,
 .newsletter h2 {
   color: var(--contact-ink);
-  font-family: var(--font-geist-sans), Arial, sans-serif;
-  font-size: clamp(28px, 2.6vw, 36px);
-  font-weight: 650;
-  line-height: 1.2;
-  letter-spacing: -1.2px;
+  font-family: var(--type-sans);
+  font-size: var(--type-section-title);
+  font-weight: var(--type-heading-weight);
+  line-height: var(--type-heading-leading);
+  letter-spacing: var(--type-heading-tracking);
   margin: 0;
 }
 .formDescription,
 .sectionDescription {
   color: var(--contact-muted);
-  font-size: 16px;
+  font-size: var(--type-body);
   line-height: 1.6;
   margin: 12px 0 0;
 }
@@ -228,7 +228,7 @@
   border-radius: 10px;
   padding: 14px 16px;
   font-size: 13px;
-  line-height: 1.65;
+  line-height: var(--type-body-leading);
   margin-bottom: 25px;
 }
 .notice a {
@@ -240,7 +240,7 @@
   border-radius: 10px;
   padding: 14px 16px;
   font-size: 13px;
-  line-height: 1.65;
+  line-height: var(--type-body-leading);
 }
 .formBottom {
   display: flex;
@@ -261,7 +261,7 @@
   border-radius: 11px;
   padding: 14px 25px;
   min-height: 52px;
-  font-size: 16px;
+  font-size: var(--type-body);
   line-height: 1.5;
   font-weight: 550;
 }
@@ -296,7 +296,7 @@
   padding: 36px 32px 0;
 }
 .details h2 {
-  font-size: clamp(26px, 2.5vw, 34px);
+  font-size: var(--type-section-title);
 }
 .contactMethod {
   display: grid;
@@ -323,17 +323,17 @@
 .contactMethod h3,
 .faqCard h3 {
   color: var(--contact-ink);
-  font-family: var(--font-geist-sans), Arial, sans-serif;
+  font-family: var(--type-sans);
   font-size: 18px;
-  font-weight: 600;
-  letter-spacing: -0.4px;
-  line-height: 1.35;
+  font-weight: var(--type-heading-weight);
+  letter-spacing: var(--type-heading-tracking);
+  line-height: var(--type-heading-leading);
   margin: 0;
 }
 .contactMethod p {
   color: var(--contact-muted);
   font-size: 14px;
-  line-height: 1.65;
+  line-height: var(--type-body-leading);
   margin: 7px 0 0;
 }
 .contactMethod a {
@@ -364,7 +364,7 @@
   margin-bottom: 13px;
 }
 .faqs h2 {
-  font-size: clamp(29px, 2.8vw, 39px);
+  font-size: var(--type-section-title);
 }
 .faqGrid {
   display: grid;
@@ -386,13 +386,13 @@
   border-radius: 15px;
 }
 .faqCard h3 {
-  font-size: 16px;
+  font-size: var(--type-body);
   margin-top: 5px;
 }
 .faqCard p {
   color: var(--contact-muted);
   font-size: 13px;
-  line-height: 1.65;
+  line-height: var(--type-body-leading);
   margin: 9px 0 0;
 }
 .faqCard a {
@@ -422,12 +422,12 @@
   box-shadow: 0 5px 16px #6e7fd111;
 }
 .newsletterCopy .eyebrow {
-  font-size: 10px;
+  font-size: var(--type-eyebrow);
   margin-bottom: 8px;
 }
 .newsletterCopy h2 {
   font-size: 26px;
-  letter-spacing: -0.9px;
+  letter-spacing: var(--type-heading-tracking);
 }
 .newsletterCopy p:last-child {
   color: var(--contact-muted);
@@ -577,7 +577,7 @@
     gap: 28px;
   }
   .hero h1 {
-    font-size: 49px;
+    font-size: var(--type-page-title);
   }
   .layout {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -591,7 +591,7 @@
   }
   .formPanel h2,
   .details h2 {
-    font-size: 28px;
+    font-size: var(--type-section-title);
   }
   .formDescription,
   .sectionDescription {
@@ -614,12 +614,12 @@
     padding-block: 28px;
   }
   .hero h1 {
-    font-size: clamp(43px, 7vw, 54px);
-    letter-spacing: -1.9px;
+    font-size: var(--type-page-title);
+    letter-spacing: var(--type-heading-tracking);
   }
   .heroDescription {
     max-width: 58ch;
-    font-size: 17px;
+    font-size: var(--type-body);
   }
   .heroImage {
     max-width: 550px;
@@ -634,7 +634,7 @@
   }
   .formPanel h2,
   .details h2 {
-    font-size: 30px;
+    font-size: var(--type-section-title);
   }
   .detailsContent {
     padding: 29px 29px 0;
@@ -682,12 +682,12 @@
   }
   .formPanel h2,
   .details h2 {
-    font-size: 28px;
-    letter-spacing: -0.9px;
+    font-size: var(--type-section-title);
+    letter-spacing: var(--type-heading-tracking);
   }
   .field input,
   .field textarea {
-    font-size: 16px;
+    font-size: var(--type-body);
   }
   .reasonOptions {
     gap: 7px;
@@ -728,7 +728,7 @@
     border-radius: 13px;
   }
   .faqCard h3 {
-    font-size: 16px;
+    font-size: var(--type-body);
   }
   .faqCard p {
     font-size: 13px;
@@ -748,7 +748,7 @@
   }
   .newsletterCopy h2 {
     font-size: 22px;
-    letter-spacing: -0.7px;
+    letter-spacing: var(--type-heading-tracking);
   }
   .newsletterCopy p:last-child {
     font-size: 11px;

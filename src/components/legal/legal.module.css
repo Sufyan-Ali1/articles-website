@@ -2,8 +2,8 @@
   background: #fff;
 }
 .page {
-  --legal-ink: #0c1937;
-  --legal-muted: #627492;
+  --legal-ink: var(--text-heading);
+  --legal-muted: var(--text-body);
   color: var(--legal-ink);
   background: #fff;
   padding-bottom: 28px;
@@ -26,26 +26,26 @@
   padding-block: 28px;
 }
 .eyebrow {
-  font-size: 11px;
+  font-size: var(--type-eyebrow);
   line-height: 1.5;
   font-weight: 650;
   color: #2275ee;
-  letter-spacing: 1.8px;
+  letter-spacing: var(--type-eyebrow-tracking);
   text-transform: uppercase;
   margin: 0 0 17px;
 }
 .hero h1 {
-  font-family: var(--font-editorial), Georgia, serif;
-  font-size: clamp(38px, 4.1vw, 58px);
-  font-weight: 650;
-  line-height: 1.08;
-  letter-spacing: -1.6px;
+  font-family: var(--type-sans);
+  font-size: var(--type-page-title);
+  font-weight: var(--type-heading-weight);
+  line-height: var(--type-heading-leading);
+  letter-spacing: var(--type-heading-tracking);
   color: var(--legal-ink);
   margin: 0;
 }
 .description {
-  font-size: 17px;
-  line-height: 1.65;
+  font-size: var(--type-body);
+  line-height: var(--type-body-leading);
   max-width: 56ch;
   color: #536d95;
   margin: 18px 0 0;
@@ -137,33 +137,20 @@
   color: #e9a500;
   background: #fff8df;
 }
-.page[data-heading-style="sans"] .hero h1,
-.page[data-heading-style="sans"] .section h2 {
-  font-family: var(--font-geist-sans), Arial, sans-serif;
-}
-.page[data-heading-style="sans"] .hero h1 {
-  font-size: clamp(36px, 4vw, 55px);
-  font-weight: 700;
-}
-.page[data-heading-style="sans"] .section h2 {
-  font-size: 20px;
-  line-height: 1.4;
-  font-weight: 650;
-}
 .section h2 {
-  font-family: var(--font-editorial), Georgia, serif;
+  font-family: var(--type-sans);
   font-size: 24px;
-  font-weight: 650;
-  line-height: 1.25;
-  letter-spacing: -0.3px;
+  font-weight: var(--type-heading-weight);
+  line-height: var(--type-heading-leading);
+  letter-spacing: var(--type-heading-tracking);
   color: var(--legal-ink);
   margin: 3px 0 8px;
   scroll-margin-top: 18px;
 }
 .section p,
 .section li {
-  font-size: 15px;
-  line-height: 1.65;
+  font-size: var(--type-body);
+  line-height: var(--type-body-leading);
   color: var(--legal-muted);
   margin: 0 0 12px;
 }
@@ -263,7 +250,7 @@
     gap: 26px;
   }
   .description {
-    font-size: 16px;
+    font-size: var(--type-body);
   }
 }
 @media (max-width: 900px) {
@@ -319,11 +306,11 @@
     padding-block: 30px 15px;
   }
   .hero h1 {
-    font-size: clamp(38px, 6vw, 48px);
-    letter-spacing: -1px;
+    font-size: var(--type-page-title);
+    letter-spacing: var(--type-heading-tracking);
   }
   .description {
-    font-size: 15px;
+    font-size: var(--type-body);
     margin-top: 15px;
   }
   .heroArt {

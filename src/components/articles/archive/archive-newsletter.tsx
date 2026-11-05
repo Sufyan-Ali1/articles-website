@@ -15,8 +15,8 @@ export function ArchiveNewsletter() {
         <p className={styles.eyebrow}>Stay in the loop</p>
         <h2 id="archive-newsletter-title">Keep up with useful guides.</h2>
         <p>
-          Save your email for future article updates, and explore the library
-          for your next guide today.
+          Subscribe to receive new articles, practical guides, and useful
+          comparisons by email.
         </p>
       </div>
       <NewsletterForm label="Articles newsletter signup" />

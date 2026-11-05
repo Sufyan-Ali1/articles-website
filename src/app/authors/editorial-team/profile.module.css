@@ -2,7 +2,7 @@
   background: #fff;
   color: #0b1630;
   padding: 20px 0 80px;
-  font-family: var(--font-geist-sans), Arial, sans-serif;
+  font-family: var(--type-sans);
 }
 .shell {
   width: var(--site-shell-width);
@@ -28,32 +28,32 @@
 .page h1,
 .page h2,
 .page h3 {
-  font-weight: 650;
+  font-weight: var(--type-heading-weight);
   margin: 0;
-  font-family: inherit;
+  font-family: var(--type-sans);
   text-wrap: balance;
 }
 .page h1 {
-  font-weight: 700;
-  font-size: clamp(32px, 3.5vw, 50px);
-  line-height: 1.14;
-  letter-spacing: -1.6px;
+  font-weight: var(--type-heading-weight);
+  font-size: var(--type-page-title);
+  line-height: var(--type-heading-leading);
+  letter-spacing: var(--type-heading-tracking);
 }
 .page h2 {
-  font-weight: 650;
-  font-size: clamp(27px, 2.7vw, 36px);
-  line-height: 1.22;
-  letter-spacing: -1px;
+  font-weight: var(--type-heading-weight);
+  font-size: var(--type-section-title);
+  line-height: var(--type-heading-leading);
+  letter-spacing: var(--type-heading-tracking);
 }
 .page h3 {
   font-size: 18px;
-  line-height: 1.4;
+  line-height: var(--type-heading-leading);
 }
 .page p {
   color: #5e6c85;
   line-height: 1.75;
   margin: 16px 0 0;
-  font-size: 16px;
+  font-size: var(--type-body);
 }
 .page a {
   color: #0865cc;
@@ -94,7 +94,7 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  font-size: 13px;
+  font-size: var(--type-eyebrow);
   color: #0865cc;
   background: #dceaff;
   border-radius: 20px;
@@ -162,13 +162,33 @@
 .topics li {
   background: #edf6ff;
   border-radius: 16px;
-  padding: 28px 16px;
   text-align: center;
   color: #087cff;
 }
+.topics .topicLink {
+  display: block;
+  height: 100%;
+  padding: 28px 16px;
+  border-radius: inherit;
+  color: inherit;
+}
+.topics .topicLink > svg {
+  margin-inline: auto;
+}
+.explore + .topics {
+  margin-top: 28px;
+}
+.topics .topicLink:hover {
+  text-decoration: none;
+  box-shadow: inset 0 0 0 2px currentColor;
+}
+.topics .topicLink:hover h3 {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
 .topics h3 {
   margin-top: 18px;
-  font-size: 16px;
+  font-size: var(--type-body);
   color: #0b1630;
 }
 .topics p {
@@ -326,13 +346,21 @@
 }
 .researchPoints li {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 10px;
   font-size: 14px;
   font-weight: 600;
 }
 .researchPoints svg {
   color: #1267f5;
+}
+.researchPoints li > div {
+  min-width: 0;
+}
+.researchPoints li p {
+  font-weight: 400;
+  font-size: 14px;
+  margin-top: 8px;
 }
 .sources {
   display: grid;
@@ -546,6 +574,6 @@
     overflow-wrap: anywhere;
   }
   .page h1 {
-    letter-spacing: -1px;
+    letter-spacing: var(--type-heading-tracking);
   }
 }

@@ -17,6 +17,20 @@
   --pale-blue: #edf1ff;
   --coral: #e9a18b;
   --editorial: var(--font-editorial), Georgia, serif;
+  --type-sans: var(--font-geist-sans), Arial, sans-serif;
+  --type-body: 16px;
+  --type-body-leading: 1.65;
+  --type-page-title: clamp(36px, 4vw, 56px);
+  --type-section-title: clamp(28px, 2.6vw, 36px);
+  --type-card-title: 18px;
+  --type-heading-weight: 650;
+  --type-heading-leading: 1.2;
+  --type-heading-tracking: -0.025em;
+  --type-eyebrow: 11px;
+  --type-eyebrow-tracking: 1.8px;
+  --text-heading: #0b1630;
+  --text-body: #5e6c85;
+  --text-link: #0865cc;
 }
 @theme inline {
   --color-background: var(--background);
@@ -36,14 +50,22 @@ body {
   margin: 0;
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), Arial, sans-serif;
-  font-size: 16px;
-  line-height: 1.65;
+  font-family: var(--type-sans);
+  font-size: var(--type-body);
+  line-height: var(--type-body-leading);
   -webkit-font-smoothing: antialiased;
 }
 a {
   color: inherit;
   text-decoration: none;
+}
+main p a:not([class]) {
+  color: var(--text-link);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+main p a:not([class]):hover {
+  text-decoration-thickness: 2px;
 }
 button,
 input,
@@ -1431,7 +1453,7 @@ mark {
 .article-body h4,
 .article-body h5,
 .article-body h6 {
-  font-family: var(--font-geist-sans), Arial, sans-serif;
+  font-family: var(--type-sans);
   letter-spacing: -0.8px;
   line-height: 1.25;
   margin: 1.8em 0 0.8em;

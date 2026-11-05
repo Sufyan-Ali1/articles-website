@@ -1,5 +1,42 @@
 import { test, expect } from "@playwright/test";
 
+test("Google Analytics initializes once across client-side navigation", async ({
+  page,
+}) => {
+  let loads = 0;
+  await page.route(
+    "https://www.googletagmanager.com/gtag/js?**",
+    async (route) => {
+      loads += 1;
+      await route.fulfill({ contentType: "application/javascript", body: "" });
+    },
+  );
+  await page.goto("/about");
+  const tag = page.locator(
+    'script[src="https://www.googletagmanager.com/gtag/js?id=G-RPSXX10VMF"]',
+  );
+  await expect(tag).toHaveCount(1);
+  const configs = () =>
+    page.evaluate(() => {
+      const layer = (window as Window & { dataLayer?: ArrayLike<unknown>[] })
+        .dataLayer;
+      return (layer || [])
+        .map((entry) => Array.from(entry))
+        .filter((entry) => entry[0] === "config" && entry[1] === "G-RPSXX10VMF")
+        .length;
+    });
+  await expect.poll(configs).toBe(1);
+  await page
+    .locator(".site-header")
+    .getByRole("link", { name: "Home", exact: true })
+    .click();
+  await expect(page).toHaveURL(/\/$/);
+  await expect(tag).toHaveCount(1);
+  expect(await configs()).toBe(1);
+  // Next.js may preload the resource separately from its script request.
+  expect(loads).toBeGreaterThan(0);
+});
+
 test("production responses enforce headers and reject unauthenticated cache mutation", async ({
   request,
 }) => {

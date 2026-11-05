@@ -179,7 +179,7 @@ test("navbar search input, right-hand submit icon and request action fit every v
   ]) {
     await page.setViewportSize({ width, height: 900 });
     const request = header.getByRole("link", {
-      name: "Request a topic",
+      name: "Request a Topic",
       exact: true,
     });
     const form = header.getByRole("search", { name: "Search publication" });
@@ -237,7 +237,7 @@ test("navbar search input, right-hand submit icon and request action fit every v
   await input.press("Enter");
   await expect(page).toHaveURL(/\/search\?search=electric$/);
   await header
-    .getByRole("link", { name: "Request a topic", exact: true })
+    .getByRole("link", { name: "Request a Topic", exact: true })
     .focus();
   await page.keyboard.press("Enter");
   await expect(page).toHaveURL(/\/request-article$/);

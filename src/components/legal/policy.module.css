@@ -48,7 +48,7 @@
   box-shadow: none;
 }
 .contentsTitle {
-  font-family: var(--font-editorial), Georgia, serif;
+  font-family: var(--type-sans);
   color: #0c1937;
   font-size: 22px;
   font-weight: 650;

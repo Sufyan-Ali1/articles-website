@@ -12,35 +12,90 @@ import { metadata as buildMetadata } from "@/lib/seo/metadata";
 import { ArticleCard } from "@/components/articles/article-card";
 import styles from "./profile.module.css";
 
-const title = "Ask & Explore Editorial Team: Our Authors & Standards";
+const title = "Ask & Explore Editorial Team | Author Profile & Standards";
+const baseMetadata = buildMetadata(
+  title,
+  "Meet the Ask & Explore Editorial Team. Learn about our shared author profile, research principles, editorial standards, and the practical guides we publish.",
+  editorialTeam.path,
+);
+const socialTitle = "Ask & Explore Editorial Team | Author Profile";
+const socialDescription =
+  "Learn about the Ask & Explore Editorial Team, our editorial principles, research approach, and practical guides.";
 export const metadata = {
-  ...buildMetadata(
-    title,
-    "Meet the Ask & Explore Editorial Team. Explore our topics, editorial standards, approach to accuracy and transparency, contact details, and latest articles.",
-    editorialTeam.path,
-  ),
+  ...baseMetadata,
   title: { absolute: title },
+  openGraph: {
+    ...baseMetadata.openGraph,
+    title: socialTitle,
+    description: socialDescription,
+  },
+  twitter: {
+    ...baseMetadata.twitter,
+    title: socialTitle,
+    description: socialDescription,
+    card: "summary_large_image" as const,
+  },
 };
 
-const topics = [
+const topics: readonly (readonly [string, string])[] = [
   [
     "Technology",
-    "Device features, software, and everyday technology explained.",
+    "AI tools, software, digital services, laptops, and technology explanations.",
   ],
   [
     "Automotive",
-    "Vehicle comparisons, ownership questions, and buying considerations.",
+    "Vehicle comparisons, ownership costs, maintenance considerations, and car-buying decisions.",
   ],
   [
     "Buying Guides",
-    "Product features, costs, and tradeoffs to consider before buying.",
+    "Product features, specifications, prices, comparisons, and purchasing tradeoffs.",
   ],
-  ["Lifestyle", "Practical ideas for everyday routines and decisions."],
-  ["Digital Safety", "Understanding online risks and safer digital habits."],
-  ["Travel", "Planning questions, travel options, and practical preparation."],
+  [
+    "Lifestyle",
+    "Digital wellbeing, daily routines, productivity, and practical everyday habits.",
+  ],
+  [
+    "Digital Safety",
+    "Online privacy, account security, cyber scams, and safer digital practices.",
+  ],
+  [
+    "Travel",
+    "Flight booking, travel planning, price comparisons, and practical travel tips.",
+  ],
 ];
 
-async function Topics() {
+const exploreTopics = [
+  [
+    "Technology",
+    "Explore AI tools, software, laptops, digital services, and everyday technology questions.",
+  ],
+  [
+    "Automotive",
+    "Understand vehicle comparisons, ownership costs, maintenance considerations, and car-buying choices.",
+  ],
+  [
+    "Buying Guides",
+    "Compare features, specifications, prices, and practical considerations before purchasing.",
+  ],
+  [
+    "Lifestyle",
+    "Discover ideas for digital wellbeing, focus, daily routines, and everyday productivity.",
+  ],
+  [
+    "Digital Safety",
+    "Learn about account protection, online privacy, scams, and safer digital habits.",
+  ],
+  [
+    "Travel",
+    "Explore flight booking strategies, travel planning, fare comparisons, and practical trip preparation.",
+  ],
+] as const;
+
+async function Topics({
+  items = topics,
+}: {
+  items?: readonly (readonly [string, string])[];
+}) {
   await connection();
   const [categories, types] = await Promise.all([
     getClassifications("categories").catch(() => []),
@@ -48,7 +103,7 @@ async function Topics() {
   ]);
   return (
     <ul className={styles.topics}>
-      {topics.map(([name, description]) => {
+      {items.map(([name, description], index) => {
         const key = name.toLowerCase().replace(/[^a-z0-9]/g, "");
         const matches = (item: {
           name: string;
@@ -70,12 +125,14 @@ async function Topics() {
           ? `/category/${category.slug}`
           : type
             ? `/articles?article_type=${type.slug}`
-            : null;
+            : `/search?search=${encodeURIComponent(name)}`;
         return (
           <li key={name} data-tone={name}>
-            <TopicIcon index={topics.findIndex((topic) => topic[0] === name)} />
-            <h3>{href ? <Link href={href}>{name}</Link> : name}</h3>
-            <p>{description}</p>
+            <Link className={styles.topicLink} href={href} aria-label={name}>
+              <TopicIcon index={index} />
+              <h3>{name}</h3>
+              <p>{description}</p>
+            </Link>
           </li>
         );
       })}
@@ -121,6 +178,11 @@ export default function EditorialTeamPage() {
           }
         >
           <Topics />
+        </Suspense>
+      }
+      exploreTopics={
+        <Suspense fallback={<p role="status">Loading topics…</p>}>
+          <Topics items={exploreTopics} />
         </Suspense>
       }
       articles={

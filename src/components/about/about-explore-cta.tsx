@@ -8,13 +8,17 @@ export function AboutExploreCta() {
     <section className={styles.explore} aria-labelledby="about-explore-title">
       <div className={styles.exploreCopy}>
         <p className={styles.eyebrow}>Ready to explore?</p>
-        <h2 id="about-explore-title">Explore Our Articles</h2>
+        <h2 id="about-explore-title">
+          Find Practical Guides for Your Next Question
+        </h2>
         <p>
-          Have a decision to make or a problem to solve? Browse our guides,
-          comparisons, and how-to articles to find a useful starting point.
+          Need help choosing a product, understanding technology, comparing car
+          costs, or staying safer online? Browse our published articles and find
+          explanations, comparisons, and practical guidance that fit your
+          question.
         </p>
         <Link href="/articles" className={styles.primaryButton}>
-          Browse the Articles <ArrowRight size={18} aria-hidden="true" />
+          Explore All Articles <ArrowRight size={18} aria-hidden="true" />
         </Link>
       </div>
       <div className={styles.exploreVisual}>

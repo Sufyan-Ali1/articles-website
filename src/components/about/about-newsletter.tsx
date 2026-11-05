@@ -16,10 +16,13 @@ export function AboutNewsletter() {
         <Mail size={34} strokeWidth={1.7} />
       </span>
       <div className={styles.newsletterCopy}>
-        <p className={styles.eyebrow}>Stay updated</p>
-        <h2 id="about-newsletter-title">Practical reads. Stay connected.</h2>
+        <p className={styles.eyebrow}>Stay connected</p>
+        <h2 id="about-newsletter-title">
+          Stay in Touch With Ask &amp; Explore
+        </h2>
         <p>
-          Subscribe for future updates about the latest articles on the site.
+          Interested in new guides and article updates? Subscribe to receive
+          practical reads from Ask &amp; Explore in your inbox.
         </p>
       </div>
       <NewsletterForm label="About page newsletter signup" />

@@ -1,9 +1,9 @@
 // Shared editorial copy for the global English-language publication.
 export const pageSeo = {
   home: {
-    title: "Ask & Explore | Practical Guides, Reviews & Advice",
+    title: "Ask & Explore | Practical Guides & Everyday Advice",
     description:
-      "Explore Ask & Explore for practical technology guides, car advice, product comparisons, digital safety tips, travel ideas, and everyday solutions.",
+      "Explore practical technology guides, car buying advice, product comparisons, digital safety tips, travel ideas, and lifestyle articles at Ask & Explore.",
   },
   articles: {
     title: "Articles, How-To Guides & Product Comparisons",
@@ -16,9 +16,12 @@ export const pageSeo = {
       "Browse Ask & Explore guides by topic: technology, cars, digital safety, lifestyle and travel. Choose a category to find related articles and buying advice.",
   },
   about: {
-    title: "About Ask & Explore: Our Editorial Approach",
+    title: "About Ask & Explore | Our Mission & Editorial Approach",
     description:
-      "Learn about Ask & Explore, our editorial approach, and the technology guides, car buying advice and product comparisons we publish for everyday decisions.",
+      "Learn about Ask & Explore, our practical guides, the topics we cover, and our approach to accuracy, transparency, and helping readers make informed choices.",
+    ogTitle: "About Ask & Explore | Practical Guides & Editorial Values",
+    ogDescription:
+      "Discover what Ask & Explore publishes, our six main topics, and the editorial principles behind our guides, comparisons, and everyday advice.",
   },
   contact: {
     title: "Contact Us: Questions, Feedback & Corrections",
@@ -38,21 +41,27 @@ export const pageSeo = {
   privacy: {
     title: "Privacy Policy: Your Information & Choices",
     description:
-      "Read how Ask & Explore handles browsing information, topic suggestions and contact messages, including external services, retention and privacy enquiries.",
+      "Learn how Ask & Explore handles personal information, cookies and Google AdSense advertising, including privacy choices, retention and contact requests.",
   },
   terms: {
     title: "Website Terms & Conditions",
     description:
-      "Read the terms for using Ask & Explore, sharing article suggestions and sending messages. Learn about content rights, external links and responsible use.",
+      "Read the terms for using Ask & Explore, including responsible use, advertising, external sellers, content rights, article suggestions and your privacy choices.",
   },
   disclaimer: {
     title: "Editorial Standards & Affiliate Disclosures",
     description:
-      "Understand Ask & Explore’s review labels, recommendations, sponsored and affiliate links, and the limits of general information before making a decision.",
+      "Understand Ask & Explore’s display advertising, Google AdSense, sponsored and affiliate links, review labels and the limits of general information.",
   },
 } as const;
 
 const topicDescriptions = [
+  {
+    pattern:
+      /digital.?safety|online.?safety|cyber.?security|online.?privacy|account.?security/i,
+    description:
+      "Explore digital safety guides covering online privacy, account security, phishing scams, and practical steps to protect your information and stay safer online.",
+  },
   {
     pattern: /smart.?home|automation/i,
     description:

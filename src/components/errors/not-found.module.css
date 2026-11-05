@@ -29,18 +29,18 @@
   z-index: 1;
 }
 .eyebrow {
-  font-size: 12px;
+  font-size: var(--type-eyebrow);
   line-height: 1.5;
-  letter-spacing: 2.6px;
+  letter-spacing: var(--type-eyebrow-tracking);
   font-weight: 650;
   text-transform: uppercase;
   color: #849ac8;
   margin: 0 0 16px;
 }
 .copy h1 {
-  font-family: var(--font-geist-sans), Arial, sans-serif;
+  font-family: var(--type-sans);
   color: var(--lost-ink);
-  font-weight: 700;
+  font-weight: var(--type-heading-weight);
   margin: 0;
 }
 .oops {
@@ -58,9 +58,9 @@
 }
 .description {
   max-width: 550px;
-  font-size: clamp(16px, 1.4vw, 20px);
+  font-size: var(--type-body);
   color: var(--lost-muted);
-  line-height: 1.65;
+  line-height: var(--type-body-leading);
   margin: 17px 0 29px;
 }
 .actions {
@@ -115,13 +115,13 @@
   padding-block: 16px 34px;
 }
 .recovery h2 {
-  font-family: var(--font-geist-sans), Arial, sans-serif;
+  font-family: var(--type-sans);
   text-align: center;
   color: var(--lost-ink);
   font-size: 27px;
-  line-height: 1.3;
-  letter-spacing: -0.7px;
-  font-weight: 650;
+  line-height: var(--type-heading-leading);
+  letter-spacing: var(--type-heading-tracking);
+  font-weight: var(--type-heading-weight);
   margin: 0 0 25px;
 }
 .cards {
@@ -240,8 +240,8 @@
     padding-top: 35px;
   }
   .eyebrow {
-    font-size: 10px;
-    letter-spacing: 2px;
+    font-size: var(--type-eyebrow);
+    letter-spacing: var(--type-eyebrow-tracking);
     margin-bottom: 13px;
   }
   .oops {
@@ -252,7 +252,7 @@
     letter-spacing: -0.8px;
   }
   .description {
-    font-size: 15px;
+    font-size: var(--type-body);
     margin-block: 14px 23px;
   }
   .actions a {

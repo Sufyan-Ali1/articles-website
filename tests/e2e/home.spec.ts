@@ -6,16 +6,19 @@ test("combined homepage renders distinct stories, active topics, and the version
 }, testInfo) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-    /Ask & Explore.*Practical Guides.*Clear Answers/,
+    /Ask & Explore: Practical Guides & Everyday Advice/,
   );
   await expect(
     page.getByRole("heading", { name: "Latest Articles", exact: true }),
   ).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "Editor’s Picks", exact: true }),
+    page.getByRole("heading", { name: "Editor's Picks", exact: true }),
   ).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "Reviews & Guides", exact: true }),
+    page.getByRole("heading", {
+      name: "Buying Guides & Comparisons",
+      exact: true,
+    }),
   ).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "Popular with Readers", exact: true }),
@@ -34,7 +37,7 @@ test("combined homepage renders distinct stories, active topics, and the version
     "Latest Articles",
     "Editor's Picks",
     "Popular articles",
-    "Reviews & Guides",
+    "Buying Guides & Comparisons",
     "Stay curious",
   ]);
   const stories = await page
@@ -52,9 +55,17 @@ test("combined homepage renders distinct stories, active topics, and the version
   await expect(
     page
       .getByRole("region", { name: "Explore by Category" })
-      .getByRole("link", { name: /Buying guides/ }),
+      .getByRole("link", { name: /Buying Guides/ }),
   ).toHaveAttribute("href", "/articles?article_type=buying-guide");
   await expect(page.locator("body")).not.toContainText("Archived topic");
+  const discovery = page.getByRole("navigation", { name: "Discover topics" });
+  await expect(discovery.locator("small")).toHaveText([
+    "Car buying & ownership tips",
+    "AI tools & tech guides",
+    "Product features & prices",
+    "Focus & daily routines",
+    "Privacy & account security",
+  ]);
   await expect(
     page.locator(".site-footer").getByRole("heading", { name: "Quick Links" }),
   ).toBeVisible();
@@ -120,6 +131,13 @@ test("homepage keeps its content aligned with the navbar without horizontal over
         () => document.documentElement.scrollWidth <= innerWidth,
       ),
     ).toBe(true);
+    const home = (await page.locator("[data-homepage]").boundingBox())!;
+    const footer = (await page.locator(".site-footer").boundingBox())!;
+    expect(Math.abs(footer.y - home.y - home.height)).toBeLessThanOrEqual(1);
+    await expect(page.locator("[data-homepage]")).toHaveCSS(
+      "background-color",
+      "rgb(255, 255, 255)",
+    );
     if ([1440, 834, 390].includes(width)) {
       await page.evaluate(() =>
         window.scrollTo({ top: 0, behavior: "instant" }),
@@ -194,6 +212,12 @@ test("hero uses compact content spacing and complete images across screen sizes 
     const topics = (await page
       .getByRole("navigation", { name: "Discover topics" })
       .boundingBox())!;
+    for (const description of await page
+      .locator("[data-home-intro] nav small")
+      .all()) {
+      await expect(description).toHaveCSS("display", "block");
+      await expect(description).toHaveCSS("-webkit-line-clamp", "none");
+    }
     expect(
       heading.y,
       `Headline starts inside hero at ${width}×${height}`,

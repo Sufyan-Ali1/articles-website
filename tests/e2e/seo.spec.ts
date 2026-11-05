@@ -63,7 +63,11 @@ test("article schema is preserved from the backend and homepage identifies the w
     .locator('script[type="application/ld+json"]')
     .first()
     .textContent();
-  expect(JSON.parse(website!)).toMatchObject({
+  expect(
+    JSON.parse(website!)["@graph"].find(
+      (node: { "@type": string }) => node["@type"] === "WebSite",
+    ),
+  ).toMatchObject({
     "@type": "WebSite",
     name: "Ask & Explore",
     url: "https://ask-explore.test/",
@@ -74,9 +78,9 @@ test("homepage sends branded metadata, content and linked schemas in server HTML
   page,
   request,
 }) => {
-  const title = "Ask & Explore | Practical Guides, Reviews & Advice";
+  const title = "Ask & Explore | Practical Guides & Everyday Advice";
   const description =
-    "Explore Ask & Explore for practical technology guides, car advice, product comparisons, digital safety tips, travel ideas, and everyday solutions.";
+    "Explore practical technology guides, car buying advice, product comparisons, digital safety tips, travel ideas, and lifestyle articles at Ask & Explore.";
   for (const agent of ["Mozilla/5.0", "Googlebot"]) {
     const response = await request.get("/", {
       headers: { "User-Agent": agent },
@@ -111,6 +115,7 @@ test("homepage sends branded metadata, content and linked schemas in server HTML
       "og:description": description,
       "og:url": "https://ask-explore.test/",
       "og:site_name": "Ask & Explore",
+      "og:type": "website",
       "twitter:title": title,
       "twitter:description": description,
       "twitter:card": "summary_large_image",
@@ -122,22 +127,53 @@ test("homepage sends branded metadata, content and linked schemas in server HTML
     expect(result.headings).toHaveLength(1);
     expect(result.headings[0]).toContain("Ask & Explore");
     expect(result.links).toBeGreaterThan(0);
-    expect(result.schemas).toHaveLength(2);
-    const website = result.schemas.find((s) => s["@type"] === "WebSite");
-    const organization = result.schemas.find(
-      (s) => s["@type"] === "Organization",
+    expect(result.schemas).toHaveLength(1);
+    const graph = result.schemas[0]["@graph"];
+    expect(graph).toHaveLength(4);
+    const website = graph.find(
+      (s: { "@type": string }) => s["@type"] === "WebSite",
+    );
+    const organization = graph.find(
+      (s: { "@type": string }) => s["@type"] === "Organization",
     );
     expect(website).toMatchObject({
       name: "Ask & Explore",
-      alternateName: "Ask and Explore",
+      alternateName: "askandexplore.com",
       publisher: { "@id": organization["@id"] },
     });
     expect(organization).toMatchObject({
       name: "Ask & Explore",
-      url: "https://ask-explore.test",
-      logo: "https://askandexplore.com/images/brand/ae-mark.svg",
+      url: "https://ask-explore.test/",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://ask-explore.test/images/brand/ae-mark.svg",
+      },
     });
+    const webpage = graph.find(
+      (s: { "@type": string }) => s["@type"] === "WebPage",
+    );
+    const categories = graph.find(
+      (s: { "@type": string }) => s["@type"] === "ItemList",
+    );
+    expect(webpage.mainEntity).toEqual({ "@id": categories["@id"] });
+    expect(categories.numberOfItems).toBe(6);
+    expect(
+      categories.itemListElement.map((item: { name: string }) => item.name),
+    ).toEqual([
+      "Automotive",
+      "Technology",
+      "Buying Guides",
+      "Lifestyle",
+      "Digital Safety",
+      "Travel",
+    ]);
   }
+  const preview = await request.get("/opengraph-image");
+  expect(preview.ok()).toBe(true);
+  expect(preview.headers()["content-type"]).toContain("image/png");
+  const png = await preview.body();
+  expect(png.readUInt32BE(16)).toBe(1200);
+  expect(png.readUInt32BE(20)).toBe(630);
 });
 
 test("article metadata and publisher are generated for optional-field fallbacks and public pages", async ({

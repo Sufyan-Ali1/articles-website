@@ -106,7 +106,7 @@ export function NewsletterSignup() {
             <h2 id="newsletter-heading">Stay in the loop</h2>
           </div>
         </div>
-        <p>Sign up for future guides and new article updates.</p>
+        <p>Subscribe to receive new guides and article updates by email.</p>
         <NewsletterForm
           showArrow={false}
           formClassName={styles.newsletterForm}

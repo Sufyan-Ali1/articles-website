@@ -1,7 +1,8 @@
 .home {
+  display: flow-root;
   --home-blue: #0865cc;
-  --home-ink: #101d35;
-  --home-muted: #758095;
+  --home-ink: var(--text-heading);
+  --home-muted: var(--text-body);
   --hero-content-spacing: clamp(36px, 4vw, 60px);
   background: #fff;
   color: var(--home-ink);
@@ -48,8 +49,8 @@
 }
 .heroDescription {
   color: var(--home-muted);
-  font-size: 16px;
-  line-height: 1.65;
+  font-size: var(--type-body);
+  line-height: var(--type-body-leading);
   max-width: 480px;
   margin-bottom: 26px;
 }
@@ -104,6 +105,13 @@
   line-height: 1.6;
   color: var(--home-muted);
   margin: 0;
+}
+.heroNote h2 {
+  font-family: var(--editorial);
+  font-size: 18px;
+  font-weight: 550;
+  line-height: 1.25;
+  margin: 0 0 6px;
 }
 .heroFeature {
   min-width: 0;
@@ -247,10 +255,7 @@
   margin-bottom: 4px;
 }
 .topicStrip small {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  display: block;
   font-size: 11px;
   color: var(--home-muted);
   line-height: 1.5;
@@ -352,13 +357,9 @@
   margin: 0 0 9px;
 }
 .categoryCard p {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
   color: var(--home-muted);
   font-size: 12px;
-  line-height: 1.65;
+  line-height: var(--type-body-leading);
   margin: 0;
 }
 .smallArrow {
@@ -503,7 +504,7 @@
 .editorCopy > p {
   color: var(--home-muted);
   font-size: 12px;
-  line-height: 1.65;
+  line-height: var(--type-body-leading);
   margin-bottom: 15px;
   display: -webkit-box;
   -webkit-line-clamp: 3;
@@ -655,6 +656,24 @@
   line-height: 1.6;
   margin-bottom: 18px;
 }
+.requestCard h3 {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.4;
+  margin: 0 0 10px;
+}
+.newsletterCard :global(.publication-newsletter-fields) {
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.newsletterCard :global(.publication-newsletter-fields input) {
+  flex: 1 1 140px;
+  width: auto;
+}
+.newsletterCard :global(.publication-newsletter-fields button) {
+  flex: 1 1 auto;
+  max-width: 100%;
+}
 .outlineButton {
   display: inline-flex;
   align-items: center;
@@ -797,7 +816,7 @@
     font-size: 49px;
   }
   .heroDescription {
-    font-size: 14px;
+    font-size: var(--type-body);
   }
   .topicStrip > a {
     padding-inline: 14px;
@@ -878,7 +897,7 @@
     letter-spacing: -1.2px;
   }
   .heroDescription {
-    font-size: 13px;
+    font-size: var(--type-body);
     margin-bottom: 20px;
   }
   .primaryButton {
@@ -916,9 +935,6 @@
   .topicStrip > a {
     border: 0;
     padding-left: 0;
-  }
-  .topicStrip > a:nth-child(n + 4) {
-    display: none;
   }
   .categoryGrid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1017,8 +1033,8 @@
     margin-bottom: 14px;
   }
   .heroDescription {
-    font-size: 14px;
-    line-height: 1.65;
+    font-size: var(--type-body);
+    line-height: var(--type-body-leading);
     max-width: 450px;
   }
   .heroNote {
@@ -1039,9 +1055,6 @@
   }
   .topicStrip > a:nth-child(n + 4) {
     display: flex;
-  }
-  .topicStrip > a:last-child:nth-child(odd) {
-    display: none;
   }
   .topicStrip > a {
     padding: 0;
@@ -1262,8 +1275,8 @@
   margin-bottom: clamp(10px, 1.5vw, 20px);
 }
 .heroShell .heroDescription {
-  font-size: clamp(12px, 1.2vw, 16px);
-  line-height: 1.55;
+  font-size: var(--type-body);
+  line-height: var(--type-body-leading);
   margin-bottom: clamp(12px, 1.5vw, 20px);
 }
 .heroShell .heroNote {
@@ -1314,7 +1327,7 @@
   }
   .heroShell .heroDescription {
     max-width: 650px;
-    font-size: 13px;
+    font-size: var(--type-body);
     margin-bottom: 14px;
   }
   .heroShell .heroOverlay h2 {
@@ -1337,7 +1350,7 @@
   }
   .firstScreen .topicStrip > a {
     display: flex;
-    flex: 1 0 160px;
+    flex: 1 0 190px;
     min-width: 0;
     gap: 10px;
     padding: 0 15px;
@@ -1358,7 +1371,6 @@
     width: 20px;
   }
   .firstScreen .topicStrip small {
-    -webkit-line-clamp: 1;
     max-width: 150px;
   }
 }
@@ -1373,8 +1385,8 @@
     margin-bottom: 8px;
   }
   .heroShell .heroDescription {
-    font-size: 12px;
-    line-height: 1.5;
+    font-size: var(--type-body);
+    line-height: var(--type-body-leading);
     margin-bottom: 12px;
   }
   .heroShell .primaryButton {
@@ -1402,9 +1414,6 @@
   .firstScreen .topicStrip {
     min-height: 62px;
     padding-block: 8px;
-  }
-  .firstScreen .topicStrip small {
-    display: none;
   }
   .firstScreen .stripIcon {
     width: 32px;

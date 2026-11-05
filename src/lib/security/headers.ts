@@ -16,12 +16,12 @@ export function securityHeaders({
     "default-src 'self'",
     // Next's cached/PPR shell contains inline bootstrapping scripts. Nonces
     // require disabling PPR; never pretend a static nonce protects cached HTML.
-    `script-src 'self' 'unsafe-inline'${production ? "" : " 'unsafe-eval'"}`,
+    `script-src 'self' 'unsafe-inline' https://www.googletagmanager.com${production ? "" : " 'unsafe-eval'"}`,
     "script-src-attr 'none'",
     "style-src 'self' 'unsafe-inline'",
     `img-src 'self' data: blob: https:${apiOrigin.startsWith("http:") ? ` ${apiOrigin}` : ""}`,
     "font-src 'self'",
-    `connect-src 'self'${production ? "" : " ws: wss:"}`,
+    `connect-src 'self' https://www.googletagmanager.com https://*.google-analytics.com https://*.google.com${production ? "" : " ws: wss:"}`,
     "object-src 'none'",
     "base-uri 'self'",
     "frame-src 'none'",

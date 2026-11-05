@@ -26,6 +26,11 @@ describe("subscriber signup", () => {
     const send = vi.fn().mockResolvedValue(accepted());
     vi.stubGlobal("fetch", send);
     render(<NewsletterForm apiUrl={apiUrl} />);
+    expect(
+      screen.getByText(
+        /Subscribe to receive new articles and practical guides by email/,
+      ),
+    ).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button"));
     expect(await screen.findByRole("alert")).toHaveTextContent(
       /Enter your email/,
@@ -35,6 +40,9 @@ describe("subscriber signup", () => {
     await userEvent.click(screen.getByRole("button"));
     expect(await screen.findByRole("status")).toHaveTextContent(
       /You’re subscribed/,
+    );
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "We’ll send new articles and practical guides to your inbox.",
     );
     const [url, init] = send.mock.calls[0];
     expect(url).toBe(`${apiUrl}/api/v1/subscriptions`);
@@ -62,7 +70,7 @@ describe("subscriber signup", () => {
     expect(screen.getByRole("textbox")).toHaveAttribute("readonly");
     resolve(accepted());
     expect(await screen.findByRole("status")).toHaveTextContent(
-      /saved your email/,
+      /You’re subscribed/,
     );
   });
   it("preserves an email on failure and allows retry", async () => {

@@ -49,28 +49,6 @@ async function FooterTopics() {
     </>
   );
 }
-async function FooterFormats() {
-  await connection();
-  const types = await getClassifications("article-types")
-    .then((items) => items.filter((type) => type.is_active))
-    .catch(() => []);
-  const review = types.find((type) =>
-    /review/i.test(`${type.name} ${type.slug}`),
-  );
-  const guide = types.find((type) =>
-    /buying.?guide|guide|tutorial/i.test(`${type.name} ${type.slug}`),
-  );
-  return (
-    <>
-      {review && (
-        <Link href={`/articles?article_type=${review.slug}`}>Reviews</Link>
-      )}
-      {guide && (
-        <Link href={`/articles?article_type=${guide.slug}`}>Guides</Link>
-      )}
-    </>
-  );
-}
 async function CopyrightYear() {
   "use cache";
   cacheLife("days");
@@ -89,10 +67,12 @@ export function Footer() {
             >
               <Brand />
             </Link>
+            <p>Discover More. Learn Every Day.</p>
             <p>
-              Discover more. Learn every day.
-              <br />
-              Practical guides for the choices you make every day.
+              Ask &amp; Explore publishes technology guides, car buying advice,
+              product comparisons, digital safety tips, travel planning
+              information, and practical lifestyle articles to help readers
+              understand everyday decisions.
             </p>
             <div
               className={styles.utilityLinks}
@@ -131,11 +111,8 @@ export function Footer() {
           <nav className={styles.linkColumn} aria-label="Footer quick links">
             <h2>Quick Links</h2>
             <Link href="/">Home</Link>
-            <Link href="/articles">All articles</Link>
+            <Link href="/articles">All Articles</Link>
             <Link href="/categories">Categories</Link>
-            <Suspense>
-              <FooterFormats />
-            </Suspense>
             <Link href="/contact">Contact</Link>
           </nav>
           <nav className={styles.linkColumn} aria-label="Footer popular topics">
@@ -149,9 +126,7 @@ export function Footer() {
           <div className={styles.newsletterColumn}>
             <h2>Stay in Touch</h2>
             <p>
-              Subscribe for future article updates.
-              <br />
-              Browse the latest articles today.
+              Sign up to receive new articles and practical guides by email.
             </p>
             <NewsletterForm compact label="Footer newsletter signup" />
           </div>

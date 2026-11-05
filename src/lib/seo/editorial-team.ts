@@ -7,11 +7,20 @@ export function editorialOrganization() {
   const url = new URL(editorialTeam.path, site.url).href;
   return {
     "@type": "Organization",
-    "@id": `${url}#organization`,
+    "@id": `${url}#author`,
     name: editorialTeam.name,
     url,
     logo: new URL(editorialTeam.logo, site.url).href,
-    description: editorialTeam.description,
+    description:
+      "The Ask & Explore Editorial Team is the shared author identity for practical guides, comparisons, and explanations published under this byline. Its editorial principles emphasize relevant evidence, clear writing, accuracy, transparency, and useful information for readers.",
+    mainEntityOfPage: { "@id": `${url}#webpage` },
+    parentOrganization: { "@id": `${site.url}/#organization` },
+    publishingPrinciples: new URL("/disclaimer", site.url).href,
+    contactPoint: {
+      "@type": "ContactPoint",
+      contactType: "Editorial feedback and corrections",
+      url: new URL("/contact", site.url).href,
+    },
   };
 }
 
@@ -20,12 +29,54 @@ export function editorialProfileSchema() {
   const url = new URL(editorialTeam.path, site.url).href;
   return {
     "@context": "https://schema.org",
-    "@type": "ProfilePage",
-    "@id": `${url}#profile`,
-    url,
-    name: editorialTeam.name,
-    description: editorialTeam.description,
-    mainEntity: editorialOrganization(),
+    "@graph": [
+      {
+        "@type": "ProfilePage",
+        "@id": `${url}#webpage`,
+        url,
+        name: "Ask & Explore Editorial Team | Author Profile & Standards",
+        headline: editorialTeam.name,
+        description:
+          "Meet the Ask & Explore Editorial Team. Learn about our shared author identity, editorial process, research principles, content accuracy, and practical guides covering technology, automotive, buying guides, lifestyle, digital safety, and travel.",
+        inLanguage: "en",
+        isPartOf: { "@id": `${site.url}/#website` },
+        mainEntity: { "@id": `${url}#author` },
+        publisher: { "@id": `${site.url}/#organization` },
+        about: [
+          "Editorial standards",
+          "Content research and accuracy",
+          "Editorial transparency",
+          "Technology guides",
+          "Automotive information",
+          "Buying guides",
+          "Lifestyle advice",
+          "Digital safety",
+          "Travel planning",
+        ].map((name) => ({ "@type": "Thing", name })),
+      },
+      editorialOrganization(),
+      {
+        "@type": "Organization",
+        "@id": `${site.url}/#organization`,
+        name: site.name,
+        url: new URL("/", site.url).href,
+        logo: {
+          "@type": "ImageObject",
+          url: new URL(editorialTeam.logo, site.url).href,
+        },
+        description:
+          "Ask & Explore publishes helpful guides, product comparisons, and practical explanations covering automotive, technology, buying guides, lifestyle, digital safety, and travel.",
+        publishingPrinciples: new URL("/disclaimer", site.url).href,
+      },
+      {
+        "@type": "WebSite",
+        "@id": `${site.url}/#website`,
+        url: new URL("/", site.url).href,
+        name: site.name,
+        inLanguage: "en",
+        publisher: { "@id": `${site.url}/#organization` },
+      },
+    ],
   };
 }
 

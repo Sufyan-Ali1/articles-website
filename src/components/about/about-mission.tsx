@@ -12,13 +12,18 @@ export function AboutMission() {
       <div>
         <p className={styles.eyebrow}>Our mission</p>
         <h2 id="about-mission-title">
-          Make complex choices easier to understand.
+          Make Useful Information Easier to Understand
         </h2>
         <p>
-          Our goal is to make useful information easier to act on. We focus on
-          the questions behind a purchase, a new device, or an everyday task,
-          with explanations that help you weigh your options and take the next
-          step with confidence.
+          Our mission is to help readers make sense of everyday questions
+          without unnecessary complexity. We focus on explaining unfamiliar
+          topics in simple language, showing meaningful differences between
+          options, and providing guidance that is useful in real situations.
+        </p>
+        <p>
+          Whether you&apos;re researching a purchase, learning about new
+          technology, or looking for a practical solution, we want you to leave
+          with a clearer understanding of what to consider next.
         </p>
       </div>
     </section>

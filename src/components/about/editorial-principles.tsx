@@ -6,19 +6,19 @@ const principles = [
   {
     icon: ShieldCheck,
     title: "Accuracy First",
-    text: "Our aim is to use credible sources, check important details, and make the limits of an article clear.",
+    text: "We aim to use credible, relevant sources, check important details, and explain uncertainty or limitations when they affect an article's conclusions.",
     tone: "blue",
   },
   {
     icon: FileText,
     title: "Clear & Practical",
-    text: "Useful explanations begin with the question, define unfamiliar terms, and make the next step clear.",
+    text: "We focus on straightforward explanations, understandable comparisons, and useful steps without unnecessary technical language.",
     tone: "violet",
   },
   {
     icon: Heart,
     title: "Honest & Helpful",
-    text: "A recommendation needs context. We value clear tradeoffs and openness about evidence and commercial links.",
+    text: "Recommendations need context. We aim to distinguish research from hands-on experience, explain important trade-offs, and be transparent about relevant commercial relationships.",
     tone: "rose",
   },
 ];
@@ -33,10 +33,16 @@ export function EditorialPrinciples() {
         <div>
           <p className={styles.eyebrow}>Editorial principles</p>
           <h2 id="about-principles-title">
-            Useful information starts with clear standards.
+            How We Approach Accuracy, Clarity, and Transparency
           </h2>
           <p>
-            These principles describe the editorial approach we aim to follow.
+            Helpful content should explain more than an answer. It should give
+            you enough context to understand where the information comes from,
+            what it means, and what may change.
+          </p>
+          <p>
+            The following principles describe the editorial standards we aim to
+            follow.
           </p>
         </div>
       </div>
@@ -58,7 +64,7 @@ export function EditorialPrinciples() {
         ))}
       </div>
       <Link className={styles.disclosureLink} href="/disclaimer">
-        Read our editorial disclosures{" "}
+        Read Our Editorial &amp; Affiliate Disclosures{" "}
         <ArrowUpRight size={15} aria-hidden="true" />
       </Link>
     </section>

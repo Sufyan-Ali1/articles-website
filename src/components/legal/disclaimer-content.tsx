@@ -7,7 +7,7 @@ export const disclaimerPage: LegalPageConfig = {
   eyebrow: "Editorial disclosures",
   title: "Editorial & Affiliate Disclosures",
   description:
-    "Understand the context behind our articles, product recommendations, review labels, and commercial links.",
+    "Understand our articles, review labels, display advertising, sponsored content, and affiliate links before making a decision.",
   image: {
     src: "/images/privacy/hero.webp",
     alt: "A reader with a laptop beside a blue shield and lock, framed by green plants.",
@@ -63,6 +63,36 @@ export const disclaimerPage: LegalPageConfig = {
       ),
     },
     {
+      id: "display-advertising",
+      title: "Display advertising",
+      content: (
+        <>
+          <p>
+            Ask &amp; Explore may earn revenue from display advertisements,
+            including Google AdSense ads. Advertising placements are separate
+            from editorial recommendations. Seeing an advertisement here does
+            not mean that we or Google have tested, approved, or endorsed the
+            advertised product, service, or seller.
+          </p>
+          <p>
+            Advertising providers may select ads automatically using the page
+            content, your settings, and other permitted signals. An ad may
+            therefore differ from the article’s subject or recommendations. You
+            are free to ignore ads; clicking an ad or buying a product is never
+            required to access our articles. Check an advertiser’s claims and
+            terms before sharing information or making a purchase.
+          </p>
+          <p>
+            See our <Link href="/privacy">Privacy Policy</Link> for information
+            about Google advertising cookies, third-party data use, and
+            personalized advertising choices. If an ad seems misleading or
+            unsafe, use any reporting controls available on the ad or contact us
+            with the page address and details of what you saw.
+          </p>
+        </>
+      ),
+    },
+    {
       id: "commercial-and-affiliate-links",
       title: "Commercial and affiliate links",
       content: (
@@ -70,16 +100,23 @@ export const disclaimerPage: LegalPageConfig = {
           <p>
             Articles may include sponsored or affiliate links. If a link is an
             affiliate link, the publication may receive compensation when a
-            reader follows it or makes a purchase. An applicable article should
-            identify the commercial relationship near the relevant content. A
-            sponsored-link notice links back to this page for additional
-            context.
+            reader follows it or makes a purchase. Relevant affiliate
+            relationships and paid sponsorships will be identified clearly with
+            the relevant content, so readers can understand the relationship
+            before acting. This general disclosure does not replace an
+            article-specific disclosure. A sponsored-link notice links back to
+            this page for additional context.
           </p>
           <p>
             An external link is not necessarily an affiliate link, and a
             commercial relationship does not tell you whether a product fits
             your needs. Check the seller’s current price, terms, and product
             information before buying.
+          </p>
+          <p>
+            Paid promotional content will be identified as advertising or
+            sponsored content. A commercial arrangement is not evidence that a
+            product has been tested or is right for every reader.
           </p>
         </>
       ),
@@ -109,6 +146,11 @@ export const disclaimerPage: LegalPageConfig = {
             other significant consequences, seek advice suited to your
             circumstances and follow the relevant manufacturer’s instructions.
           </p>
+          <p>
+            These disclosures do not remove consumer protections or other rights
+            that cannot lawfully be excluded. Please report errors or unclear
+            commercial disclosures so we can review them.
+          </p>
         </>
       ),
     },
@@ -128,6 +170,7 @@ export const disclaimerPage: LegalPageConfig = {
     },
   ],
   note: {
+    updatedAt: "2026-11-05",
     title: "Questions or corrections?",
     description:
       "Use our Contact page to ask about an article or report a correction.",

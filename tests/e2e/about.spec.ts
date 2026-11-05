@@ -5,18 +5,84 @@ test("About presents the new sections with complete images across screen sizes",
 }, testInfo) => {
   test.setTimeout(60000);
   await page.goto("/about");
-  await expect(page).toHaveTitle("About Ask & Explore: Our Editorial Approach");
+  await expect(page).toHaveTitle(
+    "About Ask & Explore | Our Mission & Editorial Approach",
+  );
+  await expect(page.locator('meta[name="description"]')).toHaveAttribute(
+    "content",
+    "Learn about Ask & Explore, our practical guides, the topics we cover, and our approach to accuracy, transparency, and helping readers make informed choices.",
+  );
+  await expect(page.locator('meta[property="og:title"]')).toHaveAttribute(
+    "content",
+    "About Ask & Explore | Practical Guides & Editorial Values",
+  );
+  await expect(page.locator('meta[property="og:description"]')).toHaveAttribute(
+    "content",
+    "Discover what Ask & Explore publishes, our six main topics, and the editorial principles behind our guides, comparisons, and everyday advice.",
+  );
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    "href",
+    "https://ask-explore.test/about",
+  );
+  await expect(page.locator('meta[property="og:url"]')).toHaveAttribute(
+    "content",
+    "https://ask-explore.test/about",
+  );
+  await expect(page.locator('meta[property="og:type"]')).toHaveAttribute(
+    "content",
+    "website",
+  );
+  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
+    "content",
+    "https://ask-explore.test/images/about/workspace.webp",
+  );
+  await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute(
+    "content",
+    "summary_large_image",
+  );
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
+    "content",
+    "index, follow, max-image-preview:large",
+  );
+  const jsonLd = page.locator('script[type="application/ld+json"]');
+  await expect(jsonLd).toHaveCount(1);
+  const graph = JSON.parse((await jsonLd.textContent())!)["@graph"];
+  expect(graph.map((node: { "@type": string }) => node["@type"])).toEqual([
+    "Organization",
+    "WebSite",
+    "AboutPage",
+    "BreadcrumbList",
+  ]);
+  expect(graph[2]).toMatchObject({
+    "@id": "https://ask-explore.test/about#webpage",
+    mainEntity: { "@id": "https://ask-explore.test/#organization" },
+    breadcrumb: { "@id": "https://ask-explore.test/about#breadcrumb" },
+  });
+  expect(graph[3].itemListElement).toEqual([
+    {
+      "@type": "ListItem",
+      position: 1,
+      name: "Home",
+      item: "https://ask-explore.test/",
+    },
+    {
+      "@type": "ListItem",
+      position: 2,
+      name: "About",
+      item: "https://ask-explore.test/about",
+    },
+  ]);
   const about = page.locator("[data-about-page]");
   await expect(about.getByRole("heading", { level: 1 })).toHaveText(
-    "About Ask & Explore",
+    "About Ask & Explore: Practical Guides for Everyday Life",
   );
   await expect(about.getByRole("region")).toHaveCount(7);
   await expect(page.locator(".site-header")).toHaveCount(1);
   await expect(page.locator(".site-footer")).toHaveCount(1);
   const topics = about.getByRole("region", {
-    name: "Practical knowledge for everyday decisions.",
+    name: "Explore Practical Guides Across Everyday Topics",
   });
-  await expect(topics.getByRole("link")).toHaveCount(5);
+  await expect(topics.getByRole("link")).toHaveCount(6);
   // Wait for streamed classification links, rather than capturing the fallback.
   await expect(
     topics.getByRole("link", { name: /Buying Guides/ }),
@@ -63,7 +129,10 @@ test("About presents the new sections with complete images across screen sizes",
         fullPage: true,
       });
       await about
-        .getByRole("region", { name: "Explore Our Articles", exact: true })
+        .getByRole("region", {
+          name: "Find Practical Guides for Your Next Question",
+          exact: true,
+        })
         .screenshot({
           path: testInfo.outputPath(`explore-banner-${width}.png`),
         });
@@ -87,7 +156,7 @@ test("About topic cards and the article CTA lead to real browsing routes", async
   await page.goto("/about");
   const about = page.locator("[data-about-page]");
   const topics = about.getByRole("region", {
-    name: "Practical knowledge for everyday decisions.",
+    name: "Explore Practical Guides Across Everyday Topics",
   });
   await expect(
     topics.getByRole("link", { name: /Technology/ }),
@@ -95,14 +164,17 @@ test("About topic cards and the article CTA lead to real browsing routes", async
   await expect(
     topics.getByRole("link", { name: /Automotive/ }),
   ).toHaveAttribute("href", "/category/automotive");
-  await expect(topics.getByRole("link", { name: /How To/ })).toHaveAttribute(
-    "href",
-    "/articles?article_type=tutorial",
-  );
+  await expect(
+    topics.getByRole("link", { name: /Digital Safety/ }),
+  ).toHaveAttribute("href", "/search?search=Digital%20Safety");
   // This fixture has no Lifestyle category; the card must stay useful without a broken category URL.
   await expect(topics.getByRole("link", { name: /Lifestyle/ })).toHaveAttribute(
     "href",
     "/search?search=Lifestyle",
+  );
+  await expect(topics.getByRole("link", { name: /Travel/ })).toHaveAttribute(
+    "href",
+    "/search?search=Travel",
   );
   await topics.getByRole("link", { name: /Buying Guides/ }).click();
   await expect(page).toHaveURL(/\/articles\?article_type=buying-guide$/);
@@ -110,7 +182,7 @@ test("About topic cards and the article CTA lead to real browsing routes", async
   await page.goto("/about");
   await page
     .locator("[data-about-page]")
-    .getByRole("link", { name: "Browse the Articles" })
+    .getByRole("link", { name: "Explore All Articles" })
     .click();
   await expect(page).toHaveURL(/\/articles$/);
 });

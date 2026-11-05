@@ -69,26 +69,26 @@
 }
 .eyebrow {
   color: #6684b2;
-  font-size: 10px;
+  font-size: var(--type-eyebrow);
   font-weight: 650;
   text-transform: uppercase;
-  letter-spacing: 2.4px;
+  letter-spacing: var(--type-eyebrow-tracking);
   line-height: 1.5;
   margin: 0 0 13px;
 }
 .errorCard h1 {
-  font-family: var(--font-geist-sans), Arial, sans-serif;
-  font-size: clamp(32px, 3.5vw, 45px);
-  font-weight: 700;
-  line-height: 1.15;
-  letter-spacing: -1.6px;
+  font-family: var(--type-sans);
+  font-size: var(--type-page-title);
+  font-weight: var(--type-heading-weight);
+  line-height: var(--type-heading-leading);
+  letter-spacing: var(--type-heading-tracking);
   margin: 0;
 }
 .description {
   max-width: 47ch;
   margin: 17px auto 25px;
-  font-size: 16px;
-  line-height: 1.7;
+  font-size: var(--type-body);
+  line-height: var(--type-body-leading);
   color: #647896;
 }
 .actions {
@@ -287,11 +287,11 @@
     margin-bottom: 18px;
   }
   .errorCard h1 {
-    font-size: 32px;
-    letter-spacing: -1px;
+    font-size: var(--type-page-title);
+    letter-spacing: var(--type-heading-tracking);
   }
   .description {
-    font-size: 14px;
+    font-size: var(--type-body);
     margin-block: 15px 22px;
   }
   .actions {

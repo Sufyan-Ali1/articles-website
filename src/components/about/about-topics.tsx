@@ -5,7 +5,8 @@ import {
   CarFront,
   Laptop,
   Leaf,
-  Lightbulb,
+  Plane,
+  ShieldCheck,
   ShoppingBag,
 } from "lucide-react";
 import { getClassifications } from "@/lib/api/client";
@@ -16,17 +17,17 @@ const topics = [
   {
     title: "Technology",
     description:
-      "Device comparisons, setup guides, and troubleshooting for the technology you use every day.",
+      "Understand AI tools, software, laptops, and digital productivity with practical technology guides, clear explanations, and useful comparisons.",
     icon: Laptop,
     image: "workspace",
     alt: "A laptop and coffee on a bright desk beside a window.",
     tone: "blue",
-    category: /tech|software|digital/i,
+    category: /tech|software/i,
   },
   {
     title: "Automotive",
     description:
-      "Car buying advice, vehicle comparisons, and maintenance explainers for everyday ownership.",
+      "Explore car buying advice, electric and hybrid vehicle comparisons, ownership costs, and practical information about everyday vehicle decisions.",
     icon: CarFront,
     image: "automotive",
     alt: "A silver SUV on a quiet road with mountains in the distance.",
@@ -36,7 +37,7 @@ const topics = [
   {
     title: "Buying Guides",
     description:
-      "Features, costs, and practical tradeoffs to consider before your next purchase.",
+      "Compare product features, specifications, prices, and trade-offs to understand what matters before you buy.",
     icon: ShoppingBag,
     image: "buying-guides",
     alt: "A small shopping cart, paper bags, and a smartphone on a cream surface.",
@@ -44,24 +45,35 @@ const topics = [
     format: /buying.?guide/i,
   },
   {
-    title: "How To",
+    title: "Digital Safety",
     description:
-      "Clear steps for device setup, everyday tasks, and common problems.",
-    icon: Lightbulb,
-    image: "how-to",
-    alt: "An open notebook with the words Learn, Plan, Do, Grow beside a pen.",
+      "Learn about account security, online privacy, suspicious messages, and common digital risks through practical online safety guides.",
+    icon: ShieldCheck,
+    image: "workspace",
+    alt: "A laptop and coffee on a bright desk beside a window.",
     tone: "violet",
-    format: /how.?to|tutorial/i,
+    category:
+      /digital.?safety|online.?safety|cyber.?security|online.?security/i,
   },
   {
     title: "Lifestyle",
     description:
-      "Useful ideas for your home, daily routines, and a more manageable working day.",
+      "Discover practical ideas for reducing screen time, managing digital distractions, improving focus, and building more balanced daily routines.",
     icon: Leaf,
     image: "lifestyle",
     alt: "A calm living room with a linen sofa, an oak table, and green plants.",
     tone: "rose",
     category: /lifestyle|everyday.?life|home.?living/i,
+  },
+  {
+    title: "Travel",
+    description:
+      "Explore travel planning guides, cheap flight tips, fare comparisons, and price alerts to compare booking options and prepare for your next trip.",
+    icon: Plane,
+    image: "explore",
+    alt: "A traveler overlooking a mountain lake at sunrise.",
+    tone: "teal",
+    category: /travel|destination/i,
   },
 ];
 
@@ -72,11 +84,14 @@ function TopicSection({ hrefs = [] }: { hrefs?: string[] }) {
         <div>
           <p className={styles.eyebrow}>What we cover</p>
           <h2 id="about-topics-title">
-            Practical knowledge for everyday decisions.
+            Explore Practical Guides Across Everyday Topics
           </h2>
         </div>
         <p>
-          Explore the subjects behind the things you buy, use, and do every day.
+          Our articles cover the technology you use, the products you compare,
+          the vehicles you consider, and the habits that shape daily life. We
+          also publish travel planning guides and digital safety advice. Explore
+          our categories to find a subject that interests you.
         </p>
       </div>
       <div className={styles.topicGrid}>
@@ -92,7 +107,7 @@ function TopicSection({ hrefs = [] }: { hrefs?: string[] }) {
               <AboutImage
                 name={image}
                 alt={alt}
-                sizes="(max-width: 540px) 100vw, (max-width: 1000px) 33vw, 20vw"
+                sizes="(max-width: 540px) 100vw, 33vw"
               />
               <div className={styles.topicCopy}>
                 <h3>
@@ -107,7 +122,7 @@ function TopicSection({ hrefs = [] }: { hrefs?: string[] }) {
                 </h3>
                 <p>{description}</p>
                 <span className={styles.topicAction}>
-                  Explore <ArrowUpRight size={15} aria-hidden="true" />
+                  Explore {title} <ArrowUpRight size={15} aria-hidden="true" />
                 </span>
               </div>
             </Link>

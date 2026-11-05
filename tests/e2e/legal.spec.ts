@@ -15,7 +15,7 @@ const pages = [
     path: "/disclaimer",
     id: "disclaimer",
     title: "Editorial & Affiliate Disclosures",
-    count: 6,
+    count: 7,
     anchor: "commercial-and-affiliate-links",
     heading: "Commercial and affiliate links",
     preserved: "An external link is not necessarily an affiliate link",
@@ -169,11 +169,12 @@ for (const config of pages) {
     await expect(
       contents.getByRole("link", { name: config.heading, exact: true }),
     ).toHaveAttribute("aria-current", "location");
-    expect((await heading.boundingBox())!.y).toBeGreaterThan(
-      await page
-        .locator("header")
-        .evaluate((node) => node.getBoundingClientRect().bottom),
-    );
+    const headerBottom = await page
+      .locator("header")
+      .evaluate((node) => node.getBoundingClientRect().bottom);
+    await expect
+      .poll(async () => (await heading.boundingBox())!.y)
+      .toBeGreaterThan(headerBottom);
     await page.screenshot({
       path: testInfo.outputPath(`${config.id}-sticky.png`),
     });

@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { metadata, safeJsonLd } from "@/lib/seo/metadata";
-import {
-  organizationStructuredData,
-  websiteStructuredData,
-} from "@/lib/seo/structured-data";
+import { homeStructuredData } from "@/lib/seo/home";
 import { pageSeo } from "@/lib/content/site-copy";
 import { HomeContent } from "@/components/home/home-content";
 import { GridSkeleton } from "@/components/shared/states";
@@ -24,13 +21,7 @@ export default function Home() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: safeJsonLd(websiteStructuredData()),
-        }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: safeJsonLd(organizationStructuredData()),
+          __html: safeJsonLd(homeStructuredData()),
         }}
       />
       <Suspense

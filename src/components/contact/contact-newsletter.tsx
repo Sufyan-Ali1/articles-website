@@ -15,7 +15,8 @@ export function ContactNewsletter() {
         <p className={styles.eyebrow}>Stay connected</p>
         <h2 id="contact-newsletter-title">Stay connected with new reads.</h2>
         <p>
-          Leave your email for future practical guides and new article updates.
+          Subscribe to receive practical guides and new article updates by
+          email.
         </p>
       </div>
       <NewsletterForm label="Contact page newsletter signup" />

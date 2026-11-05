@@ -12,16 +12,25 @@ test("privacy page uses an illustrated hero and numbered sections while retainin
   const contents = privacy.getByRole("navigation", {
     name: "Document contents",
   });
-  await expect(contents.getByRole("link")).toHaveCount(9);
+  await expect(contents.getByRole("link")).toHaveCount(11);
   await expect(
     privacy.getByRole("article").locator("section > span[data-tone] svg"),
-  ).toHaveCount(9);
+  ).toHaveCount(11);
   await expect(
     privacy.getByRole("article").getByRole("heading", { level: 2 }),
-  ).toHaveCount(9);
+  ).toHaveCount(11);
   await expect(privacy.getByRole("article")).toContainText(
-    "The site does not include advertising or third-party analytics",
+    "third-party vendors, including Google, use cookies to serve ads",
   );
+  await expect(privacy.getByRole("article")).not.toContainText(
+    "The site does not include advertising",
+  );
+  await expect(
+    privacy.getByRole("link", { name: "Google Ads Settings", exact: true }),
+  ).toHaveAttribute("href", "https://adssettings.google.com/");
+  await expect(
+    privacy.getByRole("link", { name: "YourAdChoices", exact: true }),
+  ).toHaveAttribute("href", "https://optout.aboutads.info/");
   await expect(privacy.getByRole("article")).toContainText(
     "Our backend receives and stores these messages privately",
   );

@@ -1,7 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import type { ArticleResponse } from "@/types/api";
-vi.mock("@/lib/config", () => ({ site: { url: "https://askandexplore.com" } }));
+vi.mock("@/lib/config", () => ({
+  site: { name: "Ask & Explore", url: "https://askandexplore.com" },
+}));
 import {
   editorialTeam,
   isEditorialTeam,
@@ -52,7 +54,16 @@ describe("editorial team identity", () => {
     expect(latestTeamArticles([])).toEqual([]);
   });
   it("uses one organization for the profile and fallback article", () => {
-    expect(editorialProfileSchema()).toBeNull();
+    const schema = editorialProfileSchema();
+    expect(schema?.["@graph"]).toHaveLength(4);
+    expect(schema?.["@graph"][0]).toMatchObject({
+      "@type": "ProfilePage",
+      "@id": "https://askandexplore.com/authors/editorial-team#webpage",
+      mainEntity: {
+        "@id": "https://askandexplore.com/authors/editorial-team#author",
+      },
+    });
+    expect(schema?.["@graph"][1]).toEqual(editorialOrganization());
     expect(editorialArticleSchema(article())).toMatchObject({
       "@type": "BlogPosting",
       author: editorialOrganization(),

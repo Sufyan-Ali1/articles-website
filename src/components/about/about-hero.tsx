@@ -6,12 +6,15 @@ export function AboutHero() {
     <section className={styles.hero} aria-labelledby="about-title">
       <div className={styles.heroCopy}>
         <p className={styles.eyebrow}>About Ask &amp; Explore</p>
-        <h1 id="about-title">About Ask &amp; Explore</h1>
+        <h1 id="about-title">
+          About Ask &amp; Explore: Practical Guides for Everyday Life
+        </h1>
         <p className={styles.heroDescription}>
-          Learn about Ask &amp; Explore and our editorial approach to clear
-          answers for everyday decisions. Explore technology guides, car buying
-          advice, product comparisons, and practical answers to everyday
-          questions.
+          Ask &amp; Explore is an online publication offering clear
+          explanations, practical how-to guides, and useful comparisons for
+          everyday decisions. From technology and car buying to digital safety,
+          lifestyle, travel, and product research, we help you understand your
+          options and find information that matters to you.
         </p>
       </div>
       <AboutImage

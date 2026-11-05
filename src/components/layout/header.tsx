@@ -61,9 +61,9 @@ export function Header() {
           <Link
             href="/request-article"
             className={styles.requestTopic}
-            aria-label="Request a topic"
+            aria-label="Request a Topic"
           >
-            <span className={styles.requestLabel}>Request a topic</span>
+            <span className={styles.requestLabel}>Request a Topic</span>
             <span className={styles.requestCompactLabel} aria-hidden="true">
               Request
             </span>
