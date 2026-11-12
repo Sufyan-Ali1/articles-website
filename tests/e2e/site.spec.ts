@@ -156,13 +156,13 @@ test("topic submission validates and succeeds without admin data", async ({
   page,
 }) => {
   await page.goto("/request-article");
-  await page.getByRole("button", { name: "Submit request" }).click();
+  await page.getByRole("button", { name: "Send article request" }).click();
   await expect(page.getByText(/Tell us the topic/)).toBeVisible();
   await page
-    .getByLabel(/What should we explore/)
+    .getByLabel(/What would you like us to cover/)
     .fill("How does home charging work?");
   await solveMathCaptcha(page.locator(".topic-form"));
-  await page.getByRole("button", { name: "Submit request" }).click();
+  await page.getByRole("button", { name: "Send article request" }).click();
   await expect(
     page.getByRole("heading", { name: "Curiosity, received." }),
   ).toBeVisible();
@@ -172,18 +172,22 @@ test("topic submission handles backend validation and Retry-After", async ({
   page,
 }) => {
   await page.goto("/request-article");
-  await page.getByLabel(/What should we explore/).fill("server-invalid");
+  await page
+    .getByLabel(/What would you like us to cover/)
+    .fill("server-invalid");
   await solveMathCaptcha(page.locator(".topic-form"));
-  await page.getByRole("button", { name: "Submit request" }).click();
+  await page.getByRole("button", { name: "Send article request" }).click();
   await expect(page.getByText(/check this field/)).toBeVisible();
-  await page.getByLabel(/What should we explore/).fill("rate-limit-test");
+  await page
+    .getByLabel(/What would you like us to cover/)
+    .fill("rate-limit-test");
   await solveMathCaptcha(page.locator(".topic-form"));
-  await page.getByRole("button", { name: "Submit request" }).click();
+  await page.getByRole("button", { name: "Send article request" }).click();
   await expect(page.locator(".topic-form [role=alert]")).toContainText(
     "wait before trying",
   );
   await expect(
-    page.getByRole("button", { name: "Submit request" }),
+    page.getByRole("button", { name: "Send article request" }),
   ).toBeDisabled();
 });
 test("uncached detail visibility, webhook security, and former-slug invalidation", async ({
@@ -477,11 +481,13 @@ test("contact errors preserve input and the topic starter does not replace a dra
     "A general question about the publication.",
   );
   await page.goto("/request-article");
-  await page.getByLabel(/What should we explore/).fill("My existing question");
+  await page
+    .getByLabel(/What would you like us to cover/)
+    .fill("My existing question");
   await page
     .getByRole("button", { name: "Compare options", exact: true })
     .click();
-  await expect(page.getByLabel(/What should we explore/)).toHaveValue(
+  await expect(page.getByLabel(/What would you like us to cover/)).toHaveValue(
     "My existing question",
   );
 });

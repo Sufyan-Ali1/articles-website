@@ -23,6 +23,49 @@ const pages = [
 ];
 
 for (const config of pages) {
+  test(`active contents stay in view while reading ${config.path}`, async ({
+    page,
+    isMobile,
+  }) => {
+    await page.setViewportSize({ width: isMobile ? 390 : 1440, height: 500 });
+    await page.goto(config.path);
+    const contents = page.getByRole("navigation", {
+      name: "Document contents",
+    });
+    const links = contents.getByRole("link");
+    for (const index of [config.count - 2, 0]) {
+      const link = links.nth(index);
+      const href = await link.getAttribute("href");
+      const targetScroll = await page.locator(href!).evaluate((node) => {
+        const header = document
+          .querySelector("header")!
+          .getBoundingClientRect().height;
+        return window.scrollY + node.getBoundingClientRect().top - header - 40;
+      });
+      await page.evaluate(
+        (top) => window.scrollTo({ top, behavior: "instant" }),
+        targetScroll,
+      );
+      await expect(link).toHaveAttribute("aria-current", "location");
+      await expect
+        .poll(async () => {
+          const nav = (await contents.boundingBox())!;
+          const item = (await link.boundingBox())!;
+          return (
+            item.x >= nav.x - 1 &&
+            item.x + item.width <= nav.x + nav.width + 1 &&
+            item.y >= nav.y - 1 &&
+            item.y + item.height <= nav.y + nav.height + 1
+          );
+        })
+        .toBe(true);
+      expect(await page.evaluate(() => window.scrollY)).toBeCloseTo(
+        targetScroll,
+        0,
+      );
+    }
+  });
+
   test(`dynamic legal layout renders the content and responsive design of ${config.path}`, async ({
     page,
   }, testInfo) => {

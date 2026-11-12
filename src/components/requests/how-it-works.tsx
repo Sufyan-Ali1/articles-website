@@ -4,24 +4,28 @@ const steps = [
   {
     title: "Share your idea",
     description:
-      "Tell us the question, product, or task you want a guide to cover.",
+      "Tell us which question, task, or comparison you'd like us to cover.",
   },
   {
-    title: "We consider it",
+    title: "Your idea may inform future articles",
     description:
-      "Suggestions help us understand reader needs and plan relevant coverage.",
+      "Suggestions can help us understand what readers want to learn and inform future content planning.",
   },
   {
-    title: "It may become a story",
+    title: "It may become an article",
     description:
-      "A suitable idea may become an article. Publication and a reply are not guaranteed.",
+      "A suitable topic may be covered in a future article. Publication dates and personal replies are not guaranteed.",
   },
 ];
 
 export function HowItWorks() {
   return (
-    <aside className={styles.howItWorks} aria-labelledby="request-how-title">
-      <p className={styles.eyebrow}>From question to clarity</p>
+    <aside
+      id="how-it-works"
+      className={styles.howItWorks}
+      aria-labelledby="request-how-title"
+    >
+      <p className={styles.eyebrow}>What happens next</p>
       <h2 id="request-how-title">How It Works</h2>
       <ol>
         {steps.map(({ title, description }, index) => (

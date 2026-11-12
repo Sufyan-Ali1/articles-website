@@ -185,9 +185,13 @@
   margin-bottom: 11px;
 }
 .reasonOptions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid #e4ebf5;
+  border-radius: 12px;
+  background: #f4f7fb;
 }
 .reasonOptions label {
   display: flex;
@@ -203,19 +207,28 @@
 .reasonOptions span {
   display: flex;
   align-items: center;
-  min-height: 40px;
-  padding: 9px 12px;
-  border: 1px solid #dfe7f3;
+  justify-content: center;
+  width: 100%;
+  text-align: center;
+  min-height: 44px;
+  padding: 8px;
+  border: 1px solid transparent;
   border-radius: 8px;
   color: #627693;
-  background: #fff;
+  background: transparent;
   font-size: 12px;
+  font-weight: 500;
   line-height: 1.4;
+  white-space: nowrap;
+}
+.reasonOptions label:hover span {
+  color: #294f7d;
 }
 .reasonOptions input:checked + span {
   color: #0865df;
-  background: #f0f6ff;
-  border-color: #a8c9fa;
+  background: #fff;
+  border-color: #d5e3f6;
+  box-shadow: 0 2px 5px #193b6510;
 }
 .reasonOptions input:focus-visible + span {
   outline: 2px solid #0765ed;
@@ -689,12 +702,8 @@
   .field textarea {
     font-size: var(--type-body);
   }
-  .reasonOptions {
-    gap: 7px;
-  }
   .reasonOptions span {
-    font-size: 11px;
-    padding-inline: 10px;
+    padding-inline: 2px;
   }
   .formPanel .submitButton {
     width: 100%;

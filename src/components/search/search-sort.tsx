@@ -23,6 +23,9 @@ export function SearchSort({
             <input key={key} type="hidden" name={key} value={filters[key]} />
           ),
       )}
+      {filters.topics?.length && (
+        <input type="hidden" name="topics" value={filters.topics.join(",")} />
+      )}
       {view && <input type="hidden" name="view" value={view} />}
       <label className="sr-only" htmlFor="search-result-sort">
         Sort articles

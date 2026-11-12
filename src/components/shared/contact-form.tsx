@@ -108,6 +108,7 @@ export function ContactForm({
   if (sent)
     return (
       <section
+        id="contact-form"
         className={`contact-form-panel ${styles.formPanel} ${styles.success}`}
         role="status"
         aria-labelledby="contact-form-title"
@@ -138,7 +139,7 @@ export function ContactForm({
     );
   return (
     <form
-      id="contact-message-form"
+      id="contact-form"
       name="contact"
       method="post"
       action={
@@ -158,10 +159,13 @@ export function ContactForm({
           Please enable JavaScript and reload to send your message.
         </p>
       </noscript>
-      <h2 id="contact-form-title">Send Us a Message</h2>
+      <h2 id="contact-form-title">
+        <span id="contact-message-form">Send Us a Message</span>
+      </h2>
       <p className={styles.formDescription}>
-        Tell us what you need help with. For article feedback, include the page
-        link and enough detail to explain your question or correction.
+        Choose a subject and describe your message. If it&apos;s about an
+        article, include its link and the specific detail you&apos;d like us to
+        review.
       </p>
       {!enabled && (
         <div className={styles.notice} role="status">
@@ -183,7 +187,7 @@ export function ContactForm({
           {seconds > 0 && ` Try again in ${seconds}s.`}
         </div>
       )}
-      <div className={styles.field}>
+      <div id="name-field" className={styles.field}>
         <label htmlFor="contact-name">
           Your name <span>Optional</span>
         </label>
@@ -200,7 +204,7 @@ export function ContactForm({
           {fields.name?.message}
         </p>
       </div>
-      <div className={styles.field}>
+      <div id="email-field" className={styles.field}>
         <label htmlFor="contact-email">
           Email address <span>Required</span>
         </label>
@@ -219,7 +223,7 @@ export function ContactForm({
           {fields.email?.message}
         </p>
       </div>
-      <fieldset className={styles.reasonFieldset}>
+      <fieldset id="subject-field" className={styles.reasonFieldset}>
         <legend>Subject</legend>
         <div className={styles.reasonOptions}>
           {contactReasons.map((reason) => (
@@ -227,15 +231,22 @@ export function ContactForm({
               <input
                 type="radio"
                 value={reason.value}
+                aria-label={reason.label}
                 {...form.register("reason")}
               />
-              <span>{reason.label}</span>
+              <span>
+                {reason.value === "general"
+                  ? "General"
+                  : reason.value === "correction"
+                    ? "Correction"
+                    : "Privacy"}
+              </span>
             </label>
           ))}
         </div>
       </fieldset>
       {reason === "correction" && (
-        <div className={styles.field}>
+        <div id="article-field" className={styles.field}>
           <label htmlFor="contact-article">
             Article link <span>Optional</span>
           </label>
@@ -253,7 +264,7 @@ export function ContactForm({
           </p>
         </div>
       )}
-      <div className={styles.field}>
+      <div id="message-field" className={styles.field}>
         <label htmlFor="contact-message">
           Your message <span>Required</span>
         </label>
@@ -270,8 +281,8 @@ export function ContactForm({
           {...form.register("message")}
         />
         <p className={styles.fieldHint} id="contact-message-hint">
-          Include the details we need to understand your enquiry. Plain text, up
-          to 5,000 characters.
+          Describe your question or issue clearly. Plain text; up to 5,000
+          characters.
         </p>
         <p className="field-error" id="contact-message-error">
           {fields.message?.message}
@@ -286,7 +297,11 @@ export function ContactForm({
           {...form.register("bot-field")}
         />
       </div>
-      <MathCaptcha ref={captcha} disabled={!enabled || seconds > 0} />
+      <MathCaptcha
+        id="verification"
+        ref={captcha}
+        disabled={!enabled || seconds > 0}
+      />
       <div className={styles.formBottom}>
         <Button
           className={styles.submitButton}
@@ -309,9 +324,9 @@ export function ContactForm({
             </>
           )}
         </Button>
-        <p>
+        <p id="privacy-notice">
           <LockKeyhole size={13} aria-hidden="true" />
-          Sent privately.{" "}
+          Messages are submitted privately.{" "}
           <Link href="/privacy">How we use your information</Link>
         </p>
       </div>

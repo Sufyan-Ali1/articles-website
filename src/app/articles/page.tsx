@@ -24,6 +24,7 @@ export async function generateMetadata({
   const result = await getArchiveResult(filters).catch(() => null);
   if (result) checkArchivePage(filters, result);
   const filtered = Boolean(
+    filters.topics?.length ||
     filters.search ||
     filters.category ||
     filters.tag ||

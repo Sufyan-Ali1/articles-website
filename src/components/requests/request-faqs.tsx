@@ -6,9 +6,11 @@ const faqs = [
     question: "What can I request?",
     answer: (
       <>
-        Request a guide, comparison, or explanation related to the{" "}
-        <Link href="/categories">topics we cover</Link>. A specific question
-        helps us understand the answer you are looking for.
+        You can suggest a practical guide, explanation, buying guide, or
+        comparison related to the{" "}
+        <Link href="/categories">topics we cover</Link>. If we&apos;ve already
+        published something similar, you can tell us what you&apos;d like
+        explained in more detail.
       </>
     ),
   },
@@ -16,8 +18,9 @@ const faqs = [
     question: "Will my idea be published?",
     answer: (
       <>
-        We consider suggestions as part of editorial planning. Sending a topic
-        does not guarantee an article, a publication date, or a personal reply.
+        Not necessarily. Suggestions may inform future article planning, but
+        submitting an idea doesn&apos;t guarantee publication, a specific
+        publication date, or a personal reply.
       </>
     ),
   },
@@ -25,8 +28,9 @@ const faqs = [
     question: "Do I need to add my email?",
     answer: (
       <>
-        No. You can submit a topic without a name or email. Add contact details
-        only if you want us to have a way to follow up.
+        No. Your name and email address are optional. If you provide an email
+        address, we may use it to follow up about your idea, but a reply
+        isn&apos;t guaranteed.
       </>
     ),
   },
@@ -34,7 +38,11 @@ const faqs = [
 
 export function RequestFaqs() {
   return (
-    <section className={styles.faqs} aria-labelledby="request-faq-title">
+    <section
+      id="quick-answers"
+      className={styles.faqs}
+      aria-labelledby="request-faq-title"
+    >
       <h2 id="request-faq-title">Quick Answers</h2>
       <div className={styles.faqGrid}>
         {faqs.map(({ question, answer }) => (

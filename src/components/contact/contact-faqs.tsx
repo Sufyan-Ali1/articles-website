@@ -8,9 +8,9 @@ const faqs = [
     title: "Can I suggest a topic?",
     text: (
       <>
-        Yes. Use the <Link href="/request-article">article request form</Link>{" "}
-        to suggest a question, a how-to guide, or a comparison you would find
-        useful.
+        Yes. Use our <Link href="/request-article">Request an Article</Link>{" "}
+        page to suggest a question, how-to guide, or product comparison
+        you&apos;d like us to cover.
       </>
     ),
   },
@@ -19,8 +19,9 @@ const faqs = [
     title: "How do I suggest a correction?",
     text: (
       <>
-        Choose “Suggest a correction” in the message form, add the article link,
-        and tell us which details you believe should change.
+        Select “Suggest a correction” in the contact form. Include the article
+        link, the information you&apos;d like us to check, and a supporting
+        source if you have one.
       </>
     ),
   },
@@ -29,8 +30,10 @@ const faqs = [
     title: "Can we work together?",
     text: (
       <>
-        Use the form above for a collaboration, guest article, or press enquiry.
-        Explain the proposal and why it would be useful to our readers.
+        You can send a collaboration, guest article, or press proposal through
+        the form. Choose “General question” and briefly explain your idea and
+        its relevance to Ask &amp; Explore readers. Sending a proposal
+        doesn&apos;t guarantee collaboration.
       </>
     ),
   },
@@ -38,18 +41,26 @@ const faqs = [
 
 export function ContactFaqs() {
   return (
-    <section className={styles.faqs} aria-labelledby="contact-faq-title">
+    <section
+      id="frequently-asked-questions"
+      className={styles.faqs}
+      aria-labelledby="contact-faq-title"
+    >
       <div className={styles.faqHeading}>
-        <p className={styles.eyebrow}>Frequent questions</p>
-        <h2 id="contact-faq-title">Need a Quick Answer?</h2>
+        <p className={styles.eyebrow}>Frequently asked questions</p>
+        <h2 id="contact-faq-title">Common Contact Questions</h2>
         <p className={styles.sectionDescription}>
-          Find out how to suggest a topic, report an article correction, or send
-          a collaboration enquiry.
+          Find out how to suggest an article topic, report a correction, or send
+          a collaboration proposal.
         </p>
       </div>
       <div className={styles.faqGrid}>
-        {faqs.map(({ icon: Icon, title, text }) => (
-          <article className={styles.faqCard} key={title}>
+        {faqs.map(({ icon: Icon, title, text }, index) => (
+          <article
+            id={`faq-question-${index + 1}`}
+            className={styles.faqCard}
+            key={title}
+          >
             <span className={styles.methodIcon} aria-hidden="true">
               <Icon size={27} strokeWidth={1.7} />
             </span>

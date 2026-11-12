@@ -20,15 +20,16 @@ export function RequestHero() {
       </div>
       <div className={`${styles.shell} ${styles.heroInner}`}>
         <div className={styles.heroCopy}>
-          <p className={styles.eyebrow}>Request a topic</p>
+          <p className={styles.eyebrow}>Suggest a topic</p>
           <h1 id="request-title">
             Request an Article
             <span className={styles.heroAccent} aria-hidden="true" />
           </h1>
           <p className={styles.heroDescription}>
-            What would you like a clear answer to? Suggest a how-to guide,
-            product comparison, or everyday question for a future Ask &amp;
-            Explore article.
+            Have a question you&apos;d like Ask &amp; Explore to cover? Suggest
+            a topic for a practical guide, product comparison, or clear
+            explanation. Tell us what you&apos;d like to learn using the form
+            below.
           </p>
         </div>
       </div>

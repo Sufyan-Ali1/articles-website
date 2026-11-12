@@ -26,11 +26,14 @@ export function ArchiveCard({
   article,
   query,
   variant = "archive",
+  headingLevel = 2,
 }: {
   article: ArticleSummary;
   query?: string;
   variant?: "archive" | "search";
+  headingLevel?: 2 | 3;
 }) {
+  const Heading = headingLevel === 3 ? "h3" : "h2";
   const category = article.categories.find((category) => category.is_active);
   const label =
     category?.name ||
@@ -68,11 +71,11 @@ export function ArchiveCard({
         {variant === "search" && label && (
           <span className={styles.categoryLabel}>{label}</span>
         )}
-        <h2>
+        <Heading className={styles.cardTitle}>
           <Link href={`/articles/${article.slug}`} prefetch={false}>
             <Title text={article.title} query={query} />
           </Link>
-        </h2>
+        </Heading>
         {article.excerpt && <p className={styles.excerpt}>{article.excerpt}</p>}
         <div className={styles.cardMeta}>
           {article.author && (

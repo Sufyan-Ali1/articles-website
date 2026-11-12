@@ -101,8 +101,10 @@ const articlePageSchema = z.object({
   meta: MetaSchema,
 });
 async function fetchArticles(filters: ArticleFilters = {}) {
+  const apiFilters = { ...filters };
+  delete apiFilters.topics;
   return request(
-    `articles?${query({ page: 1, page_size: 12, sort: "-published_at", ...filters })}`,
+    `articles?${query({ page: 1, page_size: 12, sort: "-published_at", ...apiFilters })}`,
     articlePageSchema,
   );
 }

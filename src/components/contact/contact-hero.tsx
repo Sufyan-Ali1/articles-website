@@ -3,15 +3,20 @@ import styles from "./contact.module.css";
 
 export function ContactHero() {
   return (
-    <section className={styles.hero} aria-labelledby="contact-title">
+    <section
+      id="introduction"
+      className={styles.hero}
+      aria-labelledby="contact-title"
+    >
       <div className={`${styles.shell} ${styles.heroInner}`}>
         <div>
           <p className={styles.eyebrow}>Get in touch</p>
           <h1 id="contact-title">Contact Us</h1>
           <p className={styles.heroDescription}>
-            Have a question about Ask &amp; Explore, spotted a detail we should
-            check, or want to share an idea? Send us a message with the context
-            we need to understand your enquiry.
+            Have a question about Ask &amp; Explore, noticed something we should
+            correct, or want to share feedback? Use the contact form to send us
+            a message. Include a relevant page link if it helps explain your
+            enquiry.
           </p>
         </div>
         <div className={styles.heroImage}>

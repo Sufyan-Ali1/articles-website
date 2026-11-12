@@ -211,11 +211,12 @@ test("reader adapts to tablet, mobile, and zoom-sized viewports", async ({
     exact: true,
   });
   await expect(
-    related.getByRole("link", { name: /View all articles/ }),
-  ).toBeHidden();
-  await related
-    .getByRole("button", { name: "Related articles", exact: true })
-    .click();
+    related.getByRole("heading", { name: "Related Articles", exact: true }),
+  ).toBeVisible();
+  await expect(
+    related.getByRole("button", { name: "Related articles", exact: true }),
+  ).toHaveCount(0);
+  await expect(related.locator('a[href^="/articles/"]').first()).toBeVisible();
   await expect(
     related.getByRole("link", { name: /View all articles/ }),
   ).toBeVisible();

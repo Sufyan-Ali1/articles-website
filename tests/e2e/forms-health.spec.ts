@@ -9,20 +9,37 @@ const newsletterLocations = [
   ["/contact", "Contact page newsletter signup"],
   ["/request-article", "Article request newsletter signup"],
   ["/articles/electric-car-question", "Newsletter signup"],
-  ["/contact", "Footer newsletter signup"],
+  ...[
+    "/",
+    "/about",
+    "/articles",
+    "/articles?tag=practical-choices",
+    "/category/technology",
+    "/categories",
+    "/search?search=electric",
+    "/contact",
+    "/request-article",
+    "/articles/electric-car-question",
+    "/authors/editorial-team",
+    "/privacy",
+    "/terms",
+    "/disclaimer",
+  ].map((path) => [path, "Footer newsletter signup"] as const),
 ] as const;
 
 for (const [path, label] of newsletterLocations) {
   test(`newsletter submits through the gateway: ${path} ${label}`, async ({
     page,
-    isMobile,
   }) => {
     await page.goto(path);
-    if (path.startsWith("/articles/") && isMobile) {
-      await page
-        .getByRole("button", { name: "Related articles", exact: true })
-        .click();
-    }
+    const submissions: unknown[] = [];
+    page.on("request", (request) => {
+      if (
+        request.url().endsWith("/api/v1/subscriptions") &&
+        request.method() === "POST"
+      )
+        submissions.push(request.postDataJSON());
+    });
     const form = page.getByRole("form", { name: label, exact: true });
     await form.getByRole("textbox").fill("not-an-email");
     await form.getByRole("button").click();
@@ -31,6 +48,7 @@ for (const [path, label] of newsletterLocations) {
         .getByRole("alert")
         .filter({ hasText: "Please enter a valid email address" }),
     ).toBeVisible();
+    expect(submissions).toHaveLength(0);
     await form.getByRole("textbox").fill("LocalFormCheck@Example.com");
     const response = page.waitForResponse(
       (response) =>
@@ -38,7 +56,10 @@ for (const [path, label] of newsletterLocations) {
         response.request().method() === "POST",
     );
     await form.getByRole("button").click();
-    expect((await response).status()).toBe(202);
+    const accepted = await response;
+    expect(accepted.status()).toBe(202);
+    expect(new URL(accepted.url()).origin).toBe(new URL(page.url()).origin);
+    expect(submissions).toEqual([{ email: "localformcheck@example.com" }]);
     await expect(
       page.getByRole("status").filter({ hasText: "You’re subscribed" }),
     ).toBeVisible();
@@ -98,7 +119,7 @@ test("topic request submits through the gateway without optional contact details
   page,
 }) => {
   await page.goto("/request-article");
-  const form = page.locator("#article-request-form");
+  const form = page.locator("#request-form");
   await form
     .locator('input[name="topic"]')
     .fill("A topic for a local isolated-backend test");
@@ -109,7 +130,7 @@ test("topic request submits through the gateway without optional contact details
       response.request().method() === "POST",
   );
   await form
-    .getByRole("button", { name: "Submit request", exact: true })
+    .getByRole("button", { name: "Send article request", exact: true })
     .click();
   expect((await response).status()).toBe(202);
   await expect(

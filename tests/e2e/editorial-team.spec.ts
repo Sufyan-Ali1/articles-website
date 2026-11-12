@@ -3,7 +3,7 @@ import { test, expect } from "@playwright/test";
 test("editorial profile has discoverable metadata and an honest empty state", async ({
   page,
   request,
-}) => {
+}, testInfo) => {
   await page.goto("/authors/editorial-team");
   await expect(page.locator("h1")).toHaveText("Ask & Explore Editorial Team");
   await expect(page).toHaveTitle(
@@ -63,7 +63,7 @@ test("editorial profile has discoverable metadata and an honest empty state", as
       .locator('section[aria-labelledby="expertise"]')
       .getByRole("link", { name: "Technology", exact: true }),
   ).toHaveAttribute("href", "/category/technology");
-  for (const id of ["expertise", "explore"]) {
+  for (const id of ["expertise"]) {
     const section = page.locator(`section[aria-labelledby="${id}"]`);
     await expect(section.locator("ul").getByRole("link")).toHaveCount(6);
     await expect(
@@ -85,18 +85,28 @@ test("editorial profile has discoverable metadata and an honest empty state", as
   });
   await question.click();
   await expect(page.locator("details").first()).toHaveAttribute("open", "");
-  for (const width of [320, 390, 768, 1440]) {
+  for (const width of [320, 390, 600, 768, 834, 1024, 1100, 1440]) {
     await page.setViewportSize({ width, height: 900 });
+    const hero = page.locator("[data-editorial-profile] header");
+    const heroBox = (await hero.boundingBox())!;
+    for (const item of await hero.locator("h1, p, li, img").all()) {
+      const box = (await item.boundingBox())!;
+      expect(box.x).toBeGreaterThanOrEqual(heroBox.x);
+      expect(box.x + box.width).toBeLessThanOrEqual(
+        heroBox.x + heroBox.width + 1,
+      );
+    }
+    if ([390, 834, 1440].includes(width)) {
+      await page.evaluate(() => document.fonts.ready);
+      await hero.screenshot({
+        path: testInfo.outputPath(`editorial-hero-${width}.png`),
+      });
+    }
     const explore = page.locator('section[aria-labelledby="explore"]');
-    const banner = (await explore.locator(":scope > div").boundingBox())!;
-    const topics = (await explore.locator("ul").boundingBox())!;
-    expect(topics.y - banner.y - banner.height).toBeGreaterThanOrEqual(27);
-    const card = explore.locator("li").first();
-    const cardBox = (await card.boundingBox())!;
-    const iconBox = (await card.locator("svg").boundingBox())!;
-    expect(
-      Math.abs(iconBox.x + iconBox.width / 2 - cardBox.x - cardBox.width / 2),
-    ).toBeLessThanOrEqual(1);
+    await expect(explore.locator("ul")).toHaveCount(0);
+    await expect(
+      explore.getByRole("link", { name: "Browse All Articles", exact: true }),
+    ).toHaveAttribute("href", "/articles");
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,

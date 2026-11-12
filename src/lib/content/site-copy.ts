@@ -24,14 +24,14 @@ export const pageSeo = {
       "Discover what Ask & Explore publishes, our six main topics, and the editorial principles behind our guides, comparisons, and everyday advice.",
   },
   contact: {
-    title: "Contact Us: Questions, Feedback & Corrections",
+    title: "Contact Us for Questions & Feedback",
     description:
-      "Contact Ask & Explore with a question, article correction, privacy enquiry or collaboration idea. Include a few details so we can understand your message.",
+      "Contact Ask & Explore about an article, suggest a correction, ask a question, or share a collaboration proposal. Send your message using our contact form.",
   },
   request: {
     title: "Request an Article or Suggest a Topic",
     description:
-      "Suggest an article topic for Ask & Explore. Ask a question, request a product comparison or share an everyday problem you would like explained.",
+      "Suggest an article topic to Ask & Explore. Request a practical guide, clear explanation, or product comparison and tell us what you'd like to learn.",
   },
   search: {
     title: "Search Articles, Guides & Comparisons",

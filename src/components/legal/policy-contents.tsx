@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { PolicyIcon, type PolicyIconName } from "./policy-icons";
 import styles from "./policy.module.css";
 
@@ -13,6 +13,38 @@ export function PolicyContents({
   framed?: boolean;
 }) {
   const [active, setActive] = useState(sections[0]?.id);
+  const contentsRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const revealActive = () => {
+      const contents = contentsRef.current;
+      const link = contents?.querySelector<HTMLElement>(
+        'a[aria-current="location"]',
+      );
+      if (!contents || !link) return;
+      const bounds = contents.getBoundingClientRect();
+      const item = link.getBoundingClientRect();
+      const left = bounds.left + contents.clientLeft;
+      const top = bounds.top + contents.clientTop;
+      const right = left + contents.clientWidth;
+      const bottom = top + contents.clientHeight;
+      const dx =
+        item.left < left ? item.left - left : Math.max(0, item.right - right);
+      const dy =
+        item.top < top ? item.top - top : Math.max(0, item.bottom - bottom);
+      if (dx || dy) {
+        contents.scrollTo({
+          left: contents.scrollLeft + dx,
+          top: contents.scrollTop + dy,
+          behavior: matchMedia("(prefers-reduced-motion: reduce)").matches
+            ? "instant"
+            : "smooth",
+        });
+      }
+    };
+    revealActive();
+    window.addEventListener("resize", revealActive);
+    return () => window.removeEventListener("resize", revealActive);
+  }, [active]);
   useEffect(() => {
     let frame = 0;
     const update = () => {
@@ -43,6 +75,7 @@ export function PolicyContents({
   }, [sections]);
   return (
     <nav
+      ref={contentsRef}
       className={styles.contents}
       aria-label="Document contents"
       data-policy-contents

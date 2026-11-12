@@ -5,6 +5,7 @@ import styles from "./request.module.css";
 export function RequestNewsletter() {
   return (
     <section
+      id="newsletter"
       className={styles.newsletter}
       aria-labelledby="request-newsletter-title"
     >
@@ -13,9 +14,12 @@ export function RequestNewsletter() {
       </span>
       <div className={styles.newsletterCopy}>
         <p className={styles.eyebrow}>Stay curious</p>
-        <h2 id="request-newsletter-title">Useful guides. Stay in the loop.</h2>
+        <h2 id="request-newsletter-title">Get Useful Guides in Your Inbox</h2>
       </div>
-      <NewsletterForm label="Article request newsletter signup" />
+      <NewsletterForm
+        label="Article request newsletter signup"
+        helperText="Subscribe to receive new articles and practical guides by email. Newsletter signup is separate from submitting an article request."
+      />
     </section>
   );
 }

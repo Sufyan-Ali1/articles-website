@@ -1,14 +1,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { connection } from "next/server";
-import {
-  ArrowRight,
-  BookOpen,
-  LayoutGrid,
-  List,
-  WifiOff,
-  X,
-} from "lucide-react";
+import { ArrowRight, BookOpen, WifiOff, X } from "lucide-react";
 import { SearchSort } from "@/components/search/search-sort";
 import { getClassifications } from "@/lib/api/client";
 import { checkArchivePage, getArchiveResult } from "@/lib/seo/archives";
@@ -20,10 +13,16 @@ import {
 import { ArchiveFilters } from "./archive-filters";
 import { ArchiveBrowser } from "./archive-browser";
 import {
+  ArchiveLayoutProvider,
+  ArchiveLayoutSwitch,
+  ArchiveCards,
+} from "./archive-layout";
+import {
   ArchiveCategories,
   CountedArchiveCategories,
 } from "./archive-categories";
 import { ArchiveCard } from "./archive-card";
+import { searchTopics } from "@/lib/utils/search-topics";
 import { Pagination } from "../pagination";
 import styles from "./archive.module.css";
 
@@ -109,7 +108,11 @@ export async function ArchiveContent({
   const shouldFetch =
     !searchPage ||
     Boolean(
-      filters.search || filters.category || filters.tag || filters.article_type,
+      filters.search ||
+      filters.category ||
+      filters.tag ||
+      filters.article_type ||
+      filters.topics?.length,
     );
   const [categories, types, result] = await Promise.all([
     showCategories || searchPage
@@ -146,161 +149,177 @@ export async function ArchiveContent({
     />
   );
   return (
-    <ArchiveBrowser
-      enabled={floatingControls}
-      path={path}
-      triggerSelector={searchPage ? "[data-search-hero-form]" : undefined}
-      controls={archiveFilters}
-    >
-      {searchPage &&
-        Boolean(
-          filters.search ||
-          filters.category ||
-          filters.tag ||
-          filters.article_type,
-        ) && (
-          <nav className="active-filters" aria-label="Active filters">
-            {(["search", "category", "tag", "article_type"] as const)
-              .filter((key) => filters[key])
-              .map((key) => (
-                <Link
-                  key={key}
-                  href={filterUrl(
-                    path,
-                    { ...navigationFilters, [key]: undefined },
-                    1,
-                    selectedView,
-                  )}
-                  aria-label={`Remove filter ${filters[key]}`}
-                  prefetch={false}
-                >
-                  {key === "search"
-                    ? `“${filters[key]}”`
-                    : categories.find((item) => item.slug === filters[key])
-                        ?.name ||
-                      types.find((item) => item.slug === filters[key])?.name ||
-                      filters[key]}
-                  <X size={13} aria-hidden="true" />
-                </Link>
-              ))}
-          </nav>
-        )}
-      <div
-        className={styles.layout}
-        data-sidebar={showCategories}
-        data-empty={!result?.data.length}
+    <ArchiveLayoutProvider view={view}>
+      <ArchiveBrowser
+        enabled={floatingControls}
+        path={path}
+        triggerSelector={searchPage ? "[data-search-hero-form]" : undefined}
+        controls={archiveFilters}
       >
-        {showCategories && (
-          <Suspense fallback={<ArchiveCategories {...categoryProps} />}>
-            <CountedArchiveCategories {...categoryProps} />
-          </Suspense>
-        )}
-        <section
-          className={styles.results}
-          aria-label="Published articles"
-          data-search-results={searchPage || undefined}
+        {searchPage &&
+          Boolean(
+            filters.topics?.some((topic) => topic !== "all") ||
+            filters.search ||
+            filters.category ||
+            filters.tag ||
+            filters.article_type,
+          ) && (
+            <nav className="active-filters" aria-label="Active filters">
+              {filters.topics
+                ?.filter((topic) => topic !== "all")
+                .map((topic) => (
+                  <Link
+                    key={topic}
+                    href={filterUrl(
+                      path,
+                      {
+                        ...navigationFilters,
+                        topics:
+                          filters.topics!.length > 1
+                            ? filters.topics!.filter((item) => item !== topic)
+                            : ["all"],
+                      },
+                      1,
+                      selectedView,
+                    )}
+                    aria-label={`Remove topic ${searchTopics.find((item) => item.key === topic)?.label || topic}`}
+                    prefetch={false}
+                  >
+                    {searchTopics.find((item) => item.key === topic)?.label ||
+                      topic}
+                    <X size={13} aria-hidden="true" />
+                  </Link>
+                ))}
+              {(["search", "category", "tag", "article_type"] as const)
+                .filter((key) => filters[key])
+                .map((key) => (
+                  <Link
+                    key={key}
+                    href={filterUrl(
+                      path,
+                      { ...navigationFilters, [key]: undefined },
+                      1,
+                      selectedView,
+                    )}
+                    aria-label={`Remove filter ${filters[key]}`}
+                    prefetch={false}
+                  >
+                    {key === "search"
+                      ? `“${filters[key]}”`
+                      : categories.find((item) => item.slug === filters[key])
+                          ?.name ||
+                        types.find((item) => item.slug === filters[key])
+                          ?.name ||
+                        filters[key]}
+                    <X size={13} aria-hidden="true" />
+                  </Link>
+                ))}
+            </nav>
+          )}
+        <div
+          className={styles.layout}
+          data-sidebar={showCategories}
+          data-empty={!result?.data.length}
         >
-          <div className={styles.resultsToolbar}>
-            <div>
-              {searchPage && (
-                <h2 className={styles.searchHeading}>
-                  {filters.search ? (
-                    <>
-                      Showing results for <span>“{filters.search}”</span>
-                    </>
-                  ) : shouldFetch ? (
-                    "Explore articles"
-                  ) : (
-                    "Start with a question"
-                  )}
-                </h2>
-              )}
-              <p className={`results-info ${styles.resultsInfo}`} role="status">
-                {result
-                  ? result.meta.total > 0
-                    ? searchPage
-                      ? `${result.meta.total.toLocaleString("en")} ${noun} found`
-                      : start
-                        ? `Showing ${start}–${end} of ${result.meta.total.toLocaleString("en")} ${noun}`
-                        : `0 articles on this page · ${result.meta.total.toLocaleString("en")} ${noun} available`
-                    : "0 articles found"
-                  : shouldFetch
-                    ? "Articles are temporarily unavailable"
-                    : "Find something worth exploring"}
-                {!searchPage && filters.search && (
-                  <span> matching “{filters.search}”</span>
-                )}
-              </p>
-            </div>
-            {(!floatingControls || searchPage) && (
-              <div className={styles.resultControls}>
+          {showCategories && (
+            <Suspense fallback={<ArchiveCategories {...categoryProps} />}>
+              <CountedArchiveCategories {...categoryProps} />
+            </Suspense>
+          )}
+          <section
+            className={styles.results}
+            aria-label="Published articles"
+            data-search-results={searchPage || undefined}
+          >
+            <div className={styles.resultsToolbar}>
+              <div>
                 {searchPage && (
-                  <SearchSort
-                    key={JSON.stringify([navigationFilters, selectedView])}
-                    filters={navigationFilters}
-                    view={selectedView}
-                  />
+                  <h2 className={styles.searchHeading}>
+                    {filters.search ? (
+                      <>
+                        Showing results for <span>“{filters.search}”</span>
+                      </>
+                    ) : shouldFetch ? (
+                      "Explore articles"
+                    ) : (
+                      "Start with a question"
+                    )}
+                  </h2>
                 )}
-                <nav className={styles.viewSwitch} aria-label="Article layout">
-                  <Link
-                    href={filterUrl(path, navigationFilters, undefined, "grid")}
-                    aria-label="Grid view"
-                    aria-current={view === "grid" ? "true" : undefined}
-                    prefetch={false}
-                  >
-                    <LayoutGrid size={16} />
-                  </Link>
-                  <Link
-                    href={filterUrl(path, navigationFilters, undefined, "list")}
-                    aria-label="List view"
-                    aria-current={view === "list" ? "true" : undefined}
-                    prefetch={false}
-                  >
-                    <List size={18} />
-                  </Link>
-                </nav>
+                <p
+                  className={`results-info ${styles.resultsInfo}`}
+                  role="status"
+                >
+                  {result
+                    ? result.meta.total > 0
+                      ? searchPage
+                        ? `${result.meta.total.toLocaleString("en")} ${noun} found`
+                        : start
+                          ? `Showing ${start}–${end} of ${result.meta.total.toLocaleString("en")} ${noun}`
+                          : `0 articles on this page · ${result.meta.total.toLocaleString("en")} ${noun} available`
+                      : "0 articles found"
+                    : shouldFetch
+                      ? "Articles are temporarily unavailable"
+                      : "Find something worth exploring"}
+                  {!searchPage && filters.search && (
+                    <span> matching “{filters.search}”</span>
+                  )}
+                </p>
               </div>
-            )}
-          </div>
-          {result?.data.length ? (
-            <div
-              className={`${styles.cards} ${view === "list" ? "article-list" : ""}`}
-              data-view={view}
-            >
-              {result.data.map((article) => (
-                <ArchiveCard
-                  key={article.id}
-                  article={article}
-                  query={filters.search}
-                  variant={searchPage ? "search" : "archive"}
-                />
-              ))}
-            </div>
-          ) : (
-            <ArchiveState
-              unavailable={shouldFetch && !result}
-              path={path}
-              searchPage={searchPage}
-              initial={!shouldFetch}
-              retryHref={filterUrl(
-                path,
-                navigationFilters,
-                undefined,
-                selectedView,
+              {(!floatingControls || searchPage) && (
+                <div className={styles.resultControls}>
+                  {searchPage && (
+                    <SearchSort
+                      key={JSON.stringify([navigationFilters, selectedView])}
+                      filters={navigationFilters}
+                      view={selectedView}
+                    />
+                  )}
+                  <ArchiveLayoutSwitch
+                    path={path}
+                    filters={navigationFilters}
+                    view={view}
+                  />
+                </div>
               )}
-            />
-          )}
-          {result && (
-            <Pagination
-              meta={result.meta}
-              filters={navigationFilters}
-              path={path}
-              view={selectedView}
-            />
-          )}
-        </section>
-      </div>
-    </ArchiveBrowser>
+            </div>
+            {result?.data.length ? (
+              <ArchiveCards view={view}>
+                {result.data.map((article) => (
+                  <ArchiveCard
+                    key={article.id}
+                    article={article}
+                    query={filters.search}
+                    variant={searchPage ? "search" : "archive"}
+                  />
+                ))}
+              </ArchiveCards>
+            ) : (
+              <ArchiveState
+                unavailable={shouldFetch && !result}
+                path={path}
+                searchPage={searchPage}
+                initial={!shouldFetch}
+                retryHref={filterUrl(
+                  path,
+                  navigationFilters,
+                  undefined,
+                  selectedView,
+                )}
+              />
+            )}
+            {result && (
+              <Pagination
+                meta={result.meta}
+                filters={navigationFilters}
+                path={path}
+                view={selectedView}
+              />
+            )}
+          </section>
+        </div>
+      </ArchiveBrowser>
+    </ArchiveLayoutProvider>
   );
 }
 

@@ -5,6 +5,7 @@ import styles from "./contact.module.css";
 export function ContactNewsletter() {
   return (
     <section
+      id="newsletter"
       className={styles.newsletter}
       aria-labelledby="contact-newsletter-title"
     >

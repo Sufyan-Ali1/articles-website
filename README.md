@@ -63,6 +63,8 @@ Successful responses use `{data}` or `{data, meta}`. Errors use `{error}`. The s
 
 Filters are `search`, `category`, `tag`, `article_type`, `sort` and `page`. There are 12 articles per page. Sort values are `-published_at`, `published_at`, `-view_count` and `title`. Category filters match direct membership. Unknown fields are ignored.
 
+The search page also accepts `topics` as comma-separated topic keys (or repeated parameters): `technology`, `automotive`, `buying-guides`, `lifestyle`, `digital-safety`, and `travel`. Selections match any selected topic; `topics=all` removes the topic restriction. Buying Guides matches its category or article type. The website applies this filter before pagination using the API's existing collection limits; `topics` is not sent to the backend API. Search text, sort order, and other filters remain in effect.
+
 Forms send requests through the website's `/api/v1/...` gateway. It allows only the three submission routes, checks the request origin, limits body size and removes browser credentials. It forwards trusted visitor-IP headers from Netlify or Vercel only. Other hosts share backend connection-IP limits until configured.
 
 A form shows success only after the expected HTTP 202 response. Errors keep the entered text. HTTP 429 starts a retry countdown. Contact and topic forms also have a honeypot and a browser maths check. The maths check can be bypassed; backend validation and rate limits are still needed.

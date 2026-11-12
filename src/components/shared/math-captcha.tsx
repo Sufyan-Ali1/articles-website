@@ -27,10 +27,12 @@ function newQuestion(previous?: Question | null): Question {
 }
 
 export function MathCaptcha({
+  id: fieldsetId,
   ref,
   disabled = false,
   compact = false,
 }: {
+  id?: string;
   ref?: Ref<MathCaptchaHandle>;
   disabled?: boolean;
   compact?: boolean;
@@ -82,6 +84,7 @@ export function MathCaptcha({
 
   return (
     <fieldset
+      id={fieldsetId}
       className={styles.captcha}
       data-compact={compact}
       data-math-captcha

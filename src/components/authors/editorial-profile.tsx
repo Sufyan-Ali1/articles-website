@@ -146,11 +146,9 @@ const sources = [
 ] as const;
 export function EditorialProfile({
   topics,
-  exploreTopics,
   articles,
 }: {
   topics: ReactNode;
-  exploreTopics: ReactNode;
   articles: ReactNode;
 }) {
   const profileSchema = editorialProfileSchema();
@@ -506,15 +504,14 @@ export function EditorialProfile({
               <h2 id="explore">Explore More from Ask & Explore</h2>
               <p>
                 Find practical how-to guides, product comparisons, and clear
-                explanations across our main topics. Choose a category to
-                explore articles relevant to your next question or decision.
+                explanations across our main topics. Browse our articles to find
+                answers to your next question or decision.
               </p>
             </div>
             <Link className={styles.button} href="/articles">
               Browse All Articles <ArrowRight size={18} aria-hidden="true" />
             </Link>
           </div>
-          {exploreTopics}
         </section>
         {profileSchema && (
           <script

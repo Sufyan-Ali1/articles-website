@@ -125,6 +125,7 @@ export function TopicForm({ apiUrl }: { apiUrl: string }) {
   if (complete)
     return (
       <section
+        id="request-form"
         className={`topic-form ${styles.form} ${styles.success}`}
         role="status"
         aria-labelledby="request-form-title"
@@ -160,7 +161,7 @@ export function TopicForm({ apiUrl }: { apiUrl: string }) {
     form.formState.errors[field]?.message;
   return (
     <form
-      id="article-request-form"
+      id="request-form"
       method="post"
       action={
         apiUrl
@@ -177,10 +178,10 @@ export function TopicForm({ apiUrl }: { apiUrl: string }) {
           Please enable JavaScript and reload to send a topic suggestion.
         </p>
       </noscript>
-      <h2 id="request-form-title">Tell Us What You Want to Read</h2>
+      <h2 id="request-form-title">Suggest an Article Topic</h2>
       <p className={styles.formDescription}>
-        Start with the question you want answered. Add context if it would help
-        us understand your idea.
+        Tell us what you&apos;d like to learn. A focused question is enough, and
+        extra details are optional.
       </p>
       {(!apiUrl || alert) && (
         <div className="form-alert" role="alert">
@@ -191,7 +192,7 @@ export function TopicForm({ apiUrl }: { apiUrl: string }) {
       )}
       <div className={styles.field}>
         <label htmlFor="topic">
-          What should we explore?{" "}
+          What would you like us to cover?{" "}
           <span className={styles.required}>Required</span>
         </label>
         <input
@@ -204,7 +205,7 @@ export function TopicForm({ apiUrl }: { apiUrl: string }) {
           {...form.register("topic")}
         />
         <p id="topic-hint" className={styles.hint}>
-          Ask a focused question or name a comparison. Up to 300 characters.
+          Describe a question, task, or comparison. Up to 300 characters.
         </p>
         {error("topic") && (
           <p id="topic-error" className="field-error">
@@ -235,7 +236,7 @@ export function TopicForm({ apiUrl }: { apiUrl: string }) {
         <textarea
           id="description"
           rows={4}
-          placeholder="What are you trying to do, and what would a useful answer explain?"
+          placeholder="Tell us what you're trying to do, what you've already tried, or what you'd like compared."
           maxLength={10000}
           aria-invalid={Boolean(error("description"))}
           aria-describedby="description-error"
@@ -310,13 +311,17 @@ export function TopicForm({ apiUrl }: { apiUrl: string }) {
           ) : (
             <>
               <Send size={18} strokeWidth={1.8} aria-hidden="true" />
-              Submit request
+              Send article request
             </>
           )}
         </Button>
         <p>
           <LockKeyhole size={13} aria-hidden="true" />
-          Sent privately. <Link href="/privacy">Privacy Policy</Link>
+          <span>
+            Your suggestion is submitted privately. Please don&apos;t include
+            sensitive personal information.{" "}
+            <Link href="/privacy">Privacy Policy</Link>
+          </span>
         </p>
       </div>
     </form>

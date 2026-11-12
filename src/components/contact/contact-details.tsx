@@ -2,56 +2,63 @@ import Image from "next/image";
 import { ArrowUpRight, Clock3, Mail, UsersRound } from "lucide-react";
 import styles from "./contact.module.css";
 
-export function ContactDetails({ email }: { email: string }) {
+export function ContactDetails() {
   return (
-    <aside className={styles.details} aria-labelledby="contact-details-title">
+    <aside
+      id="contact-options"
+      className={styles.details}
+      aria-labelledby="contact-details-title"
+    >
       <div className={styles.detailsContent}>
-        <h2 id="contact-details-title">Find the Right Way to Get in Touch</h2>
+        <h2 id="contact-details-title">How to Contact Ask &amp; Explore</h2>
         <p className={styles.sectionDescription}>
-          Choose the contact option that fits your message. For an article
-          correction, include the page link and the detail you want us to check.
+          Use the form for general questions, article feedback, privacy
+          enquiries, or collaboration proposals. If your message concerns an
+          article, include its link and the specific detail you want us to
+          review.
         </p>
-        <div className={styles.contactMethod}>
+        <div id="general-enquiries" className={styles.contactMethod}>
           <span className={styles.methodIcon} aria-hidden="true">
             <Mail size={28} strokeWidth={1.7} />
           </span>
           <div>
-            <h3>{email ? "Email" : "General Enquiries"}</h3>
+            <h3>General Enquiries</h3>
             <p>
-              For questions about the site, feedback on an article, or a general
-              enquiry.
+              For questions about Ask &amp; Explore, feedback on our articles,
+              or other general enquiries.
             </p>
-            <a href={email ? `mailto:${email}` : "#contact-message-form"}>
-              {email || "Use the message form"}
+            <a href="#contact-message-form">
+              Go to message form
               <ArrowUpRight size={14} aria-hidden="true" />
             </a>
           </div>
         </div>
-        <div className={styles.contactMethod}>
+        <div id="after-submission" className={styles.contactMethod}>
           <span className={styles.methodIcon} aria-hidden="true">
             <Clock3 size={28} strokeWidth={1.7} />
           </span>
           <div>
             <h3>After You Send</h3>
             <p>
-              An on-screen confirmation lets you know when your message is
-              accepted. We may use the email you provide to follow up; a reply
-              is not guaranteed.
+              After submitting, look for an on-screen confirmation. We may use
+              your email address to follow up if needed, but a response
+              isn&apos;t guaranteed.
             </p>
           </div>
         </div>
-        <div className={styles.contactMethod}>
+        <div id="collaboration" className={styles.contactMethod}>
           <span className={styles.methodIcon} aria-hidden="true">
             <UsersRound size={28} strokeWidth={1.7} />
           </span>
           <div>
             <h3>Collaboration &amp; Press</h3>
             <p>
-              Share your proposal, who it is for, and how it relates to our
-              readers. Include a useful link or a short outline.
+              Have a collaboration or press proposal? Choose “General question”
+              in the form and include a short outline, the intended audience,
+              and why your idea is relevant to Ask &amp; Explore readers.
             </p>
-            <a href="#contact-name">
-              Start a conversation
+            <a href="#contact-message-form">
+              Go to message form
               <ArrowUpRight size={14} aria-hidden="true" />
             </a>
           </div>

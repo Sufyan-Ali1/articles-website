@@ -1,7 +1,5 @@
-"use client";
-
-import { useId, useState, type ReactNode } from "react";
-import { BookOpen, ChevronDown, List } from "lucide-react";
+import type { ReactNode } from "react";
+import { List } from "lucide-react";
 import styles from "./reading-layout.module.css";
 
 export function ReadingPanel({
@@ -15,18 +13,10 @@ export function ReadingPanel({
   action?: ReactNode;
   extra?: ReactNode;
 }) {
-  const [compactOpen, setCompactOpen] = useState(false);
-  const contentId = useId();
   const title = side === "contents" ? "In this article" : "Related articles";
-  const Icon = side === "contents" ? List : BookOpen;
 
   return (
-    <aside
-      className={styles.panel}
-      data-side={side}
-      data-compact-open={compactOpen}
-      aria-label={title}
-    >
+    <aside className={styles.panel} data-side={side} aria-label={title}>
       <div className={styles.panelSurface}>
         <div className={styles.panelHeading}>
           <h2 className={styles.panelTitle}>
@@ -41,21 +31,7 @@ export function ReadingPanel({
           </h2>
           {action}
         </div>
-        <button
-          type="button"
-          className={styles.compactToggle}
-          aria-expanded={compactOpen}
-          aria-controls={contentId}
-          onClick={() => setCompactOpen(!compactOpen)}
-        >
-          <span>
-            <Icon size={17} />
-            {title}
-          </span>
-          <ChevronDown size={17} />
-        </button>
         <div
-          id={contentId}
           className={styles.panelContent}
           data-reader-scroll={side === "contents" ? "" : undefined}
         >

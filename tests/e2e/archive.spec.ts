@@ -1,5 +1,45 @@
 import { test, expect } from "@playwright/test";
 
+test("layout switches immediately while navigation is waiting and preserves archive state", async ({
+  page,
+}) => {
+  await page.goto("/articles?page=2&sort=title");
+  const cards = page.locator("[data-view]");
+  const layout = page.getByRole("navigation", { name: "Article layout" });
+  await expect(cards).toHaveAttribute("data-view", "grid");
+  let releaseNavigation!: () => void;
+  const navigationGate = new Promise<void>((resolve) => {
+    releaseNavigation = resolve;
+  });
+  await page.route("**/articles?**", async (route) => {
+    if (route.request().headers().rsc === "1") await navigationGate;
+    await route.continue();
+  });
+  try {
+    await layout.getByRole("link", { name: "List view" }).click();
+    await expect(cards).toHaveAttribute("data-view", "list", { timeout: 1000 });
+    await expect(
+      layout.getByRole("link", { name: "List view" }),
+    ).toHaveAttribute("aria-current", "true");
+    await expect(layout).toHaveAttribute("aria-busy", "true");
+  } finally {
+    releaseNavigation();
+  }
+  await expect(page).toHaveURL(/view=list/);
+  await expect(layout).not.toHaveAttribute("aria-busy", "true");
+  expect(new URL(page.url()).searchParams.get("page")).toBe("2");
+  expect(new URL(page.url()).searchParams.get("sort")).toBe("title");
+  await layout.getByRole("link", { name: "Grid view" }).click();
+  await expect(cards).toHaveAttribute("data-view", "grid");
+  await expect(page).toHaveURL(/view=grid/);
+  await page.goBack();
+  await expect(cards).toHaveAttribute("data-view", "list");
+  await expect(layout.getByRole("link", { name: "List view" })).toHaveAttribute(
+    "aria-current",
+    "true",
+  );
+});
+
 test("article archive keeps the new layout, full images, and category controls outside the toolbar", async ({
   page,
 }, testInfo) => {
@@ -153,19 +193,13 @@ test("article archive category panel fills the viewport and both controls stay a
     .toBeLessThanOrEqual(0);
 });
 
-test("article archive keeps mobile filters compact and article types independently scrollable", async ({
+test("article archive keeps mobile filters at the top and only floats on desktop", async ({
   page,
 }, testInfo) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/articles");
   const filterBar = page.locator("[data-archive-filter-bar]");
   await expect(filterBar).toBeVisible();
-  await page.evaluate(() => window.scrollTo({ top: 950, behavior: "instant" }));
-  const top = (await page.locator(".site-header").boundingBox())!.height + 10;
-  await expect
-    .poll(async () => Math.round((await filterBar.boundingBox())!.y))
-    .toBe(top);
-  expect((await filterBar.boundingBox())!.height).toBeLessThan(150);
   const actions = filterBar.locator("[data-archive-actions]");
   const scrollY = await page.evaluate(() => window.scrollY);
   await actions.evaluate((node) => (node.scrollLeft = node.scrollWidth));
@@ -175,9 +209,31 @@ test("article archive keeps mobile filters compact and article types independent
   await expect(
     filterBar.getByRole("combobox", { name: "Sort articles" }),
   ).toBeVisible();
+  for (const width of [390, 760]) {
+    await page.setViewportSize({ width, height: 844 });
+    await page.evaluate(() =>
+      window.scrollTo({ top: 950, behavior: "instant" }),
+    );
+    await expect(filterBar).toHaveAttribute("data-floating", "false");
+    await expect(filterBar).toHaveCSS("position", "static");
+    await expect
+      .poll(async () => {
+        const box = (await filterBar.boundingBox())!;
+        return box.y + box.height;
+      })
+      .toBeLessThan(0);
+  }
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await expect(filterBar).toHaveAttribute("data-floating", "true");
+  await expect(filterBar).toHaveCSS("position", "fixed");
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(filterBar).toHaveAttribute("data-floating", "false");
+  await expect(filterBar).toHaveCSS("position", "static");
   await page.screenshot({
-    path: testInfo.outputPath("archive-mobile-pinned.png"),
+    path: testInfo.outputPath("archive-mobile-unobstructed.png"),
   });
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+  await expect(filterBar.getByRole("searchbox")).toBeInViewport();
 });
 
 test("article archive combines category, format, search, sort, view, and pagination state", async ({

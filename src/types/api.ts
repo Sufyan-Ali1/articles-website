@@ -23,6 +23,7 @@ export type ArticleFilters = {
   page_size?: number;
   search?: string;
   category?: string;
+  topics?: string[];
   tag?: string;
   article_type?: string;
   sort?: string;

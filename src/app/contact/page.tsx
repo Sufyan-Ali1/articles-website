@@ -9,7 +9,8 @@ import { ContactFaqs } from "@/components/contact/contact-faqs";
 import { ContactNewsletter } from "@/components/contact/contact-newsletter";
 import type { SearchParams } from "@/lib/utils/filters";
 import { site } from "@/lib/config";
-import { metadata } from "@/lib/seo/metadata";
+import { metadata, safeJsonLd } from "@/lib/seo/metadata";
+import { contactStructuredData } from "@/lib/seo/contact";
 import { pageSeo } from "@/lib/content/site-copy";
 import styles from "@/components/contact/contact.module.css";
 
@@ -24,13 +25,19 @@ export default function Contact({
   const email = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(site.email) ? site.email : "";
   return (
     <div className={styles.page} data-contact-page>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: safeJsonLd(contactStructuredData()),
+        }}
+      />
       <ContactHero />
       <div className={styles.shell}>
         <div className={styles.layout}>
           <Suspense fallback={<ContactFormSkeleton />}>
             <ContactFormArea searchParams={searchParams} email={email} />
           </Suspense>
-          <ContactDetails email={email} />
+          <ContactDetails />
         </div>
         <ContactFaqs />
         <ContactNewsletter />

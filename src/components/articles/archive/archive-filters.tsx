@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { useContext } from "react";
-import { LayoutGrid, List, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import type { ArticleFilters, ClassificationResponse } from "@/types/api";
 import { filterUrl, sorts } from "@/lib/utils/filters";
+import { ArchiveLayoutSwitch } from "./archive-layout";
 import { ArchiveFloatingContext } from "./archive-browser";
 import styles from "./archive.module.css";
 
@@ -24,6 +25,7 @@ export function ArchiveFilters({
   const floating = useContext(ArchiveFloatingContext);
   const useTypeDropdown = showLayout && floating;
   const changed = Boolean(
+    filters.topics?.length ||
     filters.search ||
     filters.category ||
     filters.tag ||
@@ -44,6 +46,9 @@ export function ArchiveFilters({
         <input type="hidden" name="article_type" value={filters.article_type} />
       )}
       {filters.tag && <input type="hidden" name="tag" value={filters.tag} />}
+      {filters.topics?.length && (
+        <input type="hidden" name="topics" value={filters.topics.join(",")} />
+      )}
       {view && <input type="hidden" name="view" value={view} />}
       <div className={styles.search}>
         <button type="submit" aria-label="Search articles">
@@ -138,24 +143,7 @@ export function ArchiveFilters({
           </select>
         </label>
         {showLayout && (
-          <nav className={styles.viewSwitch} aria-label="Article layout">
-            <Link
-              href={filterUrl(path, filters, undefined, "grid")}
-              aria-label="Grid view"
-              aria-current={!view || view === "grid" ? "true" : undefined}
-              prefetch={false}
-            >
-              <LayoutGrid size={16} />
-            </Link>
-            <Link
-              href={filterUrl(path, filters, undefined, "list")}
-              aria-label="List view"
-              aria-current={view === "list" ? "true" : undefined}
-              prefetch={false}
-            >
-              <List size={18} />
-            </Link>
-          </nav>
+          <ArchiveLayoutSwitch path={path} filters={filters} view={view} />
         )}
         <noscript>
           <button type="submit">Apply filters</button>

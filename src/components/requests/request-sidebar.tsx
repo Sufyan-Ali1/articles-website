@@ -7,16 +7,20 @@ export function RequestSidebar() {
   return (
     <div className={styles.sidebar} data-request-sidebar>
       <HowItWorks />
-      <section className={styles.ideaTip} aria-labelledby="request-tip-title">
+      <section
+        id="submission-guidance"
+        className={styles.ideaTip}
+        aria-labelledby="request-tip-title"
+      >
         <div className={styles.ideaTipHeading}>
           <span className={styles.ideaTipIcon} aria-hidden="true">
             <Lightbulb size={23} strokeWidth={1.7} />
           </span>
-          <h2 id="request-tip-title">Make your idea count</h2>
+          <h2 id="request-tip-title">Make Your Idea Count</h2>
         </div>
         <div className={styles.ideaTipBody}>
           <p>
-            A specific question is easier to understand. Add the details that
+            A focused question is easier to explore. Share the details that
             would make the answer useful to you.
           </p>
           <ul className={styles.ideaTipList}>
@@ -25,8 +29,8 @@ export function RequestSidebar() {
               <div>
                 <h3>Name the topic</h3>
                 <p>
-                  Name the product or task, including a model or version when it
-                  matters. A focused question gives us a clearer starting point.
+                  Tell us the product, task, or question. Include a model or
+                  version if it matters.
                 </p>
               </div>
             </li>
@@ -35,8 +39,8 @@ export function RequestSidebar() {
               <div>
                 <h3>Add your context</h3>
                 <p>
-                  Explain what you want to achieve, what you have already tried,
-                  and the point where you need help.
+                  Explain what you&apos;re trying to do, what you&apos;ve
+                  already tried, or where you need help.
                 </p>
               </div>
             </li>
@@ -45,8 +49,8 @@ export function RequestSidebar() {
               <div>
                 <h3>Share what would help</h3>
                 <p>
-                  Would a side-by-side comparison, a worked example, or a
-                  step-by-step guide help? Tell us what you want to learn.
+                  Tell us if you&apos;d prefer a step-by-step guide, practical
+                  example, or side-by-side comparison.
                 </p>
               </div>
             </li>

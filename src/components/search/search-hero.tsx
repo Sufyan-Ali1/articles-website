@@ -1,17 +1,8 @@
 import Image from "next/image";
-import Link from "next/link";
 import { connection } from "next/server";
-import { BookOpen, Clock3, Search, Star } from "lucide-react";
-import { getClassifications } from "@/lib/api/client";
-import {
-  filterUrl,
-  parseFilters,
-  type SearchParams,
-} from "@/lib/utils/filters";
-import {
-  categoryPresentation,
-  compareCategories,
-} from "@/components/categories/category-presentation";
+import { Search } from "lucide-react";
+import { parseFilters, type SearchParams } from "@/lib/utils/filters";
+import { SearchTopics } from "./search-topics";
 import styles from "./search.module.css";
 
 export async function SearchHero({
@@ -24,15 +15,6 @@ export async function SearchHero({
   const filters = parseFilters(params);
   const view =
     params.view === "list" || params.view === "grid" ? params.view : undefined;
-  const [categories, types] = await Promise.all([
-    getClassifications("categories").catch(() => []),
-    getClassifications("article-types").catch(() => []),
-  ]);
-  const topics = categories
-    .filter((item) => item.is_active && !item.parent_id)
-    .sort(compareCategories)
-    .slice(0, 3);
-  const formats = types.filter((item) => item.is_active).slice(0, 2);
   return (
     <section className={styles.hero} aria-labelledby="search-title">
       <div className={`${styles.shell} ${styles.heroInner}`}>
@@ -45,8 +27,7 @@ export async function SearchHero({
           </h1>
           <p className={styles.description}>
             Search published article titles for a product, a topic, or a
-            question. Use the topic and article-type filters to narrow your
-            results.
+            question. Choose one or more topics to narrow your results.
           </p>
           <form
             key={JSON.stringify([filters, view])}
@@ -79,6 +60,13 @@ export async function SearchHero({
                 value={filters.article_type}
               />
             )}
+            {filters.topics?.length && (
+              <input
+                type="hidden"
+                name="topics"
+                value={filters.topics.join(",")}
+              />
+            )}
             {filters.tag && (
               <input type="hidden" name="tag" value={filters.tag} />
             )}
@@ -88,79 +76,7 @@ export async function SearchHero({
               Search
             </button>
           </form>
-          <nav className={styles.shortcuts} aria-label="Search shortcuts">
-            {topics.map((category) => {
-              const { icon: Icon } = categoryPresentation(category);
-              return (
-                <Link
-                  key={category.id}
-                  href={filterUrl(
-                    "/search",
-                    {
-                      ...filters,
-                      category:
-                        filters.category === category.slug
-                          ? undefined
-                          : category.slug,
-                    },
-                    1,
-                    view,
-                  )}
-                  aria-current={
-                    filters.category === category.slug ? "true" : undefined
-                  }
-                  prefetch={false}
-                >
-                  <Icon size={16} aria-hidden="true" />
-                  {category.name}
-                </Link>
-              );
-            })}
-            {formats.map((type) => {
-              const Icon = /review/i.test(type.name) ? Star : BookOpen;
-              return (
-                <Link
-                  key={type.id}
-                  href={filterUrl(
-                    "/search",
-                    {
-                      ...filters,
-                      article_type:
-                        filters.article_type === type.slug
-                          ? undefined
-                          : type.slug,
-                    },
-                    1,
-                    view,
-                  )}
-                  aria-current={
-                    filters.article_type === type.slug ? "true" : undefined
-                  }
-                  prefetch={false}
-                >
-                  <Icon size={16} aria-hidden="true" />
-                  {type.name}
-                </Link>
-              );
-            })}
-            <Link
-              href={filterUrl(
-                filters.search ||
-                  filters.category ||
-                  filters.article_type ||
-                  filters.tag
-                  ? "/search"
-                  : "/articles",
-                { ...filters, sort: "-published_at" },
-                1,
-                view,
-              )}
-              prefetch={false}
-            >
-              <Clock3 size={16} aria-hidden="true" />
-              Latest
-            </Link>
-          </nav>
+          <SearchTopics filters={filters} view={view} />
         </div>
         <div className={styles.heroArt}>
           <Image

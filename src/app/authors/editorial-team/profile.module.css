@@ -175,9 +175,6 @@
 .topics .topicLink > svg {
   margin-inline: auto;
 }
-.explore + .topics {
-  margin-top: 28px;
-}
 .topics .topicLink:hover {
   text-decoration: none;
   box-shadow: inset 0 0 0 2px currentColor;
@@ -472,11 +469,86 @@
 }
 @media (max-width: 1100px) {
   .hero {
-    grid-template-columns: 120px minmax(0, 1fr);
+    grid-template-columns: 64px minmax(0, 1fr) minmax(200px, 0.8fr);
+    grid-template-areas:
+      "logo eyebrow art"
+      "title title art"
+      "summary summary art"
+      "badges badges badges";
+    align-items: center;
+    gap: 16px 20px;
+    padding: 28px;
+    border: 1px solid #dfeafb;
+    border-radius: 20px;
+    background: linear-gradient(145deg, #f5f9ff, #e8f1ff);
+  }
+  .heroCopy {
+    display: contents;
+  }
+  .hero .logoTile {
+    grid-area: logo;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    padding: 10px;
+    border: 1px solid #e2eafb;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px #346acb08;
+  }
+  .hero .logoTile strong {
+    display: none;
+  }
+  .hero .eyebrow {
+    grid-area: eyebrow;
+    justify-self: start;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    border-radius: 0;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .hero h1 {
+    grid-area: title;
+    font-size: clamp(30px, 3.8vw, 40px);
+    line-height: 1.15;
+    letter-spacing: -0.9px;
+    text-wrap: pretty;
+  }
+  .heroCopy > p {
+    grid-area: summary;
+    margin: 0;
+    max-width: 48ch;
+    font-size: 15px;
+    line-height: 1.65;
+    color: #526581;
+  }
+  .heroCopy > p em {
+    font-style: normal;
+  }
+  .hero .badges {
+    grid-area: badges;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 6px 0 0;
+    padding-top: 18px;
+    border-top: 1px solid #d5e2f4;
+  }
+  .hero .badges li {
+    padding: 0;
+    border-radius: 0;
+    background: transparent;
+    color: #36547b;
+    font-size: 12px;
+    font-weight: 500;
   }
   .hero > .art {
-    grid-column: 1 / -1;
-    max-width: 400px;
+    grid-area: art;
+    max-width: 300px;
     justify-self: center;
   }
   .topics {
@@ -517,15 +589,35 @@
     padding-bottom: 48px;
   }
   .hero {
-    grid-template-columns: minmax(0, 1fr);
-    padding: 28px 24px;
-    gap: 24px;
+    grid-template-columns: 56px minmax(0, 1fr);
+    grid-template-areas:
+      "logo eyebrow"
+      "title title"
+      "summary summary"
+      "art art"
+      "badges badges";
+    padding: 22px 20px;
+    gap: 16px;
+    border-radius: 18px;
   }
-  .logoTile {
-    width: 120px;
+  .hero .logoTile {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+  }
+  .hero h1 {
+    font-size: clamp(28px, 7.5vw, 36px);
+    letter-spacing: -0.7px;
   }
   .hero > .art {
-    grid-column: auto;
+    max-width: 240px;
+  }
+  .hero .badges {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: 0;
+    padding-top: 16px;
   }
   .topics {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -542,6 +634,19 @@
   .split > .art {
     max-width: 360px;
     justify-self: center;
+  }
+  .trust .fourCards > article + article {
+    position: relative;
+  }
+  .trust .fourCards > article + article::before,
+  .process > li + li::before {
+    content: "";
+    position: absolute;
+    top: -16px;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: #c9d8ee;
   }
   .research > .art {
     order: 2;

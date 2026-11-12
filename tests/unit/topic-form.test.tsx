@@ -16,7 +16,7 @@ describe("topic suggestions", () => {
   it("switches starters while retaining the written subject and protecting custom drafts", async () => {
     const user = userEvent.setup();
     render(<TopicForm apiUrl="https://api.test" />);
-    const topic = screen.getByLabelText(/what should we explore/i);
+    const topic = screen.getByLabelText(/what would you like us to cover/i);
     const explain = screen.getByRole("button", { name: "Explain something" });
     const compare = screen.getByRole("button", { name: "Compare options" });
     const choose = screen.getByRole("button", { name: "Help me choose" });
@@ -67,7 +67,7 @@ describe("topic suggestions", () => {
       "https://api.test/api/v1/article-requests",
     );
     await userEvent.click(
-      screen.getByRole("button", { name: /submit request/i }),
+      screen.getByRole("button", { name: /send article request/i }),
     );
     expect(await screen.findByText(/tell us the topic/i)).toBeInTheDocument();
     expect(fetch).not.toHaveBeenCalled();
@@ -84,12 +84,12 @@ describe("topic suggestions", () => {
     vi.stubGlobal("fetch", fetch);
     render(<TopicForm apiUrl="https://api.test" />);
     await userEvent.type(
-      screen.getByLabelText(/what should we explore/i),
+      screen.getByLabelText(/what would you like us to cover/i),
       "Choosing an electric car",
     );
     await solveCaptcha();
     await userEvent.click(
-      screen.getByRole("button", { name: /submit request/i }),
+      screen.getByRole("button", { name: /send article request/i }),
     );
     expect(await screen.findByText("Curiosity, received.")).toBeInTheDocument();
     expect(fetch).toHaveBeenCalledWith(
@@ -116,23 +116,23 @@ describe("topic suggestions", () => {
     );
     render(<TopicForm apiUrl="https://api.test" />);
     await userEvent.type(
-      screen.getByLabelText(/what should we explore/i),
+      screen.getByLabelText(/what would you like us to cover/i),
       "A question",
     );
     await solveCaptcha();
     await userEvent.click(
-      screen.getByRole("button", { name: /submit request/i }),
+      screen.getByRole("button", { name: /send article request/i }),
     );
     await waitFor(() =>
       expect(screen.getByRole("alert")).toHaveTextContent(
         /wait before trying/i,
       ),
     );
-    expect(screen.getByLabelText(/what should we explore/i)).toHaveValue(
-      "A question",
-    );
     expect(
-      screen.getByRole("button", { name: /submit request/i }),
+      screen.getByLabelText(/what would you like us to cover/i),
+    ).toHaveValue("A question");
+    expect(
+      screen.getByRole("button", { name: /send article request/i }),
     ).toBeDisabled();
   });
 });

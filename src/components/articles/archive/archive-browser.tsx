@@ -75,8 +75,9 @@ function FloatingArchive({
     let triggerObserver: MutationObserver | undefined;
     let pastAnchor = false;
     let withinResults = true;
+    const desktopViewport = window.matchMedia("(min-width: 761px)");
     const updateFloating = () => {
-      const next = pastAnchor && withinResults;
+      const next = desktopViewport.matches && pastAnchor && withinResults;
       floatingRef.current = next;
       setFloating(next);
     };
@@ -157,6 +158,7 @@ function FloatingArchive({
       boundaryObserver.observe(root);
     };
 
+    desktopViewport.addEventListener("change", updateFloating);
     measure();
     if (triggerSelector) {
       triggerObserver = new MutationObserver(measure);
@@ -190,6 +192,7 @@ function FloatingArchive({
       boundaryObserver?.disconnect();
       resizeObserver?.disconnect();
       triggerObserver?.disconnect();
+      desktopViewport.removeEventListener("change", updateFloating);
       document.removeEventListener("input", syncHeroQuery);
       window.removeEventListener("resize", measure);
     };
@@ -238,7 +241,13 @@ function FloatingArchive({
     )
       return;
     const link = event.target.closest<HTMLAnchorElement>("a[href]");
-    if (!link || link.target || link.hasAttribute("download")) return;
+    if (
+      !link ||
+      link.target ||
+      link.hasAttribute("download") ||
+      link.hasAttribute("data-archive-layout-link")
+    )
+      return;
     const url = new URL(link.href);
     if (url.origin !== location.origin || url.pathname !== path) return;
     event.preventDefault();

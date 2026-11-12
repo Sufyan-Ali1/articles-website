@@ -297,13 +297,16 @@
 }
 .formFooter p {
   display: inline-flex;
-  align-items: center;
-  flex-wrap: wrap;
+  align-items: flex-start;
   gap: 5px;
   font-size: 11px;
   color: #8695ab;
   line-height: 1.5;
   margin: 0;
+}
+.formFooter p > svg {
+  flex-shrink: 0;
+  margin-top: 2px;
 }
 .formFooter a {
   text-decoration: underline;

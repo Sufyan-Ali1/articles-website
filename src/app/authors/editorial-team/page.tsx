@@ -9,7 +9,7 @@ import {
   latestTeamArticles,
 } from "@/lib/content/editorial-team";
 import { metadata as buildMetadata } from "@/lib/seo/metadata";
-import { ArticleCard } from "@/components/articles/article-card";
+import { ArchiveCard } from "@/components/articles/archive/archive-card";
 import styles from "./profile.module.css";
 
 const title = "Ask & Explore Editorial Team | Author Profile & Standards";
@@ -64,38 +64,7 @@ const topics: readonly (readonly [string, string])[] = [
   ],
 ];
 
-const exploreTopics = [
-  [
-    "Technology",
-    "Explore AI tools, software, laptops, digital services, and everyday technology questions.",
-  ],
-  [
-    "Automotive",
-    "Understand vehicle comparisons, ownership costs, maintenance considerations, and car-buying choices.",
-  ],
-  [
-    "Buying Guides",
-    "Compare features, specifications, prices, and practical considerations before purchasing.",
-  ],
-  [
-    "Lifestyle",
-    "Discover ideas for digital wellbeing, focus, daily routines, and everyday productivity.",
-  ],
-  [
-    "Digital Safety",
-    "Learn about account protection, online privacy, scams, and safer digital habits.",
-  ],
-  [
-    "Travel",
-    "Explore flight booking strategies, travel planning, fare comparisons, and practical trip preparation.",
-  ],
-] as const;
-
-async function Topics({
-  items = topics,
-}: {
-  items?: readonly (readonly [string, string])[];
-}) {
+async function Topics() {
   await connection();
   const [categories, types] = await Promise.all([
     getClassifications("categories").catch(() => []),
@@ -103,7 +72,7 @@ async function Topics({
   ]);
   return (
     <ul className={styles.topics}>
-      {items.map(([name, description], index) => {
+      {topics.map(([name, description], index) => {
         const key = name.toLowerCase().replace(/[^a-z0-9]/g, "");
         const matches = (item: {
           name: string;
@@ -154,7 +123,7 @@ async function LatestArticles() {
   return result.length ? (
     <div className={styles.articles}>
       {result.map((article) => (
-        <ArticleCard key={article.id} article={article} headingLevel={3} />
+        <ArchiveCard key={article.id} article={article} headingLevel={3} />
       ))}
     </div>
   ) : (
@@ -178,11 +147,6 @@ export default function EditorialTeamPage() {
           }
         >
           <Topics />
-        </Suspense>
-      }
-      exploreTopics={
-        <Suspense fallback={<p role="status">Loading topics…</p>}>
-          <Topics items={exploreTopics} />
         </Suspense>
       }
       articles={

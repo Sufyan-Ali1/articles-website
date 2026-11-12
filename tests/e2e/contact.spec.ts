@@ -1,5 +1,74 @@
 import { test, expect } from "@playwright/test";
 
+test("contact metadata and connected schema are present in server HTML", async ({
+  page,
+  request,
+}) => {
+  const title = "Contact Us for Questions & Feedback | Ask & Explore";
+  const description =
+    "Contact Ask & Explore about an article, suggest a correction, ask a question, or share a collaboration proposal. Send your message using our contact form.";
+  const response = await request.get("/contact");
+  expect(response.ok()).toBe(true);
+  const html = await response.text();
+  const script = html.match(
+    /<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/,
+  );
+  expect(script).not.toBeNull();
+  const schema = JSON.parse(script![1]);
+  expect(schema["@context"]).toBe("https://schema.org");
+  expect(schema["@graph"]).toHaveLength(21);
+  const graph = schema["@graph"] as {
+    "@id": string;
+    "@type": string;
+    acceptedAnswer?: { text: string };
+  }[];
+  const ids = new Set(graph.map((node) => node["@id"]));
+  expect(ids.size).toBe(graph.length);
+  function checkReferences(value: unknown) {
+    if (!value || typeof value !== "object") return;
+    if (Array.isArray(value)) return value.forEach(checkReferences);
+    const node = value as Record<string, unknown>;
+    if (Object.keys(node).length === 1 && typeof node["@id"] === "string")
+      expect(ids.has(node["@id"])).toBe(true);
+    Object.values(node).forEach(checkReferences);
+  }
+  graph.forEach(checkReferences);
+  expect(graph.find((node) => node["@type"] === "ContactPage")).toMatchObject({
+    "@id": "https://ask-explore.test/contact#webpage",
+    name: title,
+    headline: "Contact Us",
+    description,
+    isAccessibleForFree: true,
+  });
+  await page.goto("/contact?reason=correction");
+  await expect(page).toHaveTitle(title);
+  for (const selector of [
+    'meta[name="description"]',
+    'meta[property="og:description"]',
+    'meta[name="twitter:description"]',
+  ])
+    await expect(page.locator(selector)).toHaveAttribute(
+      "content",
+      description,
+    );
+  await expect(page.locator('script[type="application/ld+json"]')).toHaveCount(
+    1,
+  );
+  for (const node of graph) {
+    const hash = new URL(node["@id"]).hash;
+    if (!["#organization", "#website", "#webpage"].includes(hash))
+      await expect(page.locator(hash)).toHaveCount(1);
+    if (node["@type"] === "Question") {
+      const text = (await page.locator(`${hash} p`).innerText()).replace(
+        /[“”]/g,
+        "",
+      );
+      expect(text).toBe(node.acceptedAnswer!.text);
+    }
+  }
+  await expect(page.locator("#contact-form")).toHaveAttribute("method", "post");
+});
+
 test("contact reference layout keeps the form, information card, FAQs, and complete images aligned", async ({
   page,
 }, testInfo) => {
@@ -22,9 +91,11 @@ test("contact reference layout keeps the form, information card, FAQs, and compl
       .getByRole("radio"),
   ).toHaveCount(3);
   const details = contact.getByRole("complementary", {
-    name: "Find the Right Way to Get in Touch",
+    name: "How to Contact Ask & Explore",
   });
-  const faqs = contact.getByRole("region", { name: "Need a Quick Answer?" });
+  const faqs = contact.getByRole("region", {
+    name: "Common Contact Questions",
+  });
   await expect(faqs.getByRole("article")).toHaveCount(3);
   const newsletter = contact.getByRole("form", {
     name: "Contact page newsletter signup",
@@ -43,6 +114,16 @@ test("contact reference layout keeps the form, information card, FAQs, and compl
       ),
     ).toBe(true);
     const formBox = (await form.boundingBox())!;
+    const subjects = form
+      .getByRole("group", { name: "Subject", exact: true })
+      .locator("label");
+    const firstSubject = (await subjects.first().boundingBox())!;
+    for (const subject of await subjects.all()) {
+      const box = (await subject.boundingBox())!;
+      expect(Math.abs(box.y - firstSubject.y)).toBeLessThan(1);
+      expect(Math.abs(box.width - firstSubject.width)).toBeLessThan(1);
+      expect(box.x + box.width).toBeLessThanOrEqual(formBox.x + formBox.width);
+    }
     const detailsBox = (await details.boundingBox())!;
     if (width > 760) {
       expect(Math.abs(formBox.y - detailsBox.y)).toBeLessThan(1);
@@ -87,9 +168,10 @@ test("contact methods and FAQ links route visitors to the form and article reque
     contact.getByRole("button", { name: "Send message", exact: true }),
   ).toBeEnabled();
   await contact
-    .getByRole("link", { name: "Start a conversation", exact: true })
+    .getByRole("link", { name: "Go to message form", exact: true })
+    .last()
     .click();
-  await expect(page).toHaveURL(/#contact-name$/);
+  await expect(page).toHaveURL(/#contact-message-form$/);
   await expect
     .poll(async () => (await contact.getByLabel(/Your name/).boundingBox())!.y)
     .toBeGreaterThan(60);
@@ -99,8 +181,8 @@ test("contact methods and FAQ links route visitors to the form and article reque
   await expect(page).toHaveURL(/\/privacy$/);
   await page.goto("/contact");
   await page
-    .getByRole("region", { name: "Need a Quick Answer?" })
-    .getByRole("link", { name: "article request form" })
+    .getByRole("region", { name: "Common Contact Questions" })
+    .getByRole("link", { name: "Request an Article" })
     .click();
   await expect(page).toHaveURL(/\/request-article$/);
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();

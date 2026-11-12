@@ -361,9 +361,6 @@
   background: #edf5ff;
   border-radius: 9px;
 }
-.compactToggle {
-  display: none;
-}
 .panel :global(.toc-links) {
   border-left: 1px solid #e2e6ec;
   margin: 0 0 0 5px;
@@ -789,41 +786,9 @@
     width: min(100%, 800px);
     justify-self: center;
   }
-  .panel[data-side="related"] .panelHeading {
-    display: none;
-  }
   .panel[data-side="related"] .panelSurface {
     display: block;
-    padding: 0 20px;
-  }
-  .compactToggle {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    min-height: 58px;
-    padding: 12px 0;
-    border: 0;
-    background: transparent;
-    color: #182439;
-    font-size: 14px;
-    text-align: left;
-  }
-  .compactToggle span {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .panel[data-side="related"] .panelContent,
-  .panel[data-side="related"] .panelExtra {
-    display: none;
-  }
-  .panel[data-side="related"][data-compact-open="true"] .panelContent,
-  .panel[data-side="related"][data-compact-open="true"] .panelExtra {
-    display: block;
-  }
-  .panel[data-compact-open="true"] .compactToggle > svg {
-    transform: rotate(180deg);
+    padding: 20px;
   }
   .relatedList {
     padding-bottom: 20px;

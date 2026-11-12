@@ -45,10 +45,12 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       data-scroll-behavior="smooth"
       className={`${GeistSans.variable} ${GeistMono.variable} ${newsreader.variable}`}
     >
-      <body>
+      {/* Browser extensions can add attributes to these root elements before hydration. */}
+      <body suppressHydrationWarning>
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-RPSXX10VMF"
           strategy="afterInteractive"

@@ -1,4 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
+const appPort = process.env.PLAYWRIGHT_DEV_SERVER === "1" ? 3000 : 3100;
+const appUrl = `http://${process.env.PLAYWRIGHT_DEV_SERVER === "1" ? "localhost" : "127.0.0.1"}:${appPort}`;
 const env = {
   API_USER: "e2e-website",
   API_KEY: "e2e-only-api-key-over-32-characters-long",
@@ -17,7 +19,7 @@ export default defineConfig({
   expect: { timeout: 10000 },
   reporter: [["list"], ["html", { open: "never" }]],
   use: {
-    baseURL: "http://127.0.0.1:3100",
+    baseURL: appUrl,
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
   },
@@ -36,8 +38,10 @@ export default defineConfig({
     },
     {
       command:
-        "npm run build && npm run start -- --hostname 127.0.0.1 --port 3100",
-      url: "http://127.0.0.1:3100",
+        process.env.PLAYWRIGHT_DEV_SERVER === "1"
+          ? "npm run dev -- --hostname 127.0.0.1 --port 3000"
+          : "npm run build && npm run start -- --hostname 127.0.0.1 --port 3100",
+      url: appUrl,
       env,
       timeout: 180000,
       reuseExistingServer: !process.env.CI,
