@@ -49,6 +49,13 @@ export default function RootLayout({
       data-scroll-behavior="smooth"
       className={`${GeistSans.variable} ${GeistMono.variable} ${newsreader.variable}`}
     >
+      <head>
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2063885021384445"
+          crossOrigin="anonymous"
+        />
+      </head>
       {/* Browser extensions can add attributes to these root elements before hydration. */}
       <body suppressHydrationWarning>
         <Script
