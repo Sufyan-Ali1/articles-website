@@ -6,9 +6,11 @@ import {
   getArticles,
   getArticle,
 } from "@/lib/api/client";
+import { cacheLife, cacheTag } from "next/cache";
 import { ArticleSummarySchema, RequestCreateSchema } from "@/lib/api/schemas";
 beforeEach(() => {
   vi.stubEnv("API_BASE_URL", "https://api.test");
+  vi.clearAllMocks();
 });
 afterEach(() => {
   vi.unstubAllEnvs();
@@ -70,7 +72,7 @@ describe("public API boundary", () => {
     vi.stubEnv("API_BASE_URL", "");
     await expect(getArticles()).rejects.toBeInstanceOf(ApiError);
   });
-  it("does not persistently cache article details or accept path traversal", async () => {
+  it("tags public article misses for invalidation and rejects path traversal", async () => {
     const fetch = vi
       .fn()
       .mockResolvedValue(new Response("{}", { status: 404 }));
@@ -78,7 +80,14 @@ describe("public API boundary", () => {
     await expect(getArticle("valid-slug")).rejects.toMatchObject({
       status: 404,
     });
+    // The validated result is cached by use-cache; the raw HTTP response is not.
     expect(fetch.mock.calls[0][1]).toMatchObject({ cache: "no-store" });
+    expect(cacheTag).toHaveBeenCalledWith("articles", "article:valid-slug");
+    expect(cacheLife).toHaveBeenCalledWith({
+      stale: 300,
+      revalidate: 60,
+      expire: 300,
+    });
     fetch.mockClear();
     await expect(getArticle("../admin")).rejects.toMatchObject({ status: 404 });
     expect(fetch).not.toHaveBeenCalled();

@@ -1,6 +1,5 @@
 import { AuthorName } from "@/components/authors/author-name";
 import Link from "next/link";
-import { connection } from "next/server";
 import {
   ArrowRight,
   BookOpen,
@@ -363,7 +362,6 @@ export function HomeCallsToAction() {
 }
 
 export async function HomeContent() {
-  await connection();
   const [
     featuredResult,
     latestResult,

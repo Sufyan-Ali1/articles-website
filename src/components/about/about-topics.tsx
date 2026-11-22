@@ -1,4 +1,3 @@
-import { connection } from "next/server";
 import Link from "next/link";
 import {
   ArrowUpRight,
@@ -138,7 +137,6 @@ export function AboutTopicsFallback() {
 }
 
 export async function AboutTopics() {
-  await connection();
   const [categories, types] = await Promise.all([
     getClassifications("categories").catch(() => []),
     getClassifications("article-types").catch(() => []),

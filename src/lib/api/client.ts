@@ -4,6 +4,7 @@ import "server-only";
 import { cache } from "react";
 import { cacheLife, cacheTag } from "next/cache";
 import { z } from "zod";
+import { articleSlugTag } from "./revalidation";
 import { configuredApiUrl } from "@/lib/security/urls";
 import { readBoundedJson } from "@/lib/security/read-json";
 import {
@@ -110,28 +111,41 @@ async function fetchArticles(filters: ArticleFilters = {}) {
 }
 export async function getArticles(filters: ArticleFilters = {}) {
   "use cache";
-  cacheLife({ stale: 0, revalidate: 60, expire: 120 });
+  cacheLife({ stale: 300, revalidate: 60, expire: 300 });
   cacheTag("articles");
   return fetchArticles(filters);
 }
 export const searchArticles = fetchArticles;
-// React cache shares detail reads between metadata and page only within one render.
+// Cache only public, validated article data. Never read visitor credentials here.
+// Known misses are data because use-cache does not preserve Error prototypes.
+async function getCachedArticle(slug: string) {
+  "use cache";
+  cacheLife({ stale: 300, revalidate: 60, expire: 300 });
+  cacheTag("articles", articleSlugTag(slug));
+  try {
+    const result = await request(
+      `articles/${encodeURIComponent(slug)}`,
+      z.object({ data: ArticleResponseSchema }),
+    );
+    if (!isPublishedArticle(result.data)) return null;
+    cacheTag(`article:${result.data.id}`);
+    return result.data;
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) return null;
+    throw error;
+  }
+}
+// Deduplicate metadata and page reads within a render, including known misses.
 export const getArticle = cache(async (slug: string) => {
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug) || slug.length > 350)
     throw new ApiError(404, "not_found", "Article not found.");
-  const result = await request(
-    `articles/${encodeURIComponent(slug)}`,
-    z.object({ data: ArticleResponseSchema }),
-  );
-  // Public detail routes never render drafts or scheduled articles, even if
-  // an upstream response unexpectedly contains one.
-  if (!isPublishedArticle(result.data))
-    throw new ApiError(404, "not_found", "Article not found.");
-  return result.data;
+  const article = await getCachedArticle(slug);
+  if (!article) throw new ApiError(404, "not_found", "Article not found.");
+  return article;
 });
 async function getCachedClassification(collection: Collection, slug: string) {
   "use cache";
-  cacheLife({ stale: 0, revalidate: 60, expire: 120 });
+  cacheLife({ stale: 300, revalidate: 60, expire: 300 });
   cacheTag(collection);
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug) || slug.length > 180)
     return null;
@@ -167,7 +181,7 @@ export async function getClassifications(
   collection: Collection,
 ): Promise<(CategoryResponse | ClassificationResponse)[]> {
   "use cache";
-  cacheLife({ stale: 0, revalidate: 60, expire: 120 });
+  cacheLife({ stale: 300, revalidate: 60, expire: 300 });
   cacheTag(collection);
   const schema =
     collection === "categories"
@@ -222,7 +236,7 @@ export async function collectPages<T>(
 }
 export async function getSitemapArticles() {
   "use cache";
-  cacheLife({ stale: 0, revalidate: 60, expire: 120 });
+  cacheLife({ stale: 300, revalidate: 60, expire: 300 });
   cacheTag("articles");
   return collectPages((page) => fetchArticles({ page, page_size: 100 }));
 }

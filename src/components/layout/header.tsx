@@ -1,7 +1,6 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import { connection } from "next/server";
 import { getClassifications } from "@/lib/api/client";
 import { HeaderSearch } from "./header-search";
 import { Brand } from "@/components/shared/brand";
@@ -18,7 +17,6 @@ export function Logo() {
 }
 
 async function CategoryLinks() {
-  await connection();
   const categories = await getClassifications("categories")
     .then((items) => items.filter((category) => category.is_active))
     .catch(() => []);

@@ -152,6 +152,7 @@ const articles = topics.map(([title, slug, category, excerpt], i) => ({
   ...dates,
 }));
 let hidden = new Set();
+const titles = new Map();
 let outage = false;
 let detailReads = 0;
 const colors = [
@@ -194,9 +195,14 @@ createServer(async (req, res) => {
   if (url.pathname === "/__control") {
     if (body.hide) hidden.add(body.hide);
     if (body.show) hidden.delete(body.show);
+    if (body.title) {
+      if (body.title.value === null) titles.delete(body.title.slug);
+      else titles.set(body.title.slug, body.title.value);
+    }
     if (typeof body.outage === "boolean") outage = body.outage;
     if (body.reset) {
       hidden = new Set();
+      titles.clear();
       outage = false;
       detailReads = 0;
     }
@@ -245,7 +251,9 @@ createServer(async (req, res) => {
     return json(202, { data: { message: "Thank you for your suggestion." } });
   }
   if (url.pathname === "/api/v1/articles") {
-    let list = articles.filter((a) => !hidden.has(a.slug));
+    let list = articles
+      .filter((a) => !hidden.has(a.slug))
+      .map((a) => ({ ...a, title: titles.get(a.slug) || a.title }));
     const q = url.searchParams;
     if (q.has("search"))
       list = list.filter((a) =>
@@ -294,10 +302,11 @@ createServer(async (req, res) => {
       "draft-reader",
       "scheduled-reader",
     ].includes(slug);
-    const a = readerFixture
+    const original = readerFixture
       ? { ...articles[0], slug, featured_image: null }
       : articles.find((item) => item.slug === slug && !hidden.has(slug));
-    if (!a) return error(404);
+    if (!original) return error(404);
+    const a = { ...original, title: titles.get(slug) || original.title };
     detailReads++;
     return json(200, {
       data: {

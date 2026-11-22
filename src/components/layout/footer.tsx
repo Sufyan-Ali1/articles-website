@@ -1,5 +1,4 @@
 import { Suspense } from "react";
-import { connection } from "next/server";
 import { cacheLife } from "next/cache";
 import Link from "next/link";
 import { ArrowUpRight, BookOpen, Mail, Search } from "lucide-react";
@@ -10,7 +9,6 @@ import { Brand } from "@/components/shared/brand";
 import styles from "./footer.module.css";
 
 async function FooterTopics() {
-  await connection();
   const [categoriesResult, typesResult] = await Promise.allSettled([
     getClassifications("categories"),
     getClassifications("article-types"),

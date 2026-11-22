@@ -73,7 +73,7 @@ describe("homepage section visibility", () => {
     for (const name of [
       "Editor's Picks",
       "Popular articles",
-      "Reviews & Guides",
+      "Buying Guides & Comparisons",
     ]) {
       const section = screen.getByRole("region", { name });
       expect(section).toBeVisible();
@@ -86,7 +86,9 @@ describe("homepage section visibility", () => {
     expect(
       within(editors).queryByText("Editor’s pick", { exact: true }),
     ).not.toBeInTheDocument();
-    expect(within(editors).getByText(/next featured selections/)).toBeVisible();
+    expect(
+      within(editors).getByText(/Explore selected Ask & Explore articles/),
+    ).toBeVisible();
     const popular = screen.getByRole("region", { name: "Popular articles" });
     expect(popular.querySelector("[data-home-story]")).toHaveAttribute(
       "data-home-story",
@@ -107,7 +109,7 @@ describe("homepage section visibility", () => {
     for (const name of [
       "Editor's Picks",
       "Popular articles",
-      "Reviews & Guides",
+      "Buying Guides & Comparisons",
     ]) {
       const section = screen.getByRole("region", { name });
       expect(section).toBeVisible();
@@ -127,7 +129,7 @@ describe("homepage section visibility", () => {
     render(await HomeContent());
     expect(
       screen
-        .getByRole("region", { name: "Reviews & Guides" })
+        .getByRole("region", { name: "Buying Guides & Comparisons" })
         .querySelectorAll("[data-home-story]"),
     ).toHaveLength(3);
   });

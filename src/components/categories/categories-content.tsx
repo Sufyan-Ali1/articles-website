@@ -1,4 +1,3 @@
-import { connection } from "next/server";
 import Link from "next/link";
 import { ArrowRight, BookOpen, WifiOff } from "lucide-react";
 import { getArticles, getClassifications } from "@/lib/api/client";
@@ -38,7 +37,6 @@ export function CategoriesState({
 }
 
 export async function CategoriesContent() {
-  await connection();
   const categories = await getClassifications("categories")
     .then((items) => items.filter((category) => category.is_active))
     .catch(() => null);

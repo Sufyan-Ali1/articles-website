@@ -2,7 +2,6 @@ import { TopicIcon } from "@/components/authors/editorial-profile";
 import { Suspense } from "react";
 import { EditorialProfile } from "@/components/authors/editorial-profile";
 import Link from "next/link";
-import { connection } from "next/server";
 import { getClassifications, getSitemapArticles } from "@/lib/api/client";
 import {
   editorialTeam,
@@ -65,7 +64,6 @@ const topics: readonly (readonly [string, string])[] = [
 ];
 
 async function Topics() {
-  await connection();
   const [categories, types] = await Promise.all([
     getClassifications("categories").catch(() => []),
     getClassifications("article-types").catch(() => []),
@@ -110,7 +108,6 @@ async function Topics() {
 }
 
 async function LatestArticles() {
-  await connection();
   const result = await getSitemapArticles()
     .then(latestTeamArticles)
     .catch(() => null);

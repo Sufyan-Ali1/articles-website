@@ -1,5 +1,4 @@
 import type { MetadataRoute } from "next";
-import { connection } from "next/server";
 import { headers } from "next/headers";
 import {
   getArticles,
@@ -33,7 +32,6 @@ function lastModified(value: string, fallback?: string | null) {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  await connection();
   const localDevelopment =
     process.env.NODE_ENV === "development" && !process.env.CONTEXT;
   // Developers can inspect the XML locally; robots.txt still blocks indexing.

@@ -118,6 +118,19 @@ describe("URLs and security configuration", () => {
     expect(csp).not.toContain("connect-src 'self' https://api.test");
     expect(csp).toContain("upgrade-insecure-requests");
     expect(csp).not.toContain("unsafe-eval");
+    const directives = Object.fromEntries(
+      csp.split("; ").map((part) => {
+        const [name, ...sources] = part.split(" ");
+        return [name, sources];
+      }),
+    );
+    for (const directive of ["script-src", "connect-src", "frame-src"]) {
+      expect(directives[directive]).toContain(
+        "https://*.googlesyndication.com",
+      );
+      expect(directives[directive]).toContain("https://*.doubleclick.net");
+    }
+    expect(csp).not.toContain("nonce-");
     expect(headers["Strict-Transport-Security"]).toBe("max-age=31536000");
     const local = Object.fromEntries(
       securityHeaders({ production: false }).map((h) => [h.key, h.value]),

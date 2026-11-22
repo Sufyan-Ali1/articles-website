@@ -1,10 +1,10 @@
 import { articleMetadata, articleStructuredData } from "@/lib/seo/article";
 import { AuthorName } from "@/components/authors/author-name";
 import { Suspense } from "react";
+import { cacheLife } from "next/cache";
 import Link from "next/link";
-import { connection } from "next/server";
 import { ArrowUpRight } from "lucide-react";
-import { getArticle, apiOrigin } from "@/lib/api/client";
+import { getArticle, getArticles, apiOrigin } from "@/lib/api/client";
 import { orNotFound } from "@/lib/api/not-found";
 import { safeJsonLd } from "@/lib/seo/metadata";
 import { prepareArticle } from "@/lib/utils/article-html";
@@ -27,15 +27,32 @@ import { ReaderActions } from "@/components/articles/reader-actions";
 import { RelatedArticlesPanel } from "@/components/articles/related-articles";
 import { ReaderSkeleton } from "@/components/articles/reader-skeleton";
 import styles from "@/components/articles/reading-layout.module.css";
+// Require complete public HTML, including newly published slugs generated on demand.
+// This validates static eligibility; it does not suppress request-specific APIs.
+export const ensureStatic = "navigation";
+export async function generateStaticParams() {
+  const articles = await getArticles({ page_size: 24 });
+  return articles.data.map(({ slug }) => ({ slug }));
+}
+
 type Props = { params: Promise<{ slug: string }> };
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
+  return cachedMetadata(slug);
+}
+async function cachedMetadata(slug: string) {
+  "use cache";
+  cacheLife({ stale: 300, revalidate: 60, expire: 300 });
   const article = await orNotFound(getArticle(slug));
   return articleMetadata(article);
 }
 async function ArticleContent({ params }: Props) {
-  await connection();
   const { slug } = await params;
+  return <CachedArticleContent slug={slug} />;
+}
+async function CachedArticleContent({ slug }: { slug: string }) {
+  "use cache";
+  cacheLife({ stale: 300, revalidate: 60, expire: 300 });
   const article = await orNotFound(getArticle(slug));
   const schema = articleStructuredData(article);
   const body = prepareArticle(article.content_html, apiOrigin());
