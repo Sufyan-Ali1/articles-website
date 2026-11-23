@@ -13,7 +13,6 @@ const paths = [
   "/privacy",
   "/terms",
   "/disclaimer",
-  "/sitemap.xml",
 ];
 const articles = Object.entries(manifest.routes).filter(
   ([path, route]) =>
@@ -38,6 +37,10 @@ for (const path of [...paths, ...articles.map(([path]) => path)]) {
   );
   assert.equal(route.initialExpireSeconds, 300, `${path}: unexpected expiry`);
 }
+assert(
+  !manifest.routes["/sitemap.xml"],
+  "Sitemap must retain the Netlify request-time workaround",
+);
 for (const path of ["/articles", "/contact", "/search"]) {
   assert.equal(
     manifest.routes[path]?.compute,

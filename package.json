@@ -16,6 +16,7 @@
     "test:e2e": "playwright test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "check:netlify-sitemap": "NODE_ENV=production NETLIFY_DEV=true node --env-file-if-exists=.env.local scripts/check-netlify-sitemap.mjs",
     "check:netlify-cache": "node scripts/check-netlify-cache.mjs",
     "check:rendering": "node scripts/check-rendering.mjs",
     "check:config": "node --env-file-if-exists=.env.local scripts/check-config.mjs"

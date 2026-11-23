@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { connection } from "next/server";
 import { headers } from "next/headers";
 import {
   getArticles,
@@ -32,6 +33,11 @@ function lastModified(value: string, fallback?: string | null) {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  // Netlify's use-cache handler reads Date.now() on a warm lookup. During
+  // static metadata-route regeneration Next treats that as dynamic server
+  // usage and returns 500. Keep only this XML route request-time until the
+  // adapter fixes its clock access; public data caches and HTML ISR stay intact.
+  await connection();
   const localDevelopment =
     process.env.NODE_ENV === "development" && !process.env.CONTEXT;
   // Developers can inspect the XML locally; robots.txt still blocks indexing.
